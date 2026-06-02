@@ -360,6 +360,14 @@ a.course-list-item:hover { background: #e4e7ff; }
 .course-list-name { flex: 1; font-size: 13px; font-weight: 700; color: var(--blue); }
 .course-list-arrow { font-size: 14px; color: var(--blue); }
 .course-list-lock { font-size: 12px; }
+.signout-btn {
+  margin-top: 8px; background: none; border: none;
+  font-family: var(--sans); font-size: 11px; font-weight: 600;
+  color: var(--blue-soft); cursor: pointer; padding: 0;
+  text-decoration: underline; text-underline-offset: 3px;
+  transition: color 0.15s;
+}
+.signout-btn:hover { color: var(--blue); }
 </style>
 </head>
 <body>
@@ -434,6 +442,7 @@ a.course-list-item:hover { background: #e4e7ff; }
           <span class="course-list-lock">🔒</span>
         </div>
       </div>
+      <button class="signout-btn" onclick="signOut()">Sign out</button>
     </div>
 
   </div>
@@ -499,6 +508,16 @@ async function handleSubmit() {
 }
 
 function goToHub() { window.location.href = 'hub.html'; }
+
+function signOut() {
+  localStorage.removeItem('myhq_name');
+  localStorage.removeItem('myhq_email');
+  localStorage.removeItem('myhq_registered_at');
+  document.getElementById('success-panel').classList.remove('visible');
+  document.getElementById('form-panel').style.display = '';
+  document.getElementById('input-username').value = '';
+  document.getElementById('input-password').value = '';
+}
 
 window.addEventListener('DOMContentLoaded', () => {
   const n = localStorage.getItem('myhq_name');
