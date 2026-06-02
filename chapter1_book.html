@@ -2159,7 +2159,7 @@ h2.section-title { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.03em;
           <textarea class="aq-textarea" id="aq5-ans" name="q5" placeholder="Write your answer here…" rows="6" oninput="onAnsInput(5)"></textarea>
         </div>
 
-        <div class="aq-footer">
+        <div class="aq-footer" id="aqFooter">
           <span class="aq-footer-note" id="aqFooterNote">Answer all 5 questions to submit.</span>
           <button class="aq-submit-btn" type="submit" id="aqSubmitBtn" disabled>Submit Answers</button>
         </div>
@@ -2768,6 +2768,7 @@ function submitAssessment(e) {
   for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
     answers['q' + i] = document.getElementById('aq' + i + '-ans').value.trim();
   }
+  localStorage.setItem('myhq_ch1_answers', JSON.stringify(answers));
 
   // Apps Script doesn't return CORS headers on POST, so use no-cors.
   // The request still lands in the sheet; we treat the fire-and-forget as success.
@@ -2779,9 +2780,7 @@ function submitAssessment(e) {
   })
   .then(() => {
     localStorage.setItem('myhq_ch1_submitted', 'true');
-    document.getElementById('aqForm').style.display = 'none';
-    document.getElementById('aqTracker').style.display = 'none';
-    document.getElementById('aqSubmitted').style.display = '';
+    showSubmittedState();
   })
   .catch(err => {
     errEl.textContent = 'Submission failed: ' + err.message + '. Please try again.';
@@ -2792,11 +2791,31 @@ function submitAssessment(e) {
   return false;
 }
 
+function showSubmittedState() {
+  // Make all textareas read-only and styled as submitted
+  for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+    const ta = document.getElementById('aq' + i + '-ans');
+    if (ta) { ta.readOnly = true; ta.style.background = '#F7F8FF'; ta.style.color = '#2A2E4A'; }
+    const status = document.getElementById('aq' + i + '-status');
+    if (status) { status.textContent = '✓ Submitted'; status.classList.add('done'); }
+    const q = document.getElementById('aq' + i);
+    if (q) q.classList.add('is-filled');
+  }
+  // Hide tracker and footer, show confirmation banner
+  document.getElementById('aqTracker').style.display = 'none';
+  document.getElementById('aqFooter') && (document.getElementById('aqFooter').style.display = 'none');
+  document.getElementById('aqSubmitted').style.display = '';
+}
+
 (function initAssessment() {
   if (localStorage.getItem('myhq_ch1_submitted') === 'true') {
-    document.getElementById('aqForm').style.display = 'none';
-    document.getElementById('aqTracker').style.display = 'none';
-    document.getElementById('aqSubmitted').style.display = '';
+    // Restore saved answers so they're visible
+    const saved = JSON.parse(localStorage.getItem('myhq_ch1_answers') || '{}');
+    for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+      const ta = document.getElementById('aq' + i + '-ans');
+      if (ta && saved['q' + i]) ta.value = saved['q' + i];
+    }
+    showSubmittedState();
   }
 })();
 </script>
