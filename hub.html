@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>myHQ — Course Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:      #1A1E9E;
+  --blue-mid:  #4A4FD4;
+  --blue-soft: #7B7FE8;
+  --blue-pale: #C7C9F5;
+  --blue-wash: #F0F0FD;
+  --mint:      #ADDFB3;
+  --mint-dim:  rgba(173,223,179,0.15);
+  --mint-line: rgba(173,223,179,0.45);
+  --white:     #FFFFFF;
+  --border:    rgba(26,30,158,0.1);
+  --border-md: rgba(26,30,158,0.16);
+  --sans:      'Manrope', system-ui, sans-serif;
+  --mono:      'JetBrains Mono', ui-monospace, monospace;
+  --ease:      cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+::selection { background: var(--mint); color: var(--blue); }
+
+body {
+  font-family: var(--sans);
+  background: var(--white);
+  color: var(--blue);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Topbar ── */
+.topbar {
+  height: 56px; padding: 0 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+  background: var(--white);
+}
+.topbar-rule {
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--blue);
+}
+.brand-mark {
+  height: 36px; width: auto;
+  filter: brightness(0) saturate(100%) invert(10%) sepia(90%) saturate(1200%) hue-rotate(225deg);
+}
+.topbar-right { display: flex; align-items: center; gap: 24px; }
+.nav-user {
+  font-family: var(--mono);
+  font-size: 9px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--blue-soft);
+}
+.nav-user strong { color: var(--blue); }
+.nav-signout {
+  font-family: var(--mono);
+  font-size: 9px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--blue-pale);
+  background: none; border: none; cursor: pointer;
+  transition: color 0.18s;
+  padding: 0;
+}
+.nav-signout:hover { color: var(--blue); }
+
+/* ── Progress bar ── */
+.progress-bar {
+  border-bottom: 1px solid var(--border);
+  background: var(--blue-wash);
+}
+.progress-bar-inner {
+  padding: 12px 48px;
+  display: flex; align-items: center; gap: 18px;
+}
+.prog-label {
+  font-family: var(--mono);
+  font-size: 9px; font-weight: 600;
+  letter-spacing: 0.13em; text-transform: uppercase;
+  color: var(--blue-soft); white-space: nowrap;
+}
+.prog-track {
+  flex: 1; height: 3px;
+  background: var(--border);
+  overflow: hidden;
+}
+.prog-fill {
+  height: 100%; background: var(--blue);
+  transition: width 0.8s var(--ease);
+}
+.prog-pct {
+  font-family: var(--mono);
+  font-size: 9px; font-weight: 700;
+  color: var(--blue); min-width: 32px; text-align: right;
+  letter-spacing: 0.06em;
+}
+
+/* ── Page header ── */
+.page-header {
+  padding: 64px 48px 52px;
+  border-bottom: 1px solid var(--border);
+}
+.page-kicker {
+  font-family: var(--mono);
+  font-size: 9px; font-weight: 600;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--blue-soft);
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 20px;
+}
+.page-kicker::before {
+  content: ''; width: 24px; height: 1px; background: var(--blue-pale);
+}
+.page-title {
+  font-size: clamp(2rem, 3vw + 0.5rem, 3rem);
+  font-weight: 800; letter-spacing: -0.04em;
+  color: var(--blue); line-height: 1.04;
+}
+.page-title span { color: var(--blue-pale); }
+
+/* ── Course grid ── */
+.courses-wrap { padding: 48px 48px 64px; }
+.courses-heading {
+  font-family: var(--mono);
+  font-size: 9px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--blue-soft);
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 16px;
+}
+.courses-heading::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.courses-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  border: 1px solid var(--border);
+  background: var(--border);
+}
+
+/* ── Course card ── */
+.course-card {
+  background: var(--white);
+  display: flex; flex-direction: column;
+  position: relative;
+  transition: background 0.18s var(--ease);
+}
+.course-card.locked { background: var(--blue-wash); }
+.course-card.unlocked:hover { background: var(--blue-wash); }
+
+.card-top-bar {
+  height: 2px;
+  background: var(--border);
+}
+.course-card.completed .card-top-bar { background: var(--mint); }
+.course-card.unlocked:not(.completed) .card-top-bar { background: var(--blue); }
+
+.card-inner { padding: 32px 32px 28px; flex: 1; display: flex; flex-direction: column; gap: 24px; }
+
+.card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.card-num {
+  font-family: var(--mono);
+  font-size: 9px; font-weight: 600;
+  letter-spacing: 0.13em; text-transform: uppercase;
+  color: var(--blue-pale); margin-bottom: 6px;
+}
+.card-title {
+  font-size: 1.3rem; font-weight: 800;
+  color: var(--blue); letter-spacing: -0.03em; line-height: 1.1;
+}
+.course-card.locked .card-title { color: var(--blue-pale); }
+
+.badge {
+  flex-shrink: 0;
+  font-family: var(--mono);
+  font-size: 8px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  color: var(--blue-soft);
+  white-space: nowrap;
+}
+.badge-mint {
+  border-color: var(--mint-line);
+  color: #2e7d36;
+  background: var(--mint-dim);
+}
+.badge-blue {
+  border-color: var(--border-md);
+  color: var(--blue-mid);
+  background: var(--blue-wash);
+}
+.badge-locked {
+  border-color: var(--border);
+  color: var(--blue-pale);
+}
+
+/* Progress */
+.card-progress { display: flex; flex-direction: column; gap: 6px; }
+.card-prog-labels { display: flex; justify-content: space-between; }
+.card-prog-label {
+  font-family: var(--mono);
+  font-size: 8.5px; font-weight: 600;
+  color: var(--blue-pale); letter-spacing: 0.1em; text-transform: uppercase;
+}
+.card-prog-pct {
+  font-family: var(--mono);
+  font-size: 8.5px; font-weight: 700;
+  color: var(--blue);
+}
+.card-prog-track { height: 2px; background: var(--border); overflow: hidden; }
+.card-prog-fill {
+  height: 100%; background: var(--blue);
+  transition: width 0.8s var(--ease);
+}
+.course-card.completed .card-prog-fill { background: var(--mint); }
+
+/* CTA */
+.card-cta-wrap { padding: 0 32px 28px; }
+.card-cta {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; padding: 14px;
+  font-family: var(--sans);
+  font-size: 11.5px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  text-decoration: none; border: none; cursor: pointer;
+  transition: background 0.18s var(--ease), color 0.18s;
+}
+.cta-primary { background: var(--blue); color: var(--white); }
+.cta-primary:hover { background: var(--blue-mid); }
+.cta-primary .arrow { transition: transform 0.2s var(--ease); }
+.cta-primary:hover .arrow { transform: translateX(3px); }
+.cta-done {
+  background: var(--mint-dim); color: #2e7d36;
+  border: 1px solid var(--mint-line);
+}
+.cta-done:hover { background: rgba(173,223,179,0.25); }
+.cta-locked { background: var(--blue-wash); color: var(--blue-pale); cursor: not-allowed; }
+
+/* Unlock */
+.unlock-section {
+  padding: 20px 32px 28px;
+  border-top: 1px solid var(--border);
+}
+.unlock-label {
+  font-family: var(--mono);
+  font-size: 8.5px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--blue-soft); margin-bottom: 10px;
+}
+.unlock-row { display: flex; gap: 8px; }
+.unlock-input {
+  flex: 1;
+  font-family: var(--mono);
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 11px 13px;
+  background: var(--white);
+  border: 1px solid var(--border-md);
+  color: var(--blue); outline: none;
+  transition: border-color 0.18s;
+}
+.unlock-input::placeholder { color: var(--blue-pale); font-weight: 400; text-transform: none; }
+.unlock-input:focus { border-color: var(--blue); }
+.unlock-input.error { border-color: var(--blue-mid); animation: shake 0.3s var(--ease); }
+@keyframes shake { 0%,100%{transform:translateX(0)} 30%{transform:translateX(-5px)} 70%{transform:translateX(5px)} }
+.unlock-btn {
+  font-family: var(--sans);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 11px 18px;
+  background: var(--blue); color: var(--white);
+  border: none; cursor: pointer;
+  transition: background 0.18s;
+  white-space: nowrap;
+}
+.unlock-btn:hover { background: var(--blue-mid); }
+.unlock-hint {
+  font-family: var(--mono);
+  font-size: 8.5px; font-weight: 500;
+  color: var(--blue-pale); letter-spacing: 0.06em;
+  margin-top: 8px; line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 760px) {
+  .courses-grid { grid-template-columns: 1fr; }
+  .topbar, .progress-bar-inner, .page-header, .courses-wrap { padding-left: 24px; padding-right: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-rule"></div>
+  <img src="Logo_myHQ.png" alt="myHQ" class="brand-mark">
+  <div class="topbar-right">
+    <div class="nav-user">Logged in as <strong id="nav-username">—</strong></div>
+    <button class="nav-signout" onclick="signOut()">Sign out</button>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar">
+  <div class="progress-bar-inner">
+    <div class="prog-label">Progress</div>
+    <div class="prog-track">
+      <div class="prog-fill" id="overall-fill" style="width:0%"></div>
+    </div>
+    <div class="prog-pct" id="overall-pct">0%</div>
+  </div>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="page-kicker">Course Hub</div>
+  <div class="page-title">Your courses,<br><span>in order.</span></div>
+</div>
+
+<!-- COURSES -->
+<div class="courses-wrap">
+  <div class="courses-heading">Courses</div>
+  <div class="courses-grid">
+
+    <!-- CHAPTER 1 -->
+    <div class="course-card unlocked" id="card-ch1">
+      <div class="card-top-bar"></div>
+      <div class="card-inner">
+        <div class="card-head">
+          <div>
+            <div class="card-num">01</div>
+            <div class="card-title">Where We Play</div>
+          </div>
+          <div class="badge badge-blue" id="status-ch1">Not started</div>
+        </div>
+        <div class="card-progress">
+          <div class="card-prog-labels">
+            <div class="card-prog-label">Progress</div>
+            <div class="card-prog-pct" id="pct-ch1">0%</div>
+          </div>
+          <div class="card-prog-track">
+            <div class="card-prog-fill" id="fill-ch1" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card-cta-wrap">
+        <a class="card-cta cta-primary" href="chapter1_book.html" id="cta-ch1">
+          <span id="cta-ch1-text">Start</span>
+          <span class="arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- CHAPTER 2 -->
+    <div class="course-card locked" id="card-ch2">
+      <div class="card-top-bar"></div>
+      <div class="card-inner">
+        <div class="card-head">
+          <div>
+            <div class="card-num">02</div>
+            <div class="card-title">Who We Are</div>
+          </div>
+          <div class="badge badge-locked" id="status-ch2">Locked</div>
+        </div>
+        <div class="card-progress" id="prog-ch2" style="display:none">
+          <div class="card-prog-labels">
+            <div class="card-prog-label">Progress</div>
+            <div class="card-prog-pct" id="pct-ch2">0%</div>
+          </div>
+          <div class="card-prog-track">
+            <div class="card-prog-fill" id="fill-ch2" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card-cta-wrap" id="footer-ch2">
+        <button class="card-cta cta-locked" disabled>Locked</button>
+      </div>
+      <div class="unlock-section" id="unlock-section-ch2">
+        <div class="unlock-label">Unlock code</div>
+        <div class="unlock-row">
+          <input class="unlock-input" id="code-ch2" type="text" placeholder="Enter code from Chapter 1" maxlength="20" autocomplete="off" spellcheck="false">
+          <button class="unlock-btn" onclick="tryUnlock('ch2')">Unlock</button>
+        </div>
+        <div class="unlock-hint" id="hint-ch2">Complete Chapter 1 to receive your unlock code.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const CODES = { ch2: 'SPARK2016' };
+
+window.addEventListener('DOMContentLoaded', function() {
+  const name = localStorage.getItem('myhq_name');
+  const email = localStorage.getItem('myhq_email');
+  if (!name || !email || !email.endsWith('@myhq.in')) {
+    window.location.href = 'landing.html'; return;
+  }
+  document.getElementById('nav-username').textContent = name.split(' ')[0];
+  updateHub();
+  document.getElementById('code-ch2').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') tryUnlock('ch2');
+  });
+});
+
+function updateHub() {
+  const ch1Progress = parseInt(localStorage.getItem('myhq_ch1_progress') || '0');
+  const ch1Complete = localStorage.getItem('myhq_ch1_complete') === 'true';
+  const ch2Unlocked = localStorage.getItem('myhq_ch2_unlocked') === 'true';
+  const ch2Progress = parseInt(localStorage.getItem('myhq_ch2_progress') || '0');
+  const ch2Complete = localStorage.getItem('myhq_ch2_complete') === 'true';
+
+  // Chapter 1
+  const card1 = document.getElementById('card-ch1');
+  document.getElementById('fill-ch1').style.width = ch1Progress + '%';
+  document.getElementById('pct-ch1').textContent = ch1Progress + '%';
+  const status1 = document.getElementById('status-ch1');
+  const cta1text = document.getElementById('cta-ch1-text');
+  if (ch1Complete) {
+    card1.classList.add('completed');
+    status1.textContent = 'Completed'; status1.className = 'badge badge-mint';
+    cta1text.textContent = 'Review';
+    document.getElementById('cta-ch1').className = 'card-cta cta-done';
+  } else if (ch1Progress > 0) {
+    status1.textContent = 'In progress'; status1.className = 'badge badge-blue';
+    cta1text.textContent = 'Continue';
+  } else {
+    status1.textContent = 'Not started'; status1.className = 'badge badge-blue';
+    cta1text.textContent = 'Start';
+  }
+
+  // Chapter 2
+  const card2 = document.getElementById('card-ch2');
+  const footer2 = document.getElementById('footer-ch2');
+  const unlockSec = document.getElementById('unlock-section-ch2');
+  const status2 = document.getElementById('status-ch2');
+
+  if (ch2Unlocked) {
+    card2.classList.remove('locked'); card2.classList.add('unlocked');
+    document.getElementById('prog-ch2').style.display = '';
+    document.getElementById('fill-ch2').style.width = ch2Progress + '%';
+    document.getElementById('pct-ch2').textContent = ch2Progress + '%';
+    if (ch2Complete) {
+      card2.classList.add('completed');
+      status2.textContent = 'Completed'; status2.className = 'badge badge-mint';
+      footer2.innerHTML = '<a class="card-cta cta-done" href="chapter2.html"><span>Review</span><span class="arrow">→</span></a>';
+    } else {
+      const label = ch2Progress > 0 ? 'In progress' : 'Unlocked';
+      status2.textContent = label; status2.className = 'badge badge-blue';
+      const ctaLabel = ch2Progress > 0 ? 'Continue' : 'Start';
+      footer2.innerHTML = `<a class="card-cta cta-primary" href="chapter2.html"><span>${ctaLabel}</span><span class="arrow">→</span></a>`;
+    }
+    unlockSec.style.display = 'none';
+  } else if (ch1Complete) {
+    document.getElementById('hint-ch2').textContent = 'Find your unlock code at the end of Chapter 1.';
+  }
+
+  // Overall
+  const total = Math.round((ch1Progress + ch2Progress) / 2);
+  document.getElementById('overall-fill').style.width = total + '%';
+  document.getElementById('overall-pct').textContent = total + '%';
+}
+
+function tryUnlock(chapter) {
+  const input = document.getElementById('code-' + chapter);
+  const entered = input.value.trim().toUpperCase();
+  if (entered === CODES[chapter].toUpperCase()) {
+    localStorage.setItem('myhq_' + chapter + '_unlocked', 'true');
+    input.classList.remove('error');
+    updateHub();
+    setTimeout(() => document.getElementById('card-ch2').scrollIntoView({ behavior: 'smooth', block: 'center' }), 200);
+  } else {
+    input.classList.add('error'); input.value = '';
+    input.placeholder = 'Incorrect — try again';
+    setTimeout(() => { input.classList.remove('error'); input.placeholder = 'Enter code from Chapter 1'; }, 2000);
+  }
+}
+
+function signOut() {
+  if (confirm('Sign out?')) {
+    localStorage.removeItem('myhq_name');
+    localStorage.removeItem('myhq_email');
+    localStorage.removeItem('myhq_registered_at');
+    window.location.href = 'landing.html';
+  }
+}
+</script>
+</body>
+</html>

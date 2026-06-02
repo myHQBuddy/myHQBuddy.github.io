@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>myHQ — Sales L&D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:       #1A1E9E;
+  --blue-mid:   #4A4FD4;
+  --blue-soft:  #7B7FE8;
+  --blue-pale:  #C7C9F5;
+  --blue-wash:  #F0F0FD;
+  --white:      #FFFFFF;
+  --border:     rgba(26,30,158,0.12);
+  --border-mid: rgba(26,30,158,0.2);
+  --sans:       'Manrope', system-ui, sans-serif;
+  --mono:       'JetBrains Mono', ui-monospace, monospace;
+  --ease:       cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; overflow: hidden; }
+::selection { background: var(--blue); color: var(--white); }
+
+body {
+  font-family: var(--sans);
+  background: var(--white);
+  color: var(--blue);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Topbar ── */
+.topbar {
+  height: 52px;
+  padding: 0 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  background: var(--white);
+  z-index: 10;
+  flex-shrink: 0;
+}
+.topbar-rule {
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--blue);
+}
+.brand-wordmark {
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--blue);
+}
+.topbar-tag {
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--blue);
+}
+
+/* ── Main layout ── */
+.main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  height: calc(100vh - 52px);
+  overflow: hidden;
+}
+
+/* ── Left panel ── */
+.left {
+  padding: 56px 64px;
+  display: flex; flex-direction: column; justify-content: center;
+  border-right: 1px solid var(--border);
+  background: var(--white);
+  gap: 48px;
+}
+
+.left-content {
+  display: contents;
+}
+
+.headline {
+  font-size: clamp(2.8rem, 4.2vw + 0.5rem, 5rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  color: var(--blue);
+  margin-bottom: 16px;
+}
+.headline-sub {
+  font-size: clamp(2.8rem, 4.2vw + 0.5rem, 5rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+  color: var(--blue-pale);
+}
+
+.courses-heading {
+  font-family: var(--mono);
+  font-size: 9px; font-weight: 600;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--blue-soft);
+  margin-bottom: 12px;
+}
+
+.courses-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+}
+
+.course-card {
+  background: var(--white);
+  display: flex; align-items: stretch;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  transition: background 0.22s var(--ease);
+  cursor: default;
+}
+.course-card:last-child { border-bottom: none; }
+
+.course-card::after {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--blue);
+  transform: scaleY(0); transform-origin: bottom;
+  transition: transform 0.25s var(--ease);
+}
+.course-card:hover { background: var(--blue-wash); }
+.course-card:hover::after { transform: scaleY(1); }
+
+.card-inner {
+  display: flex; align-items: center; gap: 20px;
+  padding: 20px 24px;
+  width: 100%;
+}
+
+.card-num {
+  font-family: var(--mono);
+  font-size: 11px; font-weight: 600;
+  color: var(--blue-pale);
+  letter-spacing: 0.06em;
+  min-width: 32px;
+}
+.card-body { flex: 1; }
+.card-title {
+  font-size: 13px; font-weight: 700;
+  color: var(--blue);
+  letter-spacing: -0.01em;
+}
+.card-desc {
+  font-family: var(--mono);
+  font-size: 9px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--blue-soft);
+  margin-top: 4px;
+}
+.card-arrow {
+  font-size: 14px;
+  color: var(--blue-pale);
+  transition: color 0.2s, transform 0.2s var(--ease);
+}
+.course-card:hover .card-arrow {
+  color: var(--blue);
+  transform: translateX(4px);
+}
+
+/* ── Right panel ── */
+.right {
+  background: var(--blue-wash);
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 36px 40px;
+  border-left: 1px solid var(--border);
+  position: relative;
+  overflow-y: auto;
+}
+
+.form-header { margin-bottom: 18px; }
+.form-label-top {
+  font-family: var(--mono);
+  font-size: 9px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--blue-soft);
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 10px;
+}
+.form-label-top::before {
+  content: ''; width: 14px; height: 1px;
+  background: var(--blue-soft);
+}
+.form-title {
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  color: var(--blue);
+  line-height: 1.08;
+  margin-bottom: 6px;
+}
+.form-desc {
+  font-size: 12px; font-weight: 500;
+  color: var(--blue-soft);
+  line-height: 1.6;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border-mid);
+  margin-bottom: 18px;
+}
+
+/* Fields */
+.field { margin-bottom: 13px; }
+.field-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 8.5px; font-weight: 600;
+  letter-spacing: 0.13em; text-transform: uppercase;
+  color: var(--blue-soft);
+  margin-bottom: 6px;
+}
+.field-input {
+  width: 100%;
+  font-family: var(--sans);
+  font-size: 13px; font-weight: 600;
+  color: var(--blue);
+  padding: 11px 13px;
+  background: var(--white);
+  border: 1px solid var(--border-mid);
+  outline: none;
+  border-radius: 0;
+  appearance: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  letter-spacing: -0.01em;
+}
+.field-input::placeholder { color: var(--blue-pale); font-weight: 500; }
+.field-input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(26,30,158,0.07);
+}
+.field-input.error { border-color: var(--blue-mid); }
+
+.field-error {
+  font-family: var(--mono);
+  font-size: 8.5px; font-weight: 600;
+  color: var(--blue-mid);
+  margin-top: 4px;
+  display: none; align-items: center; gap: 5px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.field-error.visible { display: flex; }
+.field-hint {
+  font-family: var(--mono);
+  font-size: 8.5px; font-weight: 500;
+  color: var(--blue-pale);
+  margin-top: 4px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+/* Course radio */
+.radio-group { display: flex; flex-direction: column; gap: 6px; }
+.radio-option { cursor: pointer; }
+.radio-option input { display: none; }
+.radio-label {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px;
+  background: var(--white);
+  border: 1px solid var(--border-mid);
+  transition: border-color 0.18s, background 0.18s;
+  cursor: pointer;
+}
+.radio-option input:checked + .radio-label {
+  border-color: var(--blue);
+  background: var(--white);
+  box-shadow: inset 3px 0 0 var(--blue);
+}
+.radio-option:hover .radio-label { border-color: var(--blue-mid); }
+.radio-num {
+  font-family: var(--mono);
+  font-size: 9px; font-weight: 600;
+  color: var(--blue-pale);
+  letter-spacing: 0.08em;
+  min-width: 18px;
+}
+.radio-option input:checked + .radio-label .radio-num { color: var(--blue); }
+.radio-text {
+  font-size: 13px; font-weight: 700;
+  color: var(--blue);
+  letter-spacing: -0.01em;
+}
+
+/* Submit */
+.btn-submit {
+  width: 100%; margin-top: 10px;
+  font-family: var(--sans);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--white);
+  background: var(--blue);
+  border: none; padding: 15px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  position: relative;
+  transition: background 0.18s var(--ease), transform 0.1s;
+}
+.btn-submit:hover:not(:disabled) { background: var(--blue-mid); }
+.btn-submit:active:not(:disabled) { transform: scale(0.99); }
+.btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-submit.loading .btn-text { visibility: hidden; }
+.btn-submit.loading::after {
+  content: ''; position: absolute;
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.25);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* API error */
+.api-error {
+  display: none; margin-top: 10px;
+  padding: 11px 13px;
+  border: 1px solid var(--border-mid);
+  border-left: 2px solid var(--blue-mid);
+  font-size: 10px; color: var(--blue-mid);
+  font-weight: 600; line-height: 1.65;
+  letter-spacing: 0.02em;
+  background: var(--white);
+}
+.api-error.visible { display: block; }
+.api-error .link { color: var(--blue); cursor: pointer; text-decoration: underline; }
+
+/* Success */
+.success-panel { display: none; flex-direction: column; gap: 20px; }
+.success-panel.visible { display: flex; }
+.success-check {
+  width: 40px; height: 40px;
+  border: 1.5px solid var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; color: var(--blue);
+}
+.success-title {
+  font-size: 1.7rem; font-weight: 800;
+  color: var(--blue); letter-spacing: -0.03em; line-height: 1.1;
+}
+.success-name { color: var(--blue-mid); }
+.success-body {
+  font-size: 12px; font-weight: 500;
+  color: var(--blue-soft); line-height: 1.65;
+  padding-left: 14px;
+  border-left: 2px solid var(--blue-pale);
+}
+.success-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--sans);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--white); background: var(--blue);
+  border: none; padding: 14px 24px;
+  cursor: pointer;
+  transition: background 0.18s var(--ease);
+}
+.success-btn:hover { background: var(--blue-mid); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-rule"></div>
+  <span class="brand-wordmark">myHQ</span>
+  <span class="topbar-tag">Your Training Buddy</span>
+</div>
+
+<div class="main">
+
+  <!-- LEFT -->
+  <div class="left">
+    <div class="left-content">
+
+      <div class="headline-block">
+        <div class="headline">Build the skills</div>
+        <div class="headline-sub">to close every deal.</div>
+      </div>
+
+      <div class="courses-section">
+        <div class="courses-heading">Available Courses</div>
+        <div class="courses-list">
+          <div class="course-card">
+            <div class="card-inner">
+              <div class="card-num">01</div>
+              <div class="card-body">
+                <div class="card-title">Beginner</div>
+                <div class="card-desc">Foundations of Office Leasing</div>
+              </div>
+              <div class="card-arrow">→</div>
+            </div>
+          </div>
+          <div class="course-card">
+            <div class="card-inner">
+              <div class="card-num">02</div>
+              <div class="card-body">
+                <div class="card-title">Intermediate</div>
+                <div class="card-desc">Deal Structuring & Negotiation</div>
+              </div>
+              <div class="card-arrow">→</div>
+            </div>
+          </div>
+          <div class="course-card">
+            <div class="card-inner">
+              <div class="card-num">03</div>
+              <div class="card-body">
+                <div class="card-title">Advanced</div>
+                <div class="card-desc">Enterprise & GCC Advisory</div>
+              </div>
+              <div class="card-arrow">→</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+
+    <div id="form-panel">
+      <div class="form-header">
+        <div class="form-label-top">Sign In</div>
+        <div class="form-title">Start your<br>training.</div>
+        <div class="form-desc">Use your myHQ work email. Progress is tracked automatically.</div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="input-name">Full Name</label>
+        <input class="field-input" id="input-name" type="text" placeholder="Priya Sharma" autocomplete="name">
+        <div class="field-error" id="err-name">Enter your full name</div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="input-email">Work Email</label>
+        <input class="field-input" id="input-email" type="email" placeholder="you@myhq.in" autocomplete="email">
+        <div class="field-error" id="err-email" style="display:none;">Only @myhq.in addresses</div>
+        <div class="field-hint" id="email-hint">@myhq.in only</div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Select Course</label>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="course" value="Beginner" id="course-beginner">
+            <span class="radio-label">
+              <span class="radio-num">01</span>
+              <span class="radio-text">Beginner</span>
+            </span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="course" value="Intermediate" id="course-intermediate">
+            <span class="radio-label">
+              <span class="radio-num">02</span>
+              <span class="radio-text">Intermediate</span>
+            </span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="course" value="Advanced" id="course-advanced">
+            <span class="radio-label">
+              <span class="radio-num">03</span>
+              <span class="radio-text">Advanced</span>
+            </span>
+          </label>
+        </div>
+        <div class="field-error" id="err-course">Select a course</div>
+      </div>
+
+      <button class="btn-submit" id="submit-btn" onclick="handleSubmit()">
+        <span class="btn-text">Get Started &nbsp;→</span>
+      </button>
+
+      <div class="api-error" id="api-error">
+        Couldn't save your details — you can still continue.
+        <br><br><span class="link" onclick="proceedAnyway()">Continue anyway →</span>
+      </div>
+    </div>
+
+    <div class="success-panel" id="success-panel">
+      <div class="success-check">✓</div>
+      <div class="success-title">Welcome,<br><span class="success-name" id="success-name">—</span>.</div>
+      <div class="success-body">You're in. Your course is ready to begin.</div>
+      <button class="success-btn" onclick="goToHub()">Go to Course Hub &nbsp;→</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbymEPPPIHoXCJG_tMYPa742kXgsHEBnRLEoDFeRgv8WI2KO5nd6Pn7RJ2jRf_b9_fuJWg/exec';
+
+let registeredName = '';
+let registeredEmail = '';
+
+function isMyhqEmail(v) { return v.trim().toLowerCase().endsWith('@myhq.in'); }
+function validName(v) { return v.trim().length >= 2; }
+
+function setError(inputId, errId, show, msg) {
+  const input = document.getElementById(inputId);
+  const err = document.getElementById(errId);
+  if (show) {
+    input.classList.add('error');
+    if (msg) err.textContent = msg;
+    err.style.display = 'flex'; err.classList.add('visible');
+  } else {
+    input.classList.remove('error');
+    err.style.display = 'none'; err.classList.remove('visible');
+  }
+}
+
+document.getElementById('input-name').addEventListener('input', function() {
+  if (this.value.trim().length >= 2) setError('input-name', 'err-name', false);
+});
+
+document.getElementById('input-email').addEventListener('input', function() {
+  const val = this.value.trim().toLowerCase();
+  const hint = document.getElementById('email-hint');
+  if (!val) { setError('input-email', 'err-email', false); hint.style.display = ''; return; }
+  if (val.includes('@') && !val.endsWith('@myhq.in')) {
+    setError('input-email', 'err-email', true, 'Only @myhq.in addresses'); hint.style.display = 'none';
+  } else if (isMyhqEmail(val)) {
+    setError('input-email', 'err-email', false); hint.style.display = 'none';
+  }
+});
+
+document.getElementById('input-email').addEventListener('keydown', e => { if (e.key === 'Enter') handleSubmit(); });
+document.getElementById('input-name').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('input-email').focus(); });
+
+async function handleSubmit() {
+  const name = document.getElementById('input-name').value.trim();
+  const email = document.getElementById('input-email').value.trim().toLowerCase();
+  const courseEl = document.querySelector('input[name="course"]:checked');
+  const course = courseEl ? courseEl.value : '';
+  let valid = true;
+
+  if (!validName(name)) { setError('input-name', 'err-name', true, 'Enter your full name'); valid = false; }
+  if (!email) { setError('input-email', 'err-email', true, 'Enter your work email'); valid = false; }
+  else if (!isMyhqEmail(email)) { setError('input-email', 'err-email', true, 'Only @myhq.in addresses'); valid = false; }
+  if (!course) {
+    const e = document.getElementById('err-course');
+    e.style.display = 'flex'; e.classList.add('visible'); valid = false;
+  } else {
+    const e = document.getElementById('err-course');
+    e.style.display = 'none'; e.classList.remove('visible');
+  }
+  if (!valid) return;
+
+  registeredName = name; registeredEmail = email;
+  const btn = document.getElementById('submit-btn');
+  btn.classList.add('loading'); btn.disabled = true;
+  saveToStorage(name, email, course);
+
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'register', name, email, course })
+    });
+    showSuccess();
+  } catch {
+    btn.classList.remove('loading'); btn.disabled = false;
+    document.getElementById('api-error').classList.add('visible');
+  }
+}
+
+function showSuccess() {
+  document.getElementById('success-name').textContent = registeredName.split(' ')[0];
+  document.getElementById('form-panel').style.display = 'none';
+  document.getElementById('success-panel').classList.add('visible');
+}
+
+function saveToStorage(name, email, course) {
+  localStorage.setItem('myhq_name', name);
+  localStorage.setItem('myhq_email', email);
+  if (course) localStorage.setItem('myhq_course', course);
+  localStorage.setItem('myhq_registered_at', new Date().toISOString());
+  sessionStorage.setItem('myhq_name', name);
+  sessionStorage.setItem('myhq_email', email);
+  if (course) sessionStorage.setItem('myhq_course', course);
+}
+
+function goToHub() { window.location.href = 'hub.html'; }
+
+function proceedAnyway() {
+  const courseEl = document.querySelector('input[name="course"]:checked');
+  saveToStorage(
+    registeredName || document.getElementById('input-name').value.trim(),
+    registeredEmail || document.getElementById('input-email').value.trim().toLowerCase(),
+    courseEl ? courseEl.value : ''
+  );
+  showSuccess();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const n = localStorage.getItem('myhq_name');
+  const e = localStorage.getItem('myhq_email');
+  if (n && e && e.endsWith('@myhq.in')) window.location.href = 'hub.html';
+});
+</script>
+</body>
+</html>
