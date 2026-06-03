@@ -2800,9 +2800,14 @@ function showSubmittedState() {
     const q = document.getElementById('aq' + i);
     if (q) q.classList.add('is-filled');
   }
-  // Hide tracker and footer, show confirmation banner
+  // Hide tracker and footer, show next chapter button
   document.getElementById('aqTracker').style.display = 'none';
-  document.getElementById('aqFooter') && (document.getElementById('aqFooter').style.display = 'none');
+  const footer = document.getElementById('aqFooter');
+  if (footer) {
+    footer.innerHTML = '<a href="hub.html" style="display:inline-flex;align-items:center;gap:10px;background:var(--blue);color:#fff;font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:14px 28px;margin-top:8px;">Next Chapter <span>→</span></a>';
+    footer.style.display = 'flex';
+    footer.style.justifyContent = 'center';
+  }
 }
 
 window.addEventListener('DOMContentLoaded', function initAssessment() {

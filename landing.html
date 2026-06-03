@@ -498,13 +498,14 @@ async function handleSubmit() {
       document.getElementById('form-panel').style.display = 'none';
       document.getElementById('success-panel').classList.add('visible');
     } else {
-      apiError.style.display = '';
+      apiError.textContent = 'Wrong username or password. Please try again.';
+      apiError.classList.add('visible');
       btn.classList.remove('loading'); btn.disabled = false;
       btn.querySelector('.btn-text').textContent = 'Log In  →';
     }
   } catch {
     apiError.textContent = 'Could not connect. Please try again.';
-    apiError.style.display = '';
+    apiError.classList.add('visible');
     btn.classList.remove('loading'); btn.disabled = false;
     btn.querySelector('.btn-text').textContent = 'Log In  →';
   }
