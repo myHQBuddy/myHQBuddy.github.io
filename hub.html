@@ -393,7 +393,6 @@ body {
       <div class="unlock-section" id="unlock-section-ch2">
         <div class="unlock-label" id="unlock-ch2-label">Chapter 2 is locked</div>
         <div class="unlock-hint" id="hint-ch2">Complete Chapter 1 and submit your answers to unlock Chapter 2.</div>
-        <button class="unlock-btn" id="check-approval-btn" onclick="checkApproval()" style="margin-top:12px;display:none;">Check approval status</button>
       </div>
     </div>
 
@@ -401,8 +400,6 @@ body {
 </div>
 
 <script>
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwX0Z5vx6DSwdwZwK26pKZL3V3U9XwEyWgPa9Ek_cFEH1_tpULnWNcn7RlgE-wT8M9M/exec';
-
 window.addEventListener('DOMContentLoaded', function() {
   const name = localStorage.getItem('myhq_name');
   const email = localStorage.getItem('myhq_email');
@@ -411,10 +408,6 @@ window.addEventListener('DOMContentLoaded', function() {
   }
   const firstName = name.split(' ')[0];
   document.getElementById('header-username').textContent = firstName;
-  // Auto-check approval silently on load if answers already submitted
-  if (localStorage.getItem('myhq_ch1_submitted') === 'true' && localStorage.getItem('myhq_ch2_unlocked') !== 'true') {
-    silentCheckApproval();
-  }
   updateHub();
 });
 
@@ -427,8 +420,6 @@ function updateHub() {
 
   // Chapter 1
   const card1 = document.getElementById('card-ch1');
-  document.getElementById('fill-ch1').style.width = ch1Progress + '%';
-  document.getElementById('pct-ch1').textContent = ch1Progress + '%';
   const status1 = document.getElementById('status-ch1');
   const cta1text = document.getElementById('cta-ch1-text');
   if (ch1Complete) {
@@ -452,9 +443,6 @@ function updateHub() {
 
   if (ch2Unlocked) {
     card2.classList.remove('locked'); card2.classList.add('unlocked');
-    document.getElementById('prog-ch2').style.display = '';
-    document.getElementById('fill-ch2').style.width = ch2Progress + '%';
-    document.getElementById('pct-ch2').textContent = ch2Progress + '%';
     if (ch2Complete) {
       card2.classList.add('completed');
       status2.textContent = 'Completed'; status2.className = 'badge badge-mint';
@@ -467,59 +455,8 @@ function updateHub() {
     }
     unlockSec.style.display = 'none';
   } else {
-    const submitted = localStorage.getItem('myhq_ch1_submitted') === 'true';
-    if (submitted) {
-      document.getElementById('hint-ch2').textContent = 'Your Chapter 1 answers are under review. You\'ll be notified once approved.';
-      document.getElementById('check-approval-btn').style.display = '';
-    } else {
-      document.getElementById('hint-ch2').textContent = 'Complete Chapter 1 and submit your answers to unlock Chapter 2.';
-    }
+    document.getElementById('hint-ch2').textContent = 'Complete Chapter 1 and submit your answers to unlock Chapter 2.';
   }
-
-  // Overall
-  const total = Math.round((ch1Progress + ch2Progress) / 2);
-  document.getElementById('overall-fill').style.width = total + '%';
-  document.getElementById('overall-pct').textContent = total + '%';
-}
-
-function silentCheckApproval() {
-  const email = localStorage.getItem('myhq_email');
-  if (!email) return;
-  fetch(SHEET_URL + '?action=check&email=' + encodeURIComponent(email))
-    .then(r => r.json())
-    .then(data => {
-      if (data.approved) {
-        localStorage.setItem('myhq_ch2_unlocked', 'true');
-        updateHub();
-      }
-    })
-    .catch(() => {});
-}
-
-function checkApproval() {
-  const btn = document.getElementById('check-approval-btn');
-  const hint = document.getElementById('hint-ch2');
-  btn.disabled = true;
-  btn.textContent = 'Checking…';
-  const email = localStorage.getItem('myhq_email');
-  fetch(SHEET_URL + '?action=check&email=' + encodeURIComponent(email))
-    .then(r => r.json())
-    .then(data => {
-      if (data.approved) {
-        localStorage.setItem('myhq_ch2_unlocked', 'true');
-        updateHub();
-        document.getElementById('card-ch2').scrollIntoView({ behavior: 'smooth', block: 'center' });
-      } else {
-        hint.textContent = 'Not approved yet — your answers are still under review.';
-        btn.disabled = false;
-        btn.textContent = 'Check approval status';
-      }
-    })
-    .catch(() => {
-      hint.textContent = 'Could not connect. Please try again.';
-      btn.disabled = false;
-      btn.textContent = 'Check approval status';
-    });
 }
 
 function signOut() {

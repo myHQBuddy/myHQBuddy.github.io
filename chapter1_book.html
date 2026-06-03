@@ -2711,18 +2711,24 @@ sections.forEach(s => observer.observe(s));
 /* ── ASSESSMENT ── */
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwX0Z5vx6DSwdwZwK26pKZL3V3U9XwEyWgPa9Ek_cFEH1_tpULnWNcn7RlgE-wT8M9M/exec';
 const TOTAL_QUESTIONS = 5;
+const MIN_WORDS = 5;
+
+function wordCount(str) {
+  return str.trim().split(/\s+/).filter(w => w.length > 0).length;
+}
 
 function onAnsInput(n) {
-  const val = document.getElementById('aq' + n + '-ans').value.trim();
+  const val = document.getElementById('aq' + n + '-ans').value;
+  const wc = wordCount(val);
   const q = document.getElementById('aq' + n);
   const status = document.getElementById('aq' + n + '-status');
-  if (val.length > 0) {
+  if (wc >= MIN_WORDS) {
     q.classList.add('is-filled');
-    status.textContent = '✓ Answered';
+    status.textContent = '✓ ' + wc + ' words';
     status.classList.add('done');
   } else {
     q.classList.remove('is-filled');
-    status.textContent = '';
+    status.textContent = wc > 0 ? wc + ' / ' + MIN_WORDS + ' words min' : '';
     status.classList.remove('done');
   }
   updateTracker();
@@ -2731,7 +2737,7 @@ function onAnsInput(n) {
 function updateTracker() {
   let count = 0;
   for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
-    if (document.getElementById('aq' + i + '-ans').value.trim().length > 0) count++;
+    if (wordCount(document.getElementById('aq' + i + '-ans').value) >= MIN_WORDS) count++;
   }
   document.getElementById('aqTrackerFill').style.width = (count / TOTAL_QUESTIONS * 100) + '%';
   document.getElementById('aqTrackerLabel').textContent = count + ' / ' + TOTAL_QUESTIONS + ' answered';
@@ -2742,7 +2748,7 @@ function updateTracker() {
     note.textContent = 'All questions answered. Ready to submit.';
   } else {
     btn.disabled = true;
-    note.textContent = 'Answer all 5 questions to submit.';
+    note.textContent = 'Answer all 5 questions (min ' + MIN_WORDS + ' words each) to submit.';
   }
 }
 
@@ -2772,6 +2778,7 @@ function submitAssessment(e) {
   })
   .then(() => {
     localStorage.setItem('myhq_ch1_submitted', 'true');
+    localStorage.setItem('myhq_ch2_unlocked', 'true');
     showSubmittedState();
   })
   .catch(err => {
