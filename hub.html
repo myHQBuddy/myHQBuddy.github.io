@@ -132,6 +132,11 @@ body {
   color: var(--blue); line-height: 1.04;
 }
 .page-title span { color: var(--blue-pale); }
+.page-subtitle {
+  font-size: 1rem; font-weight: 500;
+  color: var(--blue-soft); margin-top: 10px;
+  letter-spacing: -0.01em;
+}
 
 /* ── Course grid ── */
 .courses-wrap { padding: 48px 48px 64px; }
@@ -170,9 +175,9 @@ body {
 .course-card.completed .card-top-bar { background: var(--mint); }
 .course-card.unlocked:not(.completed) .card-top-bar { background: var(--blue); }
 
-.card-inner { padding: 32px 32px 28px; flex: 1; display: flex; flex-direction: column; gap: 24px; }
+.card-inner { padding: 32px 32px 28px; flex: 1; display: flex; flex-direction: column; gap: 24px; align-items: center; text-align: center; }
 
-.card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.card-head { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
 .card-num {
   font-family: var(--mono);
   font-size: 9px; font-weight: 600;
@@ -180,7 +185,7 @@ body {
   color: var(--blue-pale); margin-bottom: 6px;
 }
 .card-title {
-  font-size: 1.3rem; font-weight: 800;
+  font-size: 1.8rem; font-weight: 800;
   color: var(--blue); letter-spacing: -0.03em; line-height: 1.1;
 }
 .course-card.locked .card-title { color: var(--blue-pale); }
@@ -319,8 +324,8 @@ body {
 
 <!-- PAGE HEADER -->
 <div class="page-header">
-  <div class="page-kicker">Chapters for Beginners</div>
-  <div class="page-title">Your courses,<br><span>in order.</span></div>
+  <div class="page-title">Hi, <span id="header-username">there</span></div>
+  <div class="page-subtitle">Here are the listed chapters for your course</div>
 </div>
 
 <!-- COURSES -->
@@ -333,10 +338,8 @@ body {
       <div class="card-top-bar"></div>
       <div class="card-inner">
         <div class="card-head">
-          <div>
-            <div class="card-num">Chapter 01</div>
-            <div class="card-title">Where We Play</div>
-          </div>
+          <div class="card-num">Chapter 01</div>
+          <div class="card-title">Where We Play</div>
           <div class="badge badge-blue" id="status-ch1">Not started</div>
         </div>
       </div>
@@ -353,10 +356,8 @@ body {
       <div class="card-top-bar"></div>
       <div class="card-inner">
         <div class="card-head">
-          <div>
-            <div class="card-num">Chapter 02</div>
-            <div class="card-title">Who We Are</div>
-          </div>
+          <div class="card-num">Chapter 02</div>
+          <div class="card-title">Who We Are</div>
           <div class="badge badge-locked" id="status-ch2">Locked</div>
         </div>
       </div>
@@ -382,7 +383,8 @@ window.addEventListener('DOMContentLoaded', function() {
   if (!name || !email) {
     window.location.href = 'landing.html'; return;
   }
-  document.getElementById('nav-username').textContent = name.split(' ')[0];
+  const firstName = name.split(' ')[0];
+  document.getElementById('header-username').textContent = firstName;
   // Auto-check approval silently on load if answers already submitted
   if (localStorage.getItem('myhq_ch1_submitted') === 'true' && localStorage.getItem('myhq_ch2_unlocked') !== 'true') {
     silentCheckApproval();
