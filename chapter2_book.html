@@ -780,6 +780,8 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 .btl-dyk-label::before { content: '?'; width: 18px; height: 18px; background: var(--amber); border-radius: 50%; font-size: 11px; font-weight: 800; color: var(--ink); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .btl-dyk-text { font-size: 13px; color: var(--body); line-height: 1.65; }
 .btl-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.btl-photo { width: 100%; border-radius: var(--radius); overflow: hidden; margin: 10px 0; }
+.btl-photo img { width: 100%; height: auto; display: block; object-fit: cover; }
 
 /* Team cards — book style, always expanded */
 .book-team-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin: 20px 0; }
@@ -893,6 +895,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
           <div class="btl-item">
             <div class="btl-dot"></div>
             <div class="btl-year">2015 · The Spark</div>
+            <div class="btl-photo"><img src="ch2_book_images/spark.jpg" alt="The Spark"></div>
             <div class="btl-title">Two IIT Delhi batchmates. One question. Why can't people work from wherever they want?</div>
             <div class="btl-body">Utkarsh Kawatra (ex-Helion Ventures) and Vinayak Aggarwal (ex-Goldman Sachs) had known each other since IIT Delhi. Years later, stuck in Bangalore traffic together, the same question kept coming up: <em>why can't people work from wherever they actually want?</em> That question is where myHQ came from.</div>
             <div class="btl-dyk">
@@ -905,6 +908,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
           <div class="btl-item">
             <div class="btl-dot"></div>
             <div class="btl-year">2016 · The Move</div>
+            <div class="btl-photo"><img src="ch2_book_images/move.png" alt="The Move"></div>
             <div class="btl-title">A friend's café sat empty every morning. Empty chairs became the first workspace.</div>
             <div class="btl-body">A friend ran a café in Delhi NCR that sat dead every morning — chairs up, tables empty, burning rent before the evening rush. <strong>Utkarsh and Vinayak looked at those empty chairs and saw a workspace.</strong> That's where myHQ actually starts.</div>
             <div class="btl-dyk">
@@ -917,6 +921,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
           <div class="btl-item">
             <div class="btl-dot"></div>
             <div class="btl-year">Apr 2016 · Founded</div>
+            <div class="btl-photo"><img src="ch2_book_images/founded.png" alt="Founded"></div>
             <div class="btl-title">Day pass model. Free WiFi. Discounted menus. No deposit, no commitment.</div>
             <div class="btl-body">Come in, get WiFi, order at a discounted rate, work. No deposit, no monthly commitment. The café that used to sit empty before noon started filling up with freelancers, remote workers, and early founders — confirming the core insight: <strong>idle space is wasted potential.</strong></div>
             <div class="btl-dyk">
@@ -929,6 +934,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
           <div class="btl-item">
             <div class="btl-dot"></div>
             <div class="btl-year">2016–17 · First Legs</div>
+            <div class="btl-photo"><img src="ch2_book_images/first_legs.jpeg" alt="First Legs"></div>
             <div class="btl-title">No ads. Just word of mouth. One café became 20+ venues across Delhi NCR.</div>
             <div class="btl-body">They didn't run ads. People just told other people. One café became two, then five, then 20+ venues across Delhi NCR — Social, Philips MTV, CCD. The concept had legs; now it needed wings.</div>
             <div class="btl-funding">
@@ -947,6 +953,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
           <div class="btl-item">
             <div class="btl-dot"></div>
             <div class="btl-year">2017–18 · Growing Up</div>
+            <div class="btl-photo"><img src="ch2_book_images/growing_up.png" alt="Growing Up"></div>
             <div class="btl-title">Cafés were the start. Coworking was next. The Day Pass is born.</div>
             <div class="btl-body">Cafés could only scale so far. They moved fast: <strong>100+ coworking spaces</strong> listed on the platform in short order. And with that came a new product — <strong>the Day Pass.</strong> Book a day, show up, work, leave. Pay only for what you use.</div>
             <div class="btl-funding">
@@ -983,6 +990,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
           <div class="btl-item">
             <div class="btl-dot"></div>
             <div class="btl-year">2020–21 · The Test</div>
+            <div class="btl-photo"><img src="ch2_book_images/anarock_headline.png" alt="ANAROCK partnership"></div>
             <div class="btl-title">COVID shut everything down. Buyout offers came in. They said no to every one.</div>
             <div class="btl-body">COVID didn't ease them into a tough patch — it just turned the lights off. Multiple buyout offers came in. <strong>The founders said no to every single one.</strong> Then ANAROCK came — not as a rescue, but as the right fit: India's largest CRE advisory, and they wanted myHQ to keep being myHQ.</div>
             <div class="btl-dyk">
@@ -995,6 +1003,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
           <div class="btl-item">
             <div class="btl-dot"></div>
             <div class="btl-year">2021–22 · New Chapter</div>
+            <div class="btl-photo"><img src="ch2_book_images/new_ch.png" alt="New Chapter"></div>
             <div class="btl-title">Three products, properly built. Four cities. A real operation.</div>
             <div class="btl-body">With ANAROCK's backing, the verticals that had been forming for years were now fully live — and the team finally had the infrastructure to scale them properly. The invisible change was <strong>credibility on enterprise calls.</strong> Pre-ANAROCK, myHQ was "a coworking app." Post-ANAROCK, it was "myHQ by ANAROCK" — unlocking deal sizes that weren't reachable before.</div>
             <div class="btl-badges"><span class="tl-badge badge-mint">3 Verticals Live</span><span class="tl-badge badge-teal">4 Cities</span></div>
@@ -1003,6 +1012,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
           <div class="btl-item">
             <div class="btl-dot"></div>
             <div class="btl-year">Today · 2026</div>
+            <div class="btl-photo"><img src="ch2_book_images/today.jpeg" alt="Today"></div>
             <div class="btl-title">India's fastest growing CRE platform. And they're just getting started.</div>
             <div class="btl-body">From a friend's café with empty chairs to India's fastest-growing CRE platform. Same mission. Completely different scale. myHQ is now taking the model global through <strong>myhqspaces.com</strong> — same operator-agnostic advisory, new geographies.</div>
             <div class="btl-badges"><span class="tl-badge badge-teal">Today</span><span class="tl-badge badge-mint">Going Global</span></div>
