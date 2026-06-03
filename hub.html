@@ -166,7 +166,7 @@ body {
   transition: background 0.18s var(--ease);
 }
 .course-card.locked { background: var(--blue-wash); }
-.course-card.unlocked:hover { background: var(--blue-wash); }
+.course-card.unlocked:not(.has-backdrop):hover { background: var(--blue-wash); }
 
 .card-top-bar {
   height: 2px;
@@ -177,7 +177,32 @@ body {
 
 .card-inner { padding: 20px 32px 16px; flex: 1; display: flex; flex-direction: column; gap: 10px; align-items: center; text-align: center; }
 
+/* Backdrop card variant */
+.card-backdrop {
+  position: relative;
+  min-height: 220px;
+  background-size: cover; background-position: center;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 24px 28px 20px;
+}
+.card-backdrop::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.55) 100%);
+  pointer-events: none;
+}
+.card-backdrop .card-num,
+.card-backdrop .card-title,
+.card-backdrop .badge { position: relative; z-index: 1; }
+.card-backdrop .card-num {
+  color: var(--blue-soft);
+  margin-bottom: 4px;
+}
+.card-backdrop .card-title { color: var(--blue); }
+
 .card-head { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
+.card-backdrop .card-head { align-items: flex-start; gap: 6px; }
+
 .card-num {
   font-family: var(--mono);
   font-size: 9px; font-weight: 600;
@@ -236,7 +261,7 @@ body {
 .course-card.completed .card-prog-fill { background: var(--mint); }
 
 /* CTA */
-.card-cta-wrap { padding: 0 32px 28px; }
+.card-cta-wrap { padding: 0; }
 .card-cta {
   display: flex; align-items: center; justify-content: center; gap: 10px;
   width: 100%; padding: 14px;
@@ -334,9 +359,9 @@ body {
   <div class="courses-grid">
 
     <!-- CHAPTER 1 -->
-    <div class="course-card unlocked" id="card-ch1">
+    <div class="course-card unlocked has-backdrop" id="card-ch1">
       <div class="card-top-bar"></div>
-      <div class="card-inner">
+      <div class="card-backdrop" style="background-image:url('ch1_book_images/where_we_play_backdrop.png')">
         <div class="card-head">
           <div class="card-num">Chapter 01</div>
           <div class="card-title">Where We Play</div>
