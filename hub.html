@@ -137,7 +137,7 @@ body {
 .courses-wrap { padding: 48px 48px 64px; }
 .courses-heading {
   font-family: var(--mono);
-  font-size: 9px; font-weight: 600;
+  font-size: 18px; font-weight: 600;
   letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--blue-soft);
   margin-bottom: 20px;
@@ -311,21 +311,11 @@ body {
   <div class="topbar-rule"></div>
   <img src="logo_landing_hub/myHQ_logo_landing.png" alt="myHQ" class="brand-mark">
   <div class="topbar-right">
-    <div class="nav-user">Logged in as <strong id="nav-username">—</strong></div>
-    <a onclick="window.location.href='https://krrishmyhq.github.io/chapter1/landing.html'" style="cursor:pointer;font-size:13px;font-weight:600;color:#1A1E9E;text-decoration:none;">&#128218; Courses</a>
+    <div class="nav-user">Beginner Course</div>
+    <a onclick="window.location.href='https://krrishmyhq.github.io/chapter1/landing.html'" style="cursor:pointer;font-size:13px;font-weight:600;color:#1A1E9E;text-decoration:none;">Courses</a>
   </div>
 </div>
 
-<!-- PROGRESS -->
-<div class="progress-bar">
-  <div class="progress-bar-inner">
-    <div class="prog-label">Progress</div>
-    <div class="prog-track">
-      <div class="prog-fill" id="overall-fill" style="width:0%"></div>
-    </div>
-    <div class="prog-pct" id="overall-pct">0%</div>
-  </div>
-</div>
 
 <!-- PAGE HEADER -->
 <div class="page-header">
@@ -335,7 +325,7 @@ body {
 
 <!-- COURSES -->
 <div class="courses-wrap">
-  <div class="courses-heading">Courses</div>
+  <div class="courses-heading">Chapters</div>
   <div class="courses-grid">
 
     <!-- CHAPTER 1 -->
@@ -344,19 +334,10 @@ body {
       <div class="card-inner">
         <div class="card-head">
           <div>
-            <div class="card-num">01</div>
+            <div class="card-num">Chapter 01</div>
             <div class="card-title">Where We Play</div>
           </div>
           <div class="badge badge-blue" id="status-ch1">Not started</div>
-        </div>
-        <div class="card-progress">
-          <div class="card-prog-labels">
-            <div class="card-prog-label">Progress</div>
-            <div class="card-prog-pct" id="pct-ch1">0%</div>
-          </div>
-          <div class="card-prog-track">
-            <div class="card-prog-fill" id="fill-ch1" style="width:0%"></div>
-          </div>
         </div>
       </div>
       <div class="card-cta-wrap">
@@ -373,19 +354,10 @@ body {
       <div class="card-inner">
         <div class="card-head">
           <div>
-            <div class="card-num">02</div>
+            <div class="card-num">Chapter 02</div>
             <div class="card-title">Who We Are</div>
           </div>
           <div class="badge badge-locked" id="status-ch2">Locked</div>
-        </div>
-        <div class="card-progress" id="prog-ch2" style="display:none">
-          <div class="card-prog-labels">
-            <div class="card-prog-label">Progress</div>
-            <div class="card-prog-pct" id="pct-ch2">0%</div>
-          </div>
-          <div class="card-prog-track">
-            <div class="card-prog-fill" id="fill-ch2" style="width:0%"></div>
-          </div>
         </div>
       </div>
       <div class="card-cta-wrap" id="footer-ch2">
