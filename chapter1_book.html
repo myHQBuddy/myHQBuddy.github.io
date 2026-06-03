@@ -2805,9 +2805,8 @@ function showSubmittedState() {
   document.getElementById('aqFooter') && (document.getElementById('aqFooter').style.display = 'none');
 }
 
-(function initAssessment() {
+window.addEventListener('DOMContentLoaded', function initAssessment() {
   if (localStorage.getItem('myhq_ch1_submitted') === 'true') {
-    // Restore saved answers so they're visible
     const saved = JSON.parse(localStorage.getItem('myhq_ch1_answers') || '{}');
     for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
       const ta = document.getElementById('aq' + i + '-ans');
@@ -2815,7 +2814,7 @@ function showSubmittedState() {
     }
     showSubmittedState();
   }
-})();
+});
 </script>
 </body>
 </html>
