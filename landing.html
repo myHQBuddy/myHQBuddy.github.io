@@ -420,9 +420,7 @@ a.course-list-item:hover { background: #e4e7ff; }
         <span class="btn-text">Log In &nbsp;→</span>
       </button>
 
-      <div class="api-error" id="api-error" style="display:none;">
-        Wrong username or password. Please try again.
-      </div>
+      <div class="api-error" id="api-error"></div>
     </div>
 
     <div class="success-panel" id="success-panel">
@@ -474,7 +472,7 @@ async function handleSubmit() {
   const username = document.getElementById('input-username').value.trim();
   const password = document.getElementById('input-password').value.trim();
   const apiError = document.getElementById('api-error');
-  apiError.style.display = 'none';
+  apiError.classList.remove('visible');
 
   let valid = true;
   if (!username) { setFieldError('input-username', 'err-username', true, 'Enter your username'); valid = false; }
