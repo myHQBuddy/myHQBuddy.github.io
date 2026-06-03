@@ -408,7 +408,8 @@ window.addEventListener('DOMContentLoaded', function() {
   const firstName = name.split(' ')[0];
   document.getElementById('header-username').textContent = firstName;
   const course = localStorage.getItem('myhq_course') || 'Beginner Course';
-  document.getElementById('nav-course').textContent = course;
+  const courseShort = course.split(' ')[0];
+  document.getElementById('nav-course').textContent = courseShort;
   document.getElementById('subtitle-course').textContent = course;
   updateHub();
 });
