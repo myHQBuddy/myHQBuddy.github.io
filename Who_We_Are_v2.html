@@ -259,9 +259,9 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 .s7-stat-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 2px; width: 32px; text-align: center; }
 .s7-stat-num { font-size: 1.15rem; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 2px; }
 .s7-stat-lbl { font-size: 12px; color: var(--body); line-height: 1.4; font-weight: 500; }
-.s7-img-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; flex: 1; min-height: 0; }
-.s7-img-panel { border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 0; }
-.s7-img-panel img { width: 100%; height: 100%; display: block; object-fit: fill; }
+.s7-img-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex: 1; min-height: 0; }
+.s7-img-panel { border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; display: flex; align-items: stretch; justify-content: center; min-height: 0; }
+.s7-img-panel img { width: 100%; height: 100%; display: block; object-fit: cover; }
 
 /* ── SCREEN 8: AMBITION ── */
 .screen-ambition { background: var(--white); display: flex; flex-direction: column; justify-content: center; align-items: stretch; padding: clamp(28px,4vw,52px) clamp(32px,6vw,72px) 72px; gap: 20px; }
