@@ -185,7 +185,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 .s4-offices strong { color: var(--muted); font-weight: 400; }
 
 /* ── SCREEN 5: TEAM ── */
-.screen-team { background: var(--white); display: flex; flex-direction: column; justify-content: center; padding: clamp(16px,2vw,28px) clamp(32px,6vw,80px) 72px; gap: 12px; overflow: hidden; height: 100%; box-sizing: border-box; }
+.screen-team { background: var(--white); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: clamp(16px,2vw,28px) clamp(32px,6vw,80px) 72px; gap: 16px; overflow: hidden; height: 100%; box-sizing: border-box; }
 .s5t-header { text-align: center; }
 .s5t-eyebrow { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 6px; }
 .s5t-title { font-size: clamp(1.2rem,2vw,1.6rem); font-weight: 800; letter-spacing: -0.03em; color: var(--ink); }
@@ -214,8 +214,9 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 .s5t-card--founder .s5t-re { color: rgba(255,255,255,0.8); }
 
 /* ── NEW TEAM LAYOUT (matching image) ── */
-.s5t-two-panel { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; width: 100%; flex: 1; min-height: 0; overflow: hidden; }
-.s5t-panel { border: 1.5px solid var(--blue); border-radius: 12px; padding: 0; background: var(--white); overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 0; }
+.s5t-two-panel { display: flex; align-items: flex-start; gap: 16px; width: 100%; }
+.s5t-panel { border: 1.5px solid var(--blue); border-radius: 12px; padding: 0; background: var(--white); overflow: hidden; display: inline-flex; }
+.s5t-panel img { display: block; width: 100%; height: auto; max-height: 75vh; object-fit: contain; }
 .s5t-panel-label { font-size: 12px; font-weight: 700; font-style: italic; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-bottom: 16px; }
 .s5t-people-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .s5t-person { display: flex; align-items: flex-start; gap: 12px; }
@@ -599,10 +600,10 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
     </div>
     <div class="s5t-two-panel">
       <div class="s5t-panel">
-        <img src="ch2_book_images/leadership.png" alt="Leadership Team" style="width:100%;height:100%;object-fit:contain;display:block;">
+        <img src="ch2_book_images/leadership.png" alt="Leadership Team">
       </div>
       <div class="s5t-panel">
-        <img src="ch2_book_images/background.png" alt="Their Background" style="width:100%;height:100%;object-fit:contain;display:block;">
+        <img src="ch2_book_images/background.png" alt="Their Background">
       </div>
     </div>
     <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
