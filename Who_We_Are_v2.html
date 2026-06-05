@@ -676,7 +676,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
     .org-chart { width:100%; max-width:100%; display:flex; flex-direction:column; align-items:center; font-family:var(--sans); }
 
     /* root */
-    .oc-root { background:var(--blue); color:#fff; font-size:14px; font-weight:800; padding:8px 28px; border-radius:8px; letter-spacing:-0.01em; }
+    .oc-root { background:var(--blue); color:#fff; font-size:18px; font-weight:800; padding:10px 32px; border-radius:8px; letter-spacing:-0.01em; }
 
     /* stems */
     .oc-stem { width:1px; background:rgba(30,34,170,0.3); height:18px; }
@@ -690,7 +690,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
     .oc-col { flex:1; display:flex; flex-direction:column; align-items:center; padding:0 12px; }
 
     /* section headers */
-    .oc-section { font-size:12px; font-weight:700; padding:7px 16px; border-radius:6px; text-align:center; letter-spacing:0.03em; }
+    .oc-section { font-size:15px; font-weight:700; padding:9px 20px; border-radius:6px; text-align:center; letter-spacing:0.03em; }
     .oc-section--biz { border:1.5px solid var(--blue); color:var(--blue); }
     .oc-section--fn  { border:1.5px solid rgba(30,34,170,0.5); color:var(--blue); }
 
@@ -705,7 +705,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
     .oc-vbox { display:flex; gap:10px; align-items:stretch; border:1.5px dashed rgba(30,34,170,0.45); border-radius:10px; padding:10px 12px; width:95%; }
     .oc-vnode { white-space:nowrap; }
     /* vertical nodes (AM / OnDemand / VO) */
-    .oc-vnode { border:1.5px solid var(--blue); color:var(--blue); font-size:11px; font-weight:600; padding:8px 10px; border-radius:8px; text-align:center; flex:1; display:flex; align-items:center; justify-content:center; min-height:48px; }
+    .oc-vnode { border:1.5px solid var(--blue); color:var(--blue); font-size:14px; font-weight:600; padding:10px 12px; border-radius:8px; text-align:center; flex:1; display:flex; align-items:center; justify-content:center; min-height:52px; }
 
     /* fn-hierarchy: mirrors oc-hierarchy */
     .oc-fn-hierarchy { display:flex; flex-direction:column; align-items:flex-start; border-left:2px solid rgba(30,34,170,0.3); padding-top:14px; padding-bottom:0; gap:0; width:fit-content; min-width:200px; }
@@ -713,7 +713,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
     .oc-fn-row::before { content:''; display:block; width:20px; height:1.5px; background:rgba(30,34,170,0.3); flex-shrink:0; }
     .oc-fn-row .oc-fnnode { margin-left:6px; }
     /* function nodes — fixed width so all boxes are same size */
-    .oc-fnnode { background:rgba(30,34,170,0.12); border:1.5px solid rgba(30,34,170,0.3); color:var(--blue); font-size:11px; font-weight:700; padding:8px 0; border-radius:20px; margin-left:6px; width:160px; text-align:center; }
+    .oc-fnnode { background:rgba(30,34,170,0.12); border:1.5px solid rgba(30,34,170,0.3); color:var(--blue); font-size:14px; font-weight:700; padding:10px 0; border-radius:20px; margin-left:6px; width:190px; text-align:center; }
 
     /* hierarchy with arrows — centered under dashed box */
     /* hierarchy wrapper — aligns border column and L-row at same left edge */
@@ -731,14 +731,14 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
     .oc-l-curve { position:absolute; left:0; top:0; height:50%; width:22px; border-left:2px solid rgba(30,34,170,0.3); border-bottom:1.5px solid rgba(30,34,170,0.3); border-bottom-left-radius:7px; background:transparent; display:block; }
     /* fn variant — positioned at vertical line center */
     .oc-l-curve--fn { left:calc(50% - 2px); }
-    .oc-hnode { font-size:11px; font-weight:700; padding:10px 16px; border-radius:20px; white-space:nowrap; }
+    .oc-hnode { font-size:14px; font-weight:700; padding:12px 18px; border-radius:20px; white-space:nowrap; }
     .oc-hnode { text-align:center; }
-    .oc-hnode--1 { background:var(--blue); color:#fff; width:240px; }
-    .oc-hnode--2 { background:rgba(30,34,170,0.7); color:#fff; width:200px; }
-    .oc-hnode--3 { background:rgba(30,34,170,0.45); color:#fff; width:170px; }
-    .oc-hnode--4 { background:rgba(30,34,170,0.25); color:var(--blue); width:150px; }
-    .oc-hnode--5 { background:rgba(30,34,170,0.1); color:var(--blue); width:120px; }
-    .oc-fn-desc { font-size:10px; color:var(--muted); line-height:1.4; max-width:180px; padding-left:10px; }
+    .oc-hnode--1 { background:var(--blue); color:#fff; width:280px; }
+    .oc-hnode--2 { background:rgba(30,34,170,0.7); color:#fff; width:240px; }
+    .oc-hnode--3 { background:rgba(30,34,170,0.45); color:#fff; width:210px; }
+    .oc-hnode--4 { background:rgba(30,34,170,0.25); color:var(--blue); width:180px; }
+    .oc-hnode--5 { background:rgba(30,34,170,0.1); color:var(--blue); width:150px; }
+    .oc-fn-desc { font-size:13px; color:var(--muted); line-height:1.4; max-width:220px; padding-left:12px; }
     </style>
     <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
   </div>
