@@ -260,9 +260,9 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 .s7-stat-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 2px; width: 32px; text-align: center; }
 .s7-stat-num { font-size: 1.15rem; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 2px; }
 .s7-stat-lbl { font-size: 12px; color: var(--body); line-height: 1.4; font-weight: 500; }
-.s7-img-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; flex: 1; min-height: 0; }
-.s7-img-panel { border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 0; }
-.s7-img-panel img { width: 100%; display: block; object-fit: contain; }
+.s7-img-row { display: flex; align-items: flex-start; gap: 16px; width: 100%; }
+.s7-img-panel { border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; display: inline-flex; }
+.s7-img-panel img { width: 100%; height: auto; max-height: 38vh; display: block; object-fit: contain; }
 
 /* ── SCREEN 8: AMBITION ── */
 .screen-ambition { background: var(--white); display: flex; flex-direction: column; justify-content: center; align-items: stretch; padding: clamp(28px,4vw,52px) clamp(32px,6vw,72px) 72px; gap: 20px; }
@@ -797,10 +797,10 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 
     <div class="s7-img-row">
       <div class="s7-img-panel">
-        <img src="ch2_book_images/clientele.png" alt="Our Esteemed Clientele" id="img-clientele" style="width:100%;display:block;object-fit:contain;background:#fff;min-height:80px;">
+        <img src="ch2_book_images/clientele.png" alt="Our Esteemed Clientele" id="img-clientele">
       </div>
       <div class="s7-img-panel">
-        <img src="ch2_book_images/supply_partners.png" alt="Our Space Partners" id="img-partners" style="width:100%;display:block;object-fit:contain;background:#fff;min-height:80px;">
+        <img src="ch2_book_images/supply_partners.png" alt="Our Space Partners" id="img-partners">
       </div>
     </div>
 
