@@ -120,7 +120,7 @@ function doGet(e) {
         var rowEmail = String(ch1Data[r][2]).toLowerCase().trim();
         if (users[rowEmail]) {
           users[rowEmail].ch1 = true;
-          users[rowEmail].ch1_submitted_at = ch1Data[r][0] ? new Date(ch1Data[r][0]).toISOString() : null;
+          users[rowEmail].ch1_submitted_at = ch1Data[r][0] ? String(ch1Data[r][0]) : null;
         }
       }
     }
@@ -132,7 +132,7 @@ function doGet(e) {
         var rowEmail = String(ch2Data[r][2]).toLowerCase().trim();
         if (users[rowEmail]) {
           users[rowEmail].ch2 = true;
-          users[rowEmail].ch2_submitted_at = ch2Data[r][0] ? new Date(ch2Data[r][0]).toISOString() : null;
+          users[rowEmail].ch2_submitted_at = ch2Data[r][0] ? String(ch2Data[r][0]) : null;
         }
       }
     }
@@ -162,7 +162,7 @@ function doPost(e) {
     }
 
     var row = [
-      data.timestamp || new Date().toISOString(),
+      data.timestamp || nowIST(),
       data.name || '—',
       data.email || '—',
       data.q1 || '',
@@ -186,7 +186,7 @@ function doPost(e) {
           break;
         }
       }
-      var now = new Date().toISOString();
+      var now = nowIST();
       if (userRow > 0) {
         if (sheetName === 'Chapter 1 Responses') {
           progressSheet.getRange(userRow, 5).setValue('Submitted'); // Ch1 Status
@@ -204,11 +204,18 @@ function doPost(e) {
   }
 }
 
+function nowIST() {
+  var now = new Date();
+  // IST is UTC+5:30
+  var ist = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+  return Utilities.formatDate(ist, 'Asia/Kolkata', 'dd MMM yyyy, hh:mm a');
+}
+
 function upsertUserProgress(ss, email, name, course) {
   var sheet = getOrCreateProgressSheet(ss);
   var data = sheet.getDataRange().getValues();
   var emailLower = String(email).toLowerCase().trim();
-  var now = new Date().toISOString();
+  var now = nowIST();
 
   for (var i = 1; i < data.length; i++) {
     if (String(data[i][0]).toLowerCase().trim() === emailLower) {
