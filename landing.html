@@ -504,12 +504,16 @@ async function handleSubmit() {
         const progRes = await fetch(APPS_SCRIPT_URL + '?action=getProgress&email=' + encodeURIComponent(data.email));
         const prog = await progRes.json();
         if (prog.found) {
-          const prefix = prog.chapter === 'Chapter 2' ? 'myhq_ch2' : 'myhq_ch1';
-          localStorage.setItem(prefix + '_answers', JSON.stringify(prog.answers));
-          localStorage.setItem(prefix + '_submitted', 'true');
-          localStorage.setItem(prefix + '_complete', 'true');
-          if (prog.chapter === 'Chapter 1') {
+          if (prog.ch1) {
+            localStorage.setItem('myhq_ch1_answers', JSON.stringify(prog.ch1));
+            localStorage.setItem('myhq_ch1_submitted', 'true');
+            localStorage.setItem('myhq_ch1_complete', 'true');
             localStorage.setItem('myhq_ch2_unlocked', 'true');
+          }
+          if (prog.ch2) {
+            localStorage.setItem('myhq_ch2_answers', JSON.stringify(prog.ch2));
+            localStorage.setItem('myhq_ch2_submitted', 'true');
+            localStorage.setItem('myhq_ch2_complete', 'true');
           }
         }
       } catch (_) { /* non-fatal — progress restore fails silently */ }

@@ -43,47 +43,44 @@ function doGet(e) {
     }
 
     var ss = SpreadsheetApp.getActiveSpreadsheet();
-
-    var ch2Sheet = ss.getSheetByName('Chapter 2 Responses');
-    if (ch2Sheet) {
-      var ch2Data = ch2Sheet.getDataRange().getValues();
-      for (var i = ch2Data.length - 1; i >= 1; i--) {
-        if (String(ch2Data[i][2]).toLowerCase() === String(email).toLowerCase()) {
-          return ContentService.createTextOutput(JSON.stringify({
-            found: true,
-            chapter: 'Chapter 2',
-            answers: {
-              q1: ch2Data[i][3] || '',
-              q2: ch2Data[i][4] || '',
-              q3: ch2Data[i][5] || '',
-              q4: ch2Data[i][6] || ''
-            }
-          })).setMimeType(ContentService.MimeType.JSON);
-        }
-      }
-    }
+    var result = { found: false, ch1: null, ch2: null };
 
     var ch1Sheet = ss.getSheetByName('Chapter 1 Responses');
     if (ch1Sheet) {
       var ch1Data = ch1Sheet.getDataRange().getValues();
       for (var j = ch1Data.length - 1; j >= 1; j--) {
         if (String(ch1Data[j][2]).toLowerCase() === String(email).toLowerCase()) {
-          return ContentService.createTextOutput(JSON.stringify({
-            found: true,
-            chapter: 'Chapter 1',
-            answers: {
-              q1: ch1Data[j][3] || '',
-              q2: ch1Data[j][4] || '',
-              q3: ch1Data[j][5] || '',
-              q4: ch1Data[j][6] || '',
-              q5: ch1Data[j][7] || ''
-            }
-          })).setMimeType(ContentService.MimeType.JSON);
+          result.found = true;
+          result.ch1 = {
+            q1: ch1Data[j][3] || '',
+            q2: ch1Data[j][4] || '',
+            q3: ch1Data[j][5] || '',
+            q4: ch1Data[j][6] || '',
+            q5: ch1Data[j][7] || ''
+          };
+          break;
         }
       }
     }
 
-    return ContentService.createTextOutput(JSON.stringify({ found: false }))
+    var ch2Sheet = ss.getSheetByName('Chapter 2 Responses');
+    if (ch2Sheet) {
+      var ch2Data = ch2Sheet.getDataRange().getValues();
+      for (var i = ch2Data.length - 1; i >= 1; i--) {
+        if (String(ch2Data[i][2]).toLowerCase() === String(email).toLowerCase()) {
+          result.found = true;
+          result.ch2 = {
+            q1: ch2Data[i][3] || '',
+            q2: ch2Data[i][4] || '',
+            q3: ch2Data[i][5] || '',
+            q4: ch2Data[i][6] || ''
+          };
+          break;
+        }
+      }
+    }
+
+    return ContentService.createTextOutput(JSON.stringify(result))
       .setMimeType(ContentService.MimeType.JSON);
   }
 
