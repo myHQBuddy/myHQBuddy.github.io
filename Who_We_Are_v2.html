@@ -2351,7 +2351,7 @@ function goTo(index) {
   dots[current].classList.add('active');
   updateCounter();
   const keyHint = document.getElementById('keyHint'); if (keyHint) keyHint.classList.add('hidden');
-  if (current === 7) requestAnimationFrame(scaleS7Canvas);
+  if (current === 7) setTimeout(scaleS7Canvas, 0);
   setTimeout(() => animating = false, 520);
 }
 
@@ -2524,14 +2524,12 @@ window.addEventListener('DOMContentLoaded', function initAssessment() {
 
 function scaleS7Canvas() {
   const canvas = document.getElementById('s7-canvas');
-  const scr = document.getElementById('screen-scale');
-  if (!canvas || !scr) return;
-  const sw = scr.clientWidth;
-  const sh = scr.clientHeight;
-  if (!sw || !sh) return;
-  const scale = Math.min(sw / 1440, sh / 860);
+  if (!canvas) return;
+  const sw = window.innerWidth;
+  const availH = window.innerHeight - 52;
+  const scale = Math.min(sw / 1440, availH / 860);
   const tx = (sw - 1440 * scale) / 2;
-  const ty = (sh - 860 * scale) / 2;
+  const ty = (availH - 860 * scale) / 2;
   canvas.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + scale + ')';
 }
 window.addEventListener('resize', function() {
