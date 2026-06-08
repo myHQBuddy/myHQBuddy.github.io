@@ -537,10 +537,14 @@ function signOut() {
   localStorage.removeItem('myhq_name');
   localStorage.removeItem('myhq_email');
   localStorage.removeItem('myhq_registered_at');
+  localStorage.removeItem('myhq_course');
   document.getElementById('success-panel').classList.remove('visible');
   document.getElementById('form-panel').style.display = '';
   document.getElementById('input-username').value = '';
   document.getElementById('input-password').value = '';
+  const btn = document.getElementById('submit-btn');
+  btn.classList.remove('loading'); btn.disabled = false;
+  btn.querySelector('.btn-text').textContent = 'Log In  →';
 }
 
 function unlockCourseCards(course) {
