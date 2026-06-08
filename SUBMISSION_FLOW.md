@@ -106,16 +106,30 @@ This means **adding a new chapter requires zero changes to the Apps Script**. Ju
 To add a new chapter (e.g. "How We Win") with a different completion type (e.g. video watched):
 
 1. Create the chapter HTML file
-2. On completion, send a POST with:
-```json
-{
-  "chapter": "Chapter 3",
-  "chapterName": "How We Win",
-  "status": "Video Watched",
-  "name": "...",
-  "email": "..."
-}
+2. Find the `fetch` POST call in the HTML file — it's the place where the user's answers are sent on submit. It looks like this:
+
+```javascript
+fetch(SHEET_URL, {
+  method: 'POST',
+  mode: 'no-cors',
+  headers: { 'Content-Type': 'text/plain' },
+  body: JSON.stringify({
+    chapter: 'Chapter 3',
+    chapterName: 'How We Win',   // human-readable name → becomes the column header in the sheet
+    status: 'Video Watched',      // what "done" means for this chapter
+    name: name,
+    email: email,
+    timestamp: new Date().toISOString()
+  })
+})
 ```
+
+Set `chapterName` to the chapter's title and `status` to whatever completion type applies:
+- Text answers → `"Completed"`
+- Video watched → `"Video Watched"`
+- Recording uploaded → `"Recording Uploaded"`
+- Any other custom value works too
+
 3. The Apps Script will automatically create `How We Win Status` and `How We Win Submitted At` columns in `User Progress`
 4. No changes needed to `Code.gs`
 
