@@ -45,7 +45,8 @@ function doGet(e) {
         upsertUserProgress(ss, email, name, course);
 
         var result = { found: false, ch1: null, ch2: null };
-        var ch1Sheet = ss.getSheetByName('Chapter 1 Responses');
+
+        var ch1Sheet = ss.getSheetByName('Where We Play Responses') || ss.getSheetByName('Chapter 1 Responses');
         if (ch1Sheet) {
           var ch1Data = ch1Sheet.getDataRange().getValues();
           for (var j = ch1Data.length - 1; j >= 1; j--) {
@@ -56,7 +57,8 @@ function doGet(e) {
             }
           }
         }
-        var ch2Sheet = ss.getSheetByName('Chapter 2 Responses');
+
+        var ch2Sheet = ss.getSheetByName('Who We Are Responses') || ss.getSheetByName('Chapter 2 Responses');
         if (ch2Sheet) {
           var ch2Data = ch2Sheet.getDataRange().getValues();
           for (var k = ch2Data.length - 1; k >= 1; k--) {
@@ -85,7 +87,7 @@ function doGet(e) {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var result = { found: false, ch1: null, ch2: null };
 
-    var ch1Sheet = ss.getSheetByName('Chapter 1 Responses');
+    var ch1Sheet = ss.getSheetByName('Where We Play Responses') || ss.getSheetByName('Chapter 1 Responses');
     if (ch1Sheet) {
       var ch1Data = ch1Sheet.getDataRange().getValues();
       for (var j = ch1Data.length - 1; j >= 1; j--) {
@@ -96,7 +98,8 @@ function doGet(e) {
         }
       }
     }
-    var ch2Sheet = ss.getSheetByName('Chapter 2 Responses');
+
+    var ch2Sheet = ss.getSheetByName('Who We Are Responses') || ss.getSheetByName('Chapter 2 Responses');
     if (ch2Sheet) {
       var ch2Data = ch2Sheet.getDataRange().getValues();
       for (var i = ch2Data.length - 1; i >= 1; i--) {
@@ -107,6 +110,7 @@ function doGet(e) {
         }
       }
     }
+
     return ContentService.createTextOutput(JSON.stringify(result))
       .setMimeType(ContentService.MimeType.JSON);
   }
@@ -131,7 +135,8 @@ function doGet(e) {
         ch2: false, ch2_submitted_at: null
       };
     }
-    var ch1Sheet = ss.getSheetByName('Chapter 1 Responses');
+
+    var ch1Sheet = ss.getSheetByName('Where We Play Responses') || ss.getSheetByName('Chapter 1 Responses');
     if (ch1Sheet) {
       var ch1Data = ch1Sheet.getDataRange().getValues();
       for (var r = 1; r < ch1Data.length; r++) {
@@ -142,7 +147,8 @@ function doGet(e) {
         }
       }
     }
-    var ch2Sheet = ss.getSheetByName('Chapter 2 Responses');
+
+    var ch2Sheet = ss.getSheetByName('Who We Are Responses') || ss.getSheetByName('Chapter 2 Responses');
     if (ch2Sheet) {
       var ch2Data = ch2Sheet.getDataRange().getValues();
       for (var r = 1; r < ch2Data.length; r++) {
@@ -153,6 +159,7 @@ function doGet(e) {
         }
       }
     }
+
     return ContentService.createTextOutput(JSON.stringify({ success: true, users: users }))
       .setMimeType(ContentService.MimeType.JSON);
   }
@@ -165,26 +172,29 @@ function doPost(e) {
     var data = JSON.parse(e.postData.contents);
     var ss = SpreadsheetApp.getActiveSpreadsheet();
 
-    var sheetName = data.chapter === 'Chapter 2' ? 'Chapter 2 Responses' : 'Chapter 1 Responses';
+    // Sheet name is always "[chapterName] Responses" — created automatically if it doesn't exist
+    var chapterName = data.chapterName || data.chapter || 'Unknown Chapter';
+    var sheetName = chapterName + ' Responses';
+
     var sheet = ss.getSheetByName(sheetName);
     if (!sheet) {
       sheet = ss.insertSheet(sheetName);
-      if (sheetName === 'Chapter 2 Responses') {
-        sheet.appendRow(['Timestamp', 'Name', 'Email', 'Q1', 'Q2', 'Q3', 'Q4']);
-      } else {
-        sheet.appendRow(['Timestamp', 'Name', 'Email', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5']);
-      }
+      // Generic header — enough columns for up to 10 questions
+      sheet.appendRow(['Timestamp', 'Name', 'Email', 'Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10']);
     }
 
+    // Build answer row — include all q1–q10 fields if present
     var row = [
       data.timestamp || nowIST(),
       data.name || '—',
       data.email || '—',
-      data.q1 || '', data.q2 || '', data.q3 || '', data.q4 || ''
+      data.q1 || '', data.q2 || '', data.q3 || '', data.q4 || '',
+      data.q5 || '', data.q6 || '', data.q7 || '', data.q8 || '',
+      data.q9 || '', data.q10 || ''
     ];
-    if (sheetName === 'Chapter 1 Responses') row.push(data.q5 || '');
     sheet.appendRow(row);
 
+    // Update User Progress sheet
     if (data.email && data.email !== '—') {
       var progressSheet = getOrCreateProgressSheet(ss);
       var emailLower = String(data.email).toLowerCase().trim();
@@ -199,7 +209,6 @@ function doPost(e) {
       }
 
       if (userRow > 0) {
-        var chapterName = data.chapterName || (sheetName === 'Chapter 2 Responses' ? 'Who We Are' : 'Where We Play');
         var completionStatus = data.status || 'Completed';
         var statusCol = findOrCreateChapterColumns(progressSheet, chapterName);
         progressSheet.getRange(userRow, statusCol).setValue(completionStatus);
@@ -237,6 +246,7 @@ function findOrCreateChapterColumns(sheet, chapterName) {
     }
   }
 
+  // Not found — create new columns
   var newCol = lastCol + 1;
   sheet.getRange(1, newCol).setValue(statusHeader);
   sheet.getRange(1, newCol + 1).setValue(chapterName + ' Submitted At');
@@ -259,7 +269,7 @@ function upsertUserProgress(ss, email, name, course) {
       return;
     }
   }
-  // New user — fixed columns only; chapter columns added dynamically on submission
+  // New user — fixed columns only; chapter columns added dynamically on first submission
   sheet.appendRow([email, name, course, now]);
 }
 
