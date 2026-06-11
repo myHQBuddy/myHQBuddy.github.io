@@ -272,7 +272,10 @@ body { font-family: var(--sans); background: var(--blue-wash); color: var(--blue
 
     <!-- All users list -->
     <div class="card">
-      <div class="card-title">All Users</div>
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>All Users</span>
+        <span id="users-count" style="font-family:var(--mono);font-size:9px;font-weight:600;color:var(--blue-pale);letter-spacing:0.08em;"></span>
+      </div>
       <table class="users-table">
         <thead>
           <tr>
@@ -281,6 +284,15 @@ body { font-family: var(--sans); background: var(--blue-wash); color: var(--blue
         </thead>
         <tbody id="users-tbody"></tbody>
       </table>
+      <!-- Collapsed footer -->
+      <div id="users-footer" style="display:none;padding:12px 0 0;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);margin-top:8px;">
+        <button id="show-all-btn" onclick="toggleShowAll()" style="background:none;border:none;font-family:var(--mono);font-size:9px;font-weight:700;color:var(--blue);cursor:pointer;letter-spacing:0.08em;text-transform:uppercase;padding:0;text-decoration:underline;"></button>
+        <div id="pagination-controls" style="display:none;align-items:center;gap:8px;">
+          <button onclick="changePage(-1)" style="background:none;border:1px solid var(--border);font-family:var(--mono);font-size:9px;font-weight:700;color:var(--blue-soft);cursor:pointer;padding:4px 10px;letter-spacing:0.06em;">← Prev</button>
+          <span id="page-indicator" style="font-family:var(--mono);font-size:9px;font-weight:600;color:var(--blue-soft);letter-spacing:0.06em;"></span>
+          <button onclick="changePage(1)" style="background:none;border:1px solid var(--border);font-family:var(--mono);font-size:9px;font-weight:700;color:var(--blue-soft);cursor:pointer;padding:4px 10px;letter-spacing:0.06em;">Next →</button>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -527,22 +539,83 @@ async function toggleChapter(chId, pill) {
 }
 
 /* ── All users table ── */
+const PAGE_SIZE    = 8;
+const COLLAPSED    = 8;
+let allUsersData   = [];
+let currentPage    = 1;
+let isExpanded     = false;
+
 async function loadAllUsers() {
   const snap = await db.collection('users').orderBy('lastLogin', 'desc').get();
-  const tbody = document.getElementById('users-tbody');
-  tbody.innerHTML = snap.docs.map(doc => {
-    const d = doc.data();
+  allUsersData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  document.getElementById('users-count').textContent = allUsersData.length + ' users';
+  currentPage = 1;
+  isExpanded  = false;
+  renderUsersTable();
+}
+
+function renderUsersTable() {
+  const tbody    = document.getElementById('users-tbody');
+  const footer   = document.getElementById('users-footer');
+  const showBtn  = document.getElementById('show-all-btn');
+  const pagCtrl  = document.getElementById('pagination-controls');
+  const pageInd  = document.getElementById('page-indicator');
+  const total    = allUsersData.length;
+
+  let rows;
+  if (!isExpanded) {
+    // Collapsed: show first COLLAPSED rows only
+    rows = allUsersData.slice(0, COLLAPSED);
+  } else {
+    // Expanded + paginated
+    const start = (currentPage - 1) * PAGE_SIZE;
+    rows = allUsersData.slice(start, start + PAGE_SIZE);
+  }
+
+  tbody.innerHTML = rows.map(d => {
     const ll = d.lastLogin ? new Date(d.lastLogin.seconds * 1000).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '—';
     const badge = d.masterAdmin
       ? '<span class="badge-master">Master Admin</span>'
       : d.isAdmin ? '<span class="badge-admin">Admin</span>' : '';
-    return `<tr onclick="loadUserResultById('${doc.id}')">
+    return `<tr onclick="loadUserResultById('${d.id}')">
       <td>${d.name || '—'}</td>
       <td style="font-family:var(--mono);font-size:11px;">${d.email || '—'}</td>
       <td style="font-family:var(--mono);font-size:11px;">${ll}</td>
       <td>${badge}</td>
     </tr>`;
   }).join('');
+
+  // Footer visibility
+  if (total <= COLLAPSED) {
+    footer.style.display = 'none';
+    return;
+  }
+  footer.style.display = 'flex';
+
+  if (!isExpanded) {
+    showBtn.textContent = `Show all ${total} users ↓`;
+    pagCtrl.style.display = 'none';
+  } else {
+    const totalPages = Math.ceil(total / PAGE_SIZE);
+    showBtn.textContent = 'Show less ↑';
+    pagCtrl.style.display = 'flex';
+    pageInd.textContent = `Page ${currentPage} of ${totalPages}`;
+    // Disable prev/next at boundaries
+    pagCtrl.querySelectorAll('button')[0].disabled = currentPage === 1;
+    pagCtrl.querySelectorAll('button')[1].disabled = currentPage === totalPages;
+  }
+}
+
+function toggleShowAll() {
+  isExpanded  = !isExpanded;
+  currentPage = 1;
+  renderUsersTable();
+}
+
+function changePage(dir) {
+  const totalPages = Math.ceil(allUsersData.length / PAGE_SIZE);
+  currentPage = Math.max(1, Math.min(totalPages, currentPage + dir));
+  renderUsersTable();
 }
 
 async function loadUserResultById(uid) {
