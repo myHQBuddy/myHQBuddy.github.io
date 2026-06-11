@@ -810,7 +810,6 @@ async function loadChapter(chId, btn) {
   const rawDraft = draftSnap.exists ? draftSnap.data() : {};
 
   // Seed Firestore with defaults for any field not yet written
-  const def = CHAPTER_DEFS[chId];
   const allFields = [...def.slideFields, ...def.contentFields, ...def.assessFields];
   const missing = {};
   allFields.forEach(f => {
