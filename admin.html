@@ -216,6 +216,25 @@ body { font-family: var(--sans); background: var(--blue-wash); color: var(--blue
   font-size: 11px; color: var(--blue-mid); font-family: var(--mono);
   margin-top: 10px; min-height: 18px; letter-spacing: 0.04em;
 }
+.diff-row {
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+  display: grid; grid-template-columns: 120px 1fr 1fr auto; gap: 12px; align-items: start;
+}
+.diff-row:last-child { border-bottom: none; }
+.diff-field-label { font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue-soft); padding-top: 4px; }
+.diff-old { font-size: 12px; color: #c62828; background: #fff5f5; padding: 6px 10px; border-left: 3px solid #f44336; line-height: 1.5; }
+.diff-new { font-size: 12px; color: #2e7d32; background: #f1f8f1; padding: 6px 10px; border-left: 3px solid #4caf50; line-height: 1.5; }
+.diff-same { font-size: 12px; color: var(--blue-soft); padding: 6px 10px; font-style: italic; grid-column: 2 / 4; }
+.diff-actions { display: flex; flex-direction: column; gap: 6px; }
+.diff-accept { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 10px; background: #e6f9e9; color: #2e7d32; border: 1px solid #BEE5C2; cursor: pointer; }
+.diff-reject { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 10px; background: #fff5f5; color: #c62828; border: 1px solid #ffcdd2; cursor: pointer; }
+.chapter-pill {
+  padding: 8px 16px; font-size: 12px; font-weight: 700;
+  border: 1.5px solid var(--border); background: var(--white);
+  color: var(--blue-soft); cursor: pointer; transition: all 0.15s;
+}
+.chapter-pill.active { background: var(--blue); color: var(--white); border-color: var(--blue); }
+.chapter-pill:disabled { opacity: 0.4; cursor: default; }
 </style>
 </head>
 <body>
@@ -299,17 +318,45 @@ body { font-family: var(--sans); background: var(--blue-wash); color: var(--blue
 
   <!-- TAB 2: EDIT CHAPTER -->
   <div class="tab-panel" id="tab-edit">
+
+    <!-- Step 1: Course picker -->
     <div class="card">
-      <div class="card-title">Edit Chapter Content</div>
-      <select class="chapter-select" id="chapter-select" onchange="loadChapter(this.value)">
-        <option value="ch1">Where We Play</option>
-        <option value="ch2">Who We Are</option>
-      </select>
-      <div class="draft-indicator" id="draft-indicator"></div>
-      <div id="edit-fields"></div>
-      <div id="sync-area"></div>
-      <div class="sync-msg" id="sync-msg"></div>
+      <div class="card-title">Select Course</div>
+      <div class="course-pills" id="edit-course-pills">
+        <button class="course-pill active" onclick="selectEditCourse('beginner', this)">01 Beginner</button>
+        <button class="course-pill" onclick="selectEditCourse('intermediate', this)">02 Intermediate</button>
+        <button class="course-pill" onclick="selectEditCourse('advanced', this)">03 Advanced</button>
+      </div>
     </div>
+
+    <!-- Step 2: Chapter picker -->
+    <div class="card" id="edit-chapter-card">
+      <div class="card-title">Select Chapter</div>
+      <div id="edit-chapter-pills" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+    </div>
+
+    <!-- Step 3: Editor -->
+    <div class="card" id="edit-editor-card" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div class="card-title" style="margin-bottom:0;" id="edit-chapter-label"></div>
+        <div class="draft-indicator" id="draft-indicator"></div>
+      </div>
+      <div id="edit-fields"></div>
+
+      <!-- MasterAdmin diff review -->
+      <div id="diff-area" style="display:none;margin-top:24px;">
+        <div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--blue-soft);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);">Changes vs Live</div>
+        <div id="diff-rows"></div>
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button class="sync-btn" onclick="acceptAllChanges()" style="background:#2e7d32;">Accept All &amp; Push Live →</button>
+          <button onclick="rejectAllChanges()" style="padding:12px 20px;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:none;color:#c62828;border:1px solid #c62828;cursor:pointer;">Reject All</button>
+        </div>
+        <div class="sync-msg" id="sync-msg"></div>
+      </div>
+
+      <div id="sync-area" style="margin-top:16px;"></div>
+    </div>
+
   </div>
 
 </div>
@@ -326,16 +373,22 @@ let isMasterAdmin  = false;
 const CHAPTER_DEFS = {
   ch1: {
     label: 'Where We Play',
+    course: 'beginner',
     fields: [
-      { id: 'slide-1-headline', label: 'Slide 1 Headline', default: 'Where We Play' },
-      { id: 'slide-1-sub',      label: 'Slide 1 Subtitle', default: "India's $1 trillion commercial real estate market" }
+      { id: 'slide-1-headline', label: 'Chapter Title',        placeholder: 'e.g. Where We Play',                              default: 'Where We Play' },
+      { id: 'slide-1-sub',      label: 'Slide 1 Tagline',      placeholder: "e.g. India's $1 trillion real estate market",     default: "Where We Play: India's $1 trillion real estate market." },
+      { id: 'slide-2-title',    label: 'Slide 2 Title',        placeholder: 'e.g. Real Estate: Two Worlds',                    default: 'Real Estate: Two Worlds' },
+      { id: 'slide-2-sub',      label: 'Slide 2 Subtitle',     placeholder: 'e.g. Residential vs Commercial',                  default: 'Residential: Emotion and aspiration.  ||  Commercial: Economics and growth.' }
     ]
   },
   ch2: {
     label: 'Who We Are',
+    course: 'beginner',
     fields: [
-      { id: 'slide-1-headline', label: 'Slide 1 Headline', default: 'Who We Are' },
-      { id: 'slide-1-sub',      label: 'Slide 1 Subtitle', default: 'Before you start, let\'s know the story and journey of myHQ.' }
+      { id: 'slide-1-headline', label: 'Chapter Title',        placeholder: 'e.g. Who We Are',                                  default: 'Who We Are' },
+      { id: 'slide-1-sub',      label: 'Intro Subtitle',       placeholder: "e.g. Before you start...",                        default: "Before you start, let's know the story and journey of myHQ." },
+      { id: 'slide-2-headline', label: 'Phase 1 Headline',     placeholder: 'e.g. From underutilised real estate...',           default: 'From underutilised real estate to productive workspaces.' },
+      { id: 'slide-2-eyebrow',  label: 'Phase 1 Eyebrow',      placeholder: 'e.g. Phase 1 · 2015–2017',                        default: 'Phase 1 · 2015 – 2017' }
     ]
   }
 };
@@ -395,7 +448,7 @@ auth.onAuthStateChanged(async function(user) {
   if (!data.isAdmin && !data.masterAdmin) { window.location.href = 'hub.html'; return; }
   isMasterAdmin = !!data.masterAdmin;
   loadAllUsers();
-  loadChapter('ch1');
+  renderChapterPills();
 });
 
 /* ── Tabs ── */
@@ -627,37 +680,78 @@ async function loadUserResultById(uid) {
   }
 }
 
-/* ── Edit chapter ── */
-let debounceTimer = null;
-let currentChapterId = 'ch1';
+/* ── Edit chapter tab ── */
+let debounceTimer    = null;
+let currentChapterId = null;
+let currentEditCourse = 'beginner';
+let liveData         = {};
+let draftData        = {};
+let fieldAccepted    = {};
 
-async function loadChapter(chId) {
+function selectEditCourse(course, btn) {
+  currentEditCourse = course;
+  document.querySelectorAll('#edit-course-pills .course-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderChapterPills();
+  document.getElementById('edit-editor-card').style.display = 'none';
+}
+
+function renderChapterPills() {
+  const pillsEl = document.getElementById('edit-chapter-pills');
+  const groups  = COURSES[currentEditCourse] || [];
+  const available = groups.flatMap(g => g.chapters.filter(c => c.available));
+  if (available.length === 0) {
+    pillsEl.innerHTML = '<span style="font-size:12px;color:var(--blue-soft);">No chapters available yet.</span>';
+    return;
+  }
+  pillsEl.innerHTML = available.map(ch =>
+    `<button class="chapter-pill" onclick="loadChapter('${ch.id}', this)">${ch.name}</button>`
+  ).join('');
+}
+
+async function loadChapter(chId, btn) {
   currentChapterId = chId;
+  document.querySelectorAll('.chapter-pill').forEach(p => p.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
   const def = CHAPTER_DEFS[chId];
-  const fields = document.getElementById('edit-fields');
+  if (!def) return;
+  document.getElementById('edit-chapter-label').textContent = def.label;
   document.getElementById('draft-indicator').textContent = '';
   document.getElementById('sync-msg').textContent = '';
+  document.getElementById('diff-area').style.display = 'none';
+  document.getElementById('edit-editor-card').style.display = '';
+  fieldAccepted = {};
 
-  let values = {};
-  const draftSnap = await db.collection('content-drafts').doc(chId).get();
-  if (draftSnap.exists) {
-    values = draftSnap.data();
-  } else {
-    const liveSnap = await db.collection('content').doc(chId).get();
-    if (liveSnap.exists) values = liveSnap.data();
-  }
+  // Load live + draft in parallel
+  const [liveSnap, draftSnap] = await Promise.all([
+    db.collection('content').doc(chId).get(),
+    db.collection('content-drafts').doc(chId).get()
+  ]);
+  liveData  = liveSnap.exists  ? liveSnap.data()  : {};
+  draftData = draftSnap.exists ? draftSnap.data() : {};
 
-  fields.innerHTML = def.fields.map(f => `
+  // Use draft values if exist, else live, else default
+  const values = {};
+  def.fields.forEach(f => {
+    values[f.id] = draftData[f.id] !== undefined ? draftData[f.id]
+                 : liveData[f.id]  !== undefined ? liveData[f.id]
+                 : f.default;
+  });
+
+  document.getElementById('edit-fields').innerHTML = def.fields.map(f => `
     <div class="edit-field">
       <label class="edit-label" for="field-${f.id}">${f.label}</label>
       <input class="edit-input" id="field-${f.id}" type="text"
-        value="${escHtml(values[f.id] !== undefined ? values[f.id] : f.default)}"
+        value="${escHtml(values[f.id])}"
+        placeholder="${escHtml(f.placeholder || '')}"
         oninput="scheduleDraftSave()" />
     </div>`).join('');
 
+  // MasterAdmin: show sync button + diff if draft differs from live
   const syncArea = document.getElementById('sync-area');
   if (isMasterAdmin) {
-    syncArea.innerHTML = '<button class="sync-btn" onclick="syncToLive()">Sync to Live →</button>';
+    syncArea.innerHTML = '<button class="sync-btn" onclick="showDiff()">Review &amp; Push Live →</button>';
   } else {
     syncArea.innerHTML = '';
   }
@@ -680,17 +774,85 @@ async function saveDraft() {
     const el = document.getElementById('field-' + f.id);
     if (el) data[f.id] = el.value;
   });
+  draftData = { ...draftData, ...data };
   await db.collection('content-drafts').doc(currentChapterId).set(data, { merge: true });
   document.getElementById('draft-indicator').textContent = 'Draft saved ✓';
 }
 
-async function syncToLive() {
-  const snap = await db.collection('content-drafts').doc(currentChapterId).get();
-  if (!snap.exists) { alert('No draft to sync.'); return; }
-  await db.collection('content').doc(currentChapterId).set(snap.data());
+function showDiff() {
+  const def     = CHAPTER_DEFS[currentChapterId];
+  const diffArea = document.getElementById('diff-area');
+  const diffRows = document.getElementById('diff-rows');
+  fieldAccepted  = {};
+
+  // Read current input values as the draft
+  const currentDraft = {};
+  def.fields.forEach(f => {
+    const el = document.getElementById('field-' + f.id);
+    if (el) currentDraft[f.id] = el.value;
+  });
+
+  const rows = def.fields.map(f => {
+    const live    = liveData[f.id]    !== undefined ? liveData[f.id]    : f.default;
+    const draft   = currentDraft[f.id] !== undefined ? currentDraft[f.id] : f.default;
+    const changed = live !== draft;
+    fieldAccepted[f.id] = true; // default accept all
+
+    if (!changed) {
+      return `<div class="diff-row">
+        <div class="diff-field-label">${f.label}</div>
+        <div class="diff-same">No change</div>
+      </div>`;
+    }
+    return `<div class="diff-row" id="diff-row-${f.id}">
+      <div class="diff-field-label">${f.label}</div>
+      <div class="diff-old"><span style="font-family:var(--mono);font-size:8px;color:#c62828;letter-spacing:0.06em;display:block;margin-bottom:4px;">LIVE</span>${escHtml(live)}</div>
+      <div class="diff-new"><span style="font-family:var(--mono);font-size:8px;color:#2e7d32;letter-spacing:0.06em;display:block;margin-bottom:4px;">DRAFT</span>${escHtml(draft)}</div>
+      <div class="diff-actions">
+        <button class="diff-accept" id="accept-${f.id}" onclick="toggleFieldAccept('${f.id}', true)">✓ Accept</button>
+        <button class="diff-reject" id="reject-${f.id}" onclick="toggleFieldAccept('${f.id}', false)">✕ Reject</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  diffRows.innerHTML = rows;
+  diffArea.style.display = '';
+}
+
+function toggleFieldAccept(fieldId, accept) {
+  fieldAccepted[fieldId] = accept;
+  const row = document.getElementById('diff-row-' + fieldId);
+  if (!row) return;
+  row.querySelector('#accept-' + fieldId).style.fontWeight = accept ? '800' : '600';
+  row.querySelector('#reject-' + fieldId).style.fontWeight = !accept ? '800' : '600';
+  row.style.opacity = accept ? '1' : '0.45';
+}
+
+async function acceptAllChanges() {
+  const def = CHAPTER_DEFS[currentChapterId];
+  const toWrite = {};
+  def.fields.forEach(f => {
+    if (fieldAccepted[f.id] !== false) {
+      const el = document.getElementById('field-' + f.id);
+      if (el) toWrite[f.id] = el.value;
+      else if (draftData[f.id] !== undefined) toWrite[f.id] = draftData[f.id];
+    } else {
+      // Rejected — keep live value
+      if (liveData[f.id] !== undefined) toWrite[f.id] = liveData[f.id];
+    }
+  });
+  await db.collection('content').doc(currentChapterId).set(toWrite, { merge: true });
   const now = new Date();
   const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
-  document.getElementById('sync-msg').textContent = `Synced at ${hhmm} — live for all users.`;
+  document.getElementById('sync-msg').textContent = `Pushed live at ${hhmm} — visible to all users.`;
+  document.getElementById('diff-area').style.display = 'none';
+  liveData = { ...liveData, ...toWrite };
+}
+
+async function rejectAllChanges() {
+  const def = CHAPTER_DEFS[currentChapterId];
+  def.fields.forEach(f => { fieldAccepted[f.id] = false; toggleFieldAccept(f.id, false); });
+  document.getElementById('sync-msg').textContent = 'All changes rejected — live content unchanged.';
 }
 </script>
 </body>
