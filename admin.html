@@ -1075,13 +1075,17 @@ function toggleFieldAccept(fieldId, accept) {
 
   if (newState === false) {
     // Rejected — remove from draft immediately and hide the row
-    const cleanup = {};
-    cleanup[fieldId] = firebase.firestore.FieldValue.delete();
     delete draftData[fieldId];
-    const remainingDraft = Object.keys(draftData).length > 0;
-    cleanup._draftStatus = remainingDraft ? 'pending' : 'rejected';
-    db.collection('content-drafts').doc(currentChapterId).set(cleanup, { merge: true });
-    updatePillStatus(currentChapterId, remainingDraft, remainingDraft ? 'pending' : 'rejected');
+    const remainingKeys = Object.keys(draftData);
+    if (remainingKeys.length > 0) {
+      const remaining = { _draftStatus: 'pending' };
+      remainingKeys.forEach(k => { remaining[k] = draftData[k]; });
+      db.collection('content-drafts').doc(currentChapterId).set(remaining);
+      updatePillStatus(currentChapterId, true, 'pending');
+    } else {
+      db.collection('content-drafts').doc(currentChapterId).delete();
+      updatePillStatus(currentChapterId, false, null);
+    }
     row.style.display = 'none';
     updatePushButton();
     return;
@@ -1108,31 +1112,27 @@ function acceptAllFields() {
 }
 
 function rejectAllFields() {
-  changedFields.forEach(id => {
-    fieldAccepted[id] = false;
-  });
-  // Clear draft fields from Firestore and go back immediately
-  const cleanup = {};
-  changedFields.forEach(id => { cleanup[id] = firebase.firestore.FieldValue.delete(); delete draftData[id]; });
-  cleanup._draftStatus = 'rejected';
-  db.collection('content-drafts').doc(currentChapterId).set(cleanup, { merge: true });
-  updatePillStatus(currentChapterId, false, 'rejected');
+  changedFields.forEach(id => { fieldAccepted[id] = false; delete draftData[id]; });
+  // Delete entire draft doc — nothing remains to review
+  db.collection('content-drafts').doc(currentChapterId).delete();
+  updatePillStatus(currentChapterId, false, null);
   showEditorView();
 }
 
 async function pushLive() {
   const def = CHAPTER_DEFS[currentChapterId];
   const toWrite = {};
-  const draftCleanup = {};
+  const acceptedIds = new Set();
+  const rejectedIds = new Set();
 
   [...def.slideFields, ...def.contentFields, ...def.assessFields].forEach(f => {
     if (fieldAccepted[f.id] === true) {
       const inputEl = document.getElementById('draft-input-' + f.id);
       const textEl  = document.getElementById('draft-text-' + f.id);
       toWrite[f.id] = (inputEl && inputEl.style.display === 'block') ? inputEl.value : (textEl ? textEl.textContent : (draftData[f.id] || ''));
-      draftCleanup[f.id] = firebase.firestore.FieldValue.delete();
+      acceptedIds.add(f.id);
     } else if (fieldAccepted[f.id] === false) {
-      draftCleanup[f.id] = firebase.firestore.FieldValue.delete();
+      rejectedIds.add(f.id);
     }
   });
 
@@ -1140,26 +1140,28 @@ async function pushLive() {
   btn.disabled = true;
   btn.textContent = 'Pushing…';
 
-  const writes = [db.collection('content').doc(currentChapterId).set(toWrite, { merge: true })];
-  if (Object.keys(draftCleanup).length) {
-    // use set+merge so it works even if some fields don't exist in the doc
-    writes.push(db.collection('content-drafts').doc(currentChapterId).set(draftCleanup, { merge: true }));
-  }
-  await Promise.all(writes);
-
+  await db.collection('content').doc(currentChapterId).set(toWrite, { merge: true });
   liveData = { ...liveData, ...toWrite };
-  // Remove cleaned-up fields from local draftData too
-  Object.keys(draftCleanup).forEach(k => { delete draftData[k]; });
+
+  // Remove accepted + rejected from local draftData
+  acceptedIds.forEach(k => delete draftData[k]);
+  rejectedIds.forEach(k => delete draftData[k]);
+
+  // If pending fields remain, rewrite draft doc with only those; else delete the whole doc
+  const remainingKeys = Object.keys(draftData);
+  if (remainingKeys.length > 0) {
+    const remaining = { _draftStatus: 'pending' };
+    remainingKeys.forEach(k => { remaining[k] = draftData[k]; });
+    await db.collection('content-drafts').doc(currentChapterId).set(remaining);
+  } else {
+    await db.collection('content-drafts').doc(currentChapterId).delete();
+  }
 
   const now = new Date();
   const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
   document.getElementById('sync-msg').textContent = `Pushed live at ${hhmm} — accepted changes visible to all users.`;
   btn.textContent = 'Push to Live →';
-  const remainingDraft = Object.keys(draftData).length > 0;
-  await db.collection('content-drafts').doc(currentChapterId).set(
-    { _draftStatus: remainingDraft ? 'pending' : 'reviewed' }, { merge: true }
-  );
-  updatePillStatus(currentChapterId, remainingDraft, remainingDraft ? 'pending' : 'reviewed');
+  updatePillStatus(currentChapterId, remainingKeys.length > 0, remainingKeys.length > 0 ? 'pending' : null);
   setTimeout(showEditorView, 1600);
 }
 </script>
