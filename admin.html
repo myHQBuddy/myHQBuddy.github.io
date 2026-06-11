@@ -244,14 +244,17 @@ body { font-family: var(--sans); background: var(--blue-wash); color: var(--blue
   padding: 8px 16px; font-size: 12px; font-weight: 700;
   border: 1.5px solid var(--border); background: var(--white);
   color: var(--blue-soft); cursor: pointer; transition: all 0.15s;
-  display: inline-flex; align-items: center; gap: 8px;
 }
 .chapter-pill.active { background: var(--blue); color: var(--white); border-color: var(--blue); }
 .chapter-pill:disabled { opacity: 0.4; cursor: default; }
-.pill-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: #ddd; }
-.pill-dot.dot-draft   { background: #f59e0b; }
-.pill-dot.dot-live    { background: #22c55e; }
-.pill-dot.dot-default { background: #cbd5e1; }
+.pill-wrap { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.pill-callout {
+  font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; padding: 2px 7px; border-radius: 2px;
+}
+.pill-callout.status-pending  { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+.pill-callout.status-reviewed { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+.pill-callout.status-rejected { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
 </style>
 </head>
 <body>
@@ -781,7 +784,8 @@ function selectEditCourse(course, btn) {
   document.getElementById('edit-editor-card').style.display = 'none';
 }
 
-let pillStatuses = {}; // chId -> 'draft' | 'live' | 'default'
+// pillStatuses: chId -> { draftStatus: 'pending'|'reviewed'|'rejected'|null, hasDraft: bool }
+let pillStatuses = {};
 
 function renderChapterPills() {
   const pillsEl = document.getElementById('edit-chapter-pills');
@@ -792,11 +796,19 @@ function renderChapterPills() {
     return;
   }
   pillsEl.innerHTML = available.map(ch => {
-    const status = pillStatuses[ch.id] || 'default';
-    const tipMap = { draft: 'Has pending draft', live: 'Up to date', default: 'Not yet edited' };
-    return `<button class="chapter-pill" id="pill-${ch.id}" onclick="loadChapter('${ch.id}', this)" title="${tipMap[status]}">
-      <span class="pill-dot dot-${status}"></span>${ch.name}
-    </button>`;
+    const s = pillStatuses[ch.id] || {};
+    let callout = '';
+    if (s.hasDraft && s.draftStatus === 'pending') {
+      callout = `<span class="pill-callout status-pending">Pending review</span>`;
+    } else if (s.draftStatus === 'reviewed') {
+      callout = `<span class="pill-callout status-reviewed">Reviewed ✓</span>`;
+    } else if (s.draftStatus === 'rejected') {
+      callout = `<span class="pill-callout status-rejected">Rejected</span>`;
+    }
+    return `<div class="pill-wrap">
+      <button class="chapter-pill" id="pill-${ch.id}" onclick="loadChapter('${ch.id}', this)">${ch.name}</button>
+      <span id="callout-${ch.id}">${callout}</span>
+    </div>`;
   }).join('');
 }
 
@@ -804,29 +816,34 @@ async function refreshPillStatuses() {
   const groups = COURSES[currentEditCourse] || [];
   const available = groups.flatMap(g => g.chapters.filter(c => c.available));
   await Promise.all(available.map(async ch => {
-    const [liveSnap, draftSnap] = await Promise.all([
-      db.collection('content').doc(ch.id).get(),
-      db.collection('content-drafts').doc(ch.id).get()
-    ]);
-    if (draftSnap.exists && Object.keys(draftSnap.data()).length > 0) {
-      pillStatuses[ch.id] = 'draft';
-    } else if (liveSnap.exists && Object.keys(liveSnap.data()).length > 0) {
-      pillStatuses[ch.id] = 'live';
+    const draftSnap = await db.collection('content-drafts').doc(ch.id).get();
+    if (draftSnap.exists) {
+      const d = draftSnap.data();
+      const contentKeys = Object.keys(d).filter(k => k !== '_draftStatus');
+      pillStatuses[ch.id] = {
+        hasDraft: contentKeys.length > 0,
+        draftStatus: d._draftStatus || (contentKeys.length > 0 ? 'pending' : null)
+      };
     } else {
-      pillStatuses[ch.id] = 'default';
+      pillStatuses[ch.id] = { hasDraft: false, draftStatus: null };
     }
   }));
   renderChapterPills();
 }
 
-function updatePillStatus(chId, status) {
-  pillStatuses[chId] = status;
-  const pill = document.getElementById('pill-' + chId);
-  if (!pill) return;
-  const dot = pill.querySelector('.pill-dot');
-  if (dot) { dot.className = 'pill-dot dot-' + status; }
-  const tipMap = { draft: 'Has pending draft', live: 'Up to date', default: 'Not yet edited' };
-  pill.title = tipMap[status] || '';
+function updatePillStatus(chId, hasDraft, draftStatus) {
+  pillStatuses[chId] = { hasDraft, draftStatus };
+  const calloutEl = document.getElementById('callout-' + chId);
+  if (!calloutEl) return;
+  let callout = '';
+  if (hasDraft && draftStatus === 'pending') {
+    callout = `<span class="pill-callout status-pending">Pending review</span>`;
+  } else if (draftStatus === 'reviewed') {
+    callout = `<span class="pill-callout status-reviewed">Reviewed ✓</span>`;
+  } else if (draftStatus === 'rejected') {
+    callout = `<span class="pill-callout status-rejected">Rejected</span>`;
+  }
+  calloutEl.innerHTML = callout;
 }
 
 async function loadChapter(chId, btn) {
@@ -938,9 +955,10 @@ async function saveDraft() {
     if (el) data[f.id] = el.value !== undefined ? el.value : el.textContent;
   });
   draftData = { ...draftData, ...data };
+  data._draftStatus = 'pending';
   await db.collection('content-drafts').doc(currentChapterId).set(data, { merge: true });
   document.getElementById('draft-indicator').textContent = 'Draft saved ✓';
-  updatePillStatus(currentChapterId, 'draft');
+  updatePillStatus(currentChapterId, true, 'pending');
 }
 
 // fieldAccepted: null = pending, true = accepted, false = rejected
@@ -1060,7 +1078,10 @@ function toggleFieldAccept(fieldId, accept) {
     const cleanup = {};
     cleanup[fieldId] = firebase.firestore.FieldValue.delete();
     delete draftData[fieldId];
+    const remainingDraft = Object.keys(draftData).length > 0;
+    cleanup._draftStatus = remainingDraft ? 'pending' : 'rejected';
     db.collection('content-drafts').doc(currentChapterId).set(cleanup, { merge: true });
+    updatePillStatus(currentChapterId, remainingDraft, remainingDraft ? 'pending' : 'rejected');
     row.style.display = 'none';
     updatePushButton();
     return;
@@ -1093,10 +1114,9 @@ function rejectAllFields() {
   // Clear draft fields from Firestore and go back immediately
   const cleanup = {};
   changedFields.forEach(id => { cleanup[id] = firebase.firestore.FieldValue.delete(); delete draftData[id]; });
-  if (Object.keys(cleanup).length) {
-    db.collection('content-drafts').doc(currentChapterId).set(cleanup, { merge: true });
-  }
-  updatePillStatus(currentChapterId, Object.keys(draftData).length > 0 ? 'draft' : 'live');
+  cleanup._draftStatus = 'rejected';
+  db.collection('content-drafts').doc(currentChapterId).set(cleanup, { merge: true });
+  updatePillStatus(currentChapterId, false, 'rejected');
   showEditorView();
 }
 
@@ -1135,7 +1155,11 @@ async function pushLive() {
   const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
   document.getElementById('sync-msg').textContent = `Pushed live at ${hhmm} — accepted changes visible to all users.`;
   btn.textContent = 'Push to Live →';
-  updatePillStatus(currentChapterId, Object.keys(draftData).length > 0 ? 'draft' : 'live');
+  const remainingDraft = Object.keys(draftData).length > 0;
+  await db.collection('content-drafts').doc(currentChapterId).set(
+    { _draftStatus: remainingDraft ? 'pending' : 'reviewed' }, { merge: true }
+  );
+  updatePillStatus(currentChapterId, remainingDraft, remainingDraft ? 'pending' : 'reviewed');
   setTimeout(showEditorView, 1600);
 }
 </script>
