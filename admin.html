@@ -357,10 +357,7 @@ body { font-family: var(--sans); background: var(--blue-wash); color: var(--blue
     <div class="card" id="edit-editor-card" style="display:none;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <div class="card-title" style="margin-bottom:0;" id="edit-chapter-label"></div>
-        <div style="display:flex;align-items:center;gap:12px;">
-          <button id="reseed-btn" onclick="forceReseedHtmlFields()" style="display:none;padding:4px 10px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;background:#fff8e1;color:#f57f17;border:1px solid #ffe082;cursor:pointer;">↺ Restore HTML Defaults</button>
-          <div class="draft-indicator" id="draft-indicator"></div>
-        </div>
+        <div class="draft-indicator" id="draft-indicator"></div>
       </div>
       <div id="edit-subtabs" style="display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid var(--border);">
         <button class="edit-subtab active" id="subtab-slide" onclick="switchEditTab('slide')">Slide Content</button>
@@ -1000,20 +997,6 @@ function updatePillStatus(chId, hasDraft, draftStatus) {
   renderCoursePills();
 }
 
-async function forceReseedHtmlFields() {
-  const chId = currentChapterId;
-  if (!chId) return;
-  const def = CHAPTER_DEFS[chId];
-  const allFields = [...def.slideFields, ...def.contentFields, ...def.assessFields];
-  const updates = {};
-  allFields.forEach(f => { if (f.html && f.default) updates[f.id] = f.default; });
-  await db.collection('content').doc(chId).set(updates, { merge: true });
-  Object.assign(liveData, updates);
-  document.getElementById('draft-indicator').textContent = 'HTML defaults restored ✓';
-  setTimeout(() => { document.getElementById('draft-indicator').textContent = ''; }, 3000);
-  renderEditFields();
-}
-
 async function loadChapter(chId, btn) {
   currentChapterId = chId;
   document.querySelectorAll('.chapter-pill').forEach(p => p.classList.remove('active'));
@@ -1024,8 +1007,6 @@ async function loadChapter(chId, btn) {
   document.getElementById('edit-chapter-label').textContent = def.label;
   document.getElementById('draft-indicator').textContent = '';
   document.getElementById('sync-msg').textContent = '';
-  var hasHtmlFields = [...def.slideFields, ...def.contentFields, ...def.assessFields].some(f => f.html);
-  document.getElementById('reseed-btn').style.display = hasHtmlFields ? '' : 'none';
   document.getElementById('diff-card').style.display = 'none';
   document.getElementById('edit-editor-card').style.display = '';
   fieldAccepted = {};
@@ -1037,21 +1018,16 @@ async function loadChapter(chId, btn) {
   ]);
   liveData  = liveSnap.exists  ? liveSnap.data()  : {};
 
-  // Build set of fields that intentionally store HTML (html:true in CHAPTER_DEFS)
-  const allFieldDefs = [...def.slideFields, ...def.contentFields, ...def.assessFields];
-  const htmlFieldIds = new Set(allFieldDefs.filter(f => f.html).map(f => f.id));
-
-  // Strip stale HTML tags from non-body/outcome/html fields (cleanup from old data)
+  // Strip stale HTML tags from non-body/outcome fields (cleanup from old data)
   Object.keys(liveData).forEach(k => {
-    if (k.indexOf('-body') === -1 && k.indexOf('-outcome') === -1 && !htmlFieldIds.has(k) && typeof liveData[k] === 'string') {
+    if (k.indexOf('-body') === -1 && k.indexOf('-outcome') === -1 && typeof liveData[k] === 'string') {
       liveData[k] = stripHtml(liveData[k]);
     }
   });
 
   const rawDraft = draftSnap.exists ? draftSnap.data() : {};
 
-  // Seed Firestore with defaults for any field not yet written,
-  // and re-seed html:true fields whose stored value was stripped of HTML tags
+  // Seed Firestore with defaults for any field not yet written
   const allFields = [...def.slideFields, ...def.contentFields, ...def.assessFields];
   const missing = {};
   allFields.forEach(f => {
@@ -1071,7 +1047,7 @@ async function loadChapter(chId, btn) {
   Object.keys(rawDraft).forEach(k => {
     if (k === '_draftStatus') return;
     let val = rawDraft[k];
-    if (k.indexOf('-body') === -1 && k.indexOf('-outcome') === -1 && !htmlFieldIds.has(k) && typeof val === 'string') {
+    if (k.indexOf('-body') === -1 && k.indexOf('-outcome') === -1 && typeof val === 'string') {
       val = stripHtml(val);
     }
     if (val !== liveData[k]) draftData[k] = val;
@@ -1142,28 +1118,13 @@ function renderEditFields() {
       </div>`;
       lastGroup = group;
     }
-    if (f.type === 'textarea' || f.html) {
-      const hint = f.html ? ' <span style="font-family:var(--mono);font-size:8px;color:var(--blue-soft);font-weight:600;letter-spacing:0.08em;">HTML</span>' : '';
-      if (f.html) {
-        html += `<div class="edit-field">
-          <label class="edit-label" for="field-${f.id}">${f.label}${hint}</label>
-          <div style="padding:10px 12px;border:1px solid var(--border);background:#f8f9ff;margin-bottom:6px;font-size:0.97em;line-height:1.5;">${val}</div>
-          <details style="margin-top:0;">
-            <summary style="font-family:var(--mono);font-size:9px;color:var(--blue-soft);cursor:pointer;letter-spacing:0.06em;text-transform:uppercase;list-style:none;">Edit HTML ▸</summary>
-            <textarea class="edit-input" id="field-${f.id}" rows="2"
-              placeholder="${escHtml(f.placeholder || '')}"
-              oninput="scheduleDraftSave();this.closest('.edit-field').querySelector('div[style]').innerHTML=this.value;"
-              style="resize:vertical;min-height:44px;font-family:var(--mono);font-size:11px;margin-top:6px;">${escHtml(val)}</textarea>
-          </details>
-        </div>`;
-      } else {
-        html += `<div class="edit-field">
+    if (f.type === 'textarea') {
+      html += `<div class="edit-field">
         <label class="edit-label" for="field-${f.id}">${f.label}</label>
         <textarea class="edit-input" id="field-${f.id}" rows="4"
           placeholder="${escHtml(f.placeholder || '')}"
           oninput="scheduleDraftSave()" style="resize:vertical;min-height:80px;">${escHtml(val)}</textarea>
       </div>`;
-      }
     } else {
       html += `<div class="edit-field">
         <label class="edit-label" for="field-${f.id}">${f.label}</label>
