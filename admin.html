@@ -993,12 +993,7 @@ function showDiff() {
     const draft = currentDraft[f.id] !== undefined ? currentDraft[f.id] : f.default;
     const changed = live !== draft;
 
-    if (!changed) {
-      return `<div class="diff-row">
-        <div class="diff-field-label">${escHtml(f.label)}</div>
-        <div class="diff-same">No change — ${escHtml(live)}</div>
-      </div>`;
-    }
+    if (!changed) return '';
 
     fieldAccepted[f.id] = null; // pending — not yet decided
     changedFields.add(f.id);
