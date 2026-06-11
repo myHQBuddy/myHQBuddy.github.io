@@ -290,8 +290,8 @@ body { font-family: var(--sans); background: var(--blue-wash); color: var(--blue
     <div class="card">
       <div class="card-title">Edit Chapter Content</div>
       <select class="chapter-select" id="chapter-select" onchange="loadChapter(this.value)">
-        <option value="ch1">Ch 1 — Where We Play</option>
-        <option value="ch2">Ch 2 — Who We Are</option>
+        <option value="ch1">Where We Play</option>
+        <option value="ch2">Who We Are</option>
       </select>
       <div class="draft-indicator" id="draft-indicator"></div>
       <div id="edit-fields"></div>
@@ -313,14 +313,14 @@ let isMasterAdmin  = false;
 
 const CHAPTER_DEFS = {
   ch1: {
-    label: 'Ch 1 — Where We Play',
+    label: 'Where We Play',
     fields: [
       { id: 'slide-1-headline', label: 'Slide 1 Headline', default: 'Where We Play' },
       { id: 'slide-1-sub',      label: 'Slide 1 Subtitle', default: "India's $1 trillion commercial real estate market" }
     ]
   },
   ch2: {
-    label: 'Ch 2 — Who We Are',
+    label: 'Who We Are',
     fields: [
       { id: 'slide-1-headline', label: 'Slide 1 Headline', default: 'Who We Are' },
       { id: 'slide-1-sub',      label: 'Slide 1 Subtitle', default: 'Before you start, let\'s know the story and journey of myHQ.' }
@@ -333,9 +333,15 @@ const COURSES = {
     { id: 'ch1', name: 'Where We Play', desc: "India's commercial real estate market", available: true },
     { id: 'ch2', name: 'Who We Are',    desc: "myHQ's story, team & ambition",         available: true }
   ],
-  intermediate: [],
-  advanced: []
+  intermediate: [
+    { id: 'ch3', name: 'Coming Soon', desc: '', available: false }
+  ],
+  advanced: [
+    { id: 'ch4', name: 'Coming Soon', desc: '', available: false }
+  ]
 };
+
+const CHAPTER_NAMES = { ch1: 'Where We Play', ch2: 'Who We Are' };
 
 auth.onAuthStateChanged(async function(user) {
   if (!user) { window.location.href = 'landing.html'; return; }
