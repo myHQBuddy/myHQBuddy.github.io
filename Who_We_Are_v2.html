@@ -194,7 +194,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 .s4-offices strong { color: var(--muted); font-weight: 400; }
 
 /* ── SCREEN 5: TEAM ── */
-.screen-team { background: var(--white); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: clamp(16px,2vw,28px) clamp(32px,6vw,80px) 72px; gap: 16px; overflow: hidden; height: 100%; box-sizing: border-box; }
+.screen-team { background: var(--white); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: clamp(16px,2vw,28px) clamp(32px,6vw,80px) 72px; gap: 16px; overflow: hidden; height: 100%; box-sizing: border-box; min-height: 0; }
 .s5t-header { text-align: center; }
 .s5t-eyebrow { font-size: clamp(11px,1.2vw,14px); font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 6px; }
 .s5t-title { font-size: clamp(1.8rem,3.5vw,3rem); font-weight: 800; letter-spacing: -0.03em; color: var(--ink); }
@@ -223,7 +223,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 .s5t-card--founder .s5t-re { color: rgba(255,255,255,0.8); }
 
 /* ── NEW TEAM LAYOUT (matching image) ── */
-.s5t-two-panel { display: flex; align-items: flex-start; gap: clamp(8px,1.2vw,16px); width: 100%; }
+.s5t-two-panel { display: flex; align-items: stretch; gap: clamp(8px,1.2vw,16px); width: 100%; height: clamp(320px,45vh,450px); }
 .s5t-panel { border: 1.5px solid var(--blue); border-radius: 12px; padding: 0; background: var(--white); overflow: hidden; display: inline-flex; }
 .s5t-panel img { display: block; width: 100%; height: auto; max-height: 75vh; object-fit: contain; }
 .s5t-panel-label { font-size: clamp(10px,1vw,12px); font-weight: 700; font-style: italic; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-bottom: clamp(10px,1.4vw,16px); }
@@ -457,11 +457,12 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
   .s4-cards { grid-template-columns: repeat(2, 1fr); }
 
   /* Slide 5 team — panels stack vertically */
+  .screen-team { overflow-y: auto; height: auto; justify-content: flex-start; }
   .s5t-two-panel { flex-direction: column; height: auto !important; }
   .s5t-panel--left  { flex: none !important; width: 100%; }
   .s5t-panel--right { flex: none !important; width: 100%; }
   .s5t-people-grid  { grid-template-columns: repeat(2, 1fr); }
-  .s5t-bg-grid      { grid-template-columns: repeat(3, 1fr); grid-template-rows: unset; }
+  .s5t-bg-grid      { grid-template-columns: repeat(3, 1fr); grid-template-rows: unset; min-height: 200px; }
 
   .s7-stats { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
   .s7-sub-panels--clientele { grid-template-columns: 1fr; }
@@ -719,7 +720,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
       <h2 class="s5t-title">An entrepreneurial team using tech to disrupt commercial real estate.</h2>
     </div>
 
-    <div class="s5t-two-panel" style="height:clamp(320px,45vh,450px);align-items:stretch;">
+    <div class="s5t-two-panel">
 
       <!-- LEFT: LEADERSHIP TEAM -->
       <div class="s5t-panel s5t-panel--left">
