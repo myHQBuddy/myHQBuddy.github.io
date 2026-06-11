@@ -2404,6 +2404,15 @@ function submitAssessment(e) {
   localStorage.setItem('myhq_ch2_complete', 'true');
   showSubmittedState();
 
+  // Write completion to Firestore
+  var fbUser = window.firebaseAuth.currentUser;
+  if (fbUser) {
+    window.firebaseDB.collection('users').doc(fbUser.uid).update({
+      'progress.ch2.completed': true,
+      'progress.ch2.completedAt': firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+
   if (SHEET_URL_CH2) {
     fetch(SHEET_URL_CH2, {
       method: 'POST', mode: 'no-cors',

@@ -2816,6 +2816,15 @@ function submitAssessment(e) {
   localStorage.setItem('myhq_ch2_unlocked', 'true');
   showSubmittedState();
 
+  // Write completion to Firestore
+  var fbUser = window.firebaseAuth.currentUser;
+  if (fbUser) {
+    window.firebaseDB.collection('users').doc(fbUser.uid).update({
+      'progress.ch1.completed': true,
+      'progress.ch1.completedAt': firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+
   // Apps Script doesn't return CORS headers on POST, so use no-cors.
   // Fire-and-forget — state is already saved above.
   fetch(SHEET_URL, {
