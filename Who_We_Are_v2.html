@@ -229,6 +229,9 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 .s5t-panel-label { font-size: clamp(10px,1vw,12px); font-weight: 700; font-style: italic; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-bottom: clamp(10px,1.4vw,16px); }
 .s5t-people-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(10px,1.5vw,14px); }
 .s5t-person { display: flex; align-items: flex-start; gap: clamp(8px,1vw,12px); }
+.s5t-panel--left { flex: 1.15; flex-direction: column; padding: 24px 28px; display: flex; }
+.s5t-panel--right { flex: 0.85; flex-direction: column; padding: 24px 28px; display: flex; gap: 0; justify-content: flex-start; }
+.s5t-bg-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: repeat(3,1fr); gap: clamp(8px,1.2vw,16px); flex: 1; }
 .s5t-photo { width: clamp(40px,4.5vw,52px); height: clamp(40px,4.5vw,52px); border-radius: 50%; border: 2px solid var(--hairline); background: rgba(30,34,170,0.08); display: flex; align-items: center; justify-content: center; font-size: clamp(12px,1.4vw,16px); font-weight: 800; color: var(--blue); flex-shrink: 0; overflow: hidden; }
 .s5t-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
 .s5t-person-name { font-size: clamp(12px,1.3vw,15px); font-weight: 800; color: var(--ink); letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 2px; }
@@ -427,96 +430,72 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 
 /* ── RESPONSIVE BREAKPOINTS ── */
 
-/* ── ≤1280px: large laptops & small desktops ── */
+/* ── ≤1280px: large laptops ── */
 @media (max-width: 1280px) {
-  /* Slide 5 — team: PnL 4-col → 2-col */
   .s5t-pnl { grid-template-columns: repeat(2, 1fr); }
-
-  /* Slide 6 — stats: 5-col → auto wrap */
   .s7-stats { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-
-  /* Slide 6 — logo panels stack */
   .s7-logo-panels { grid-template-columns: 1fr; }
-
-  /* Slide 6 — clientele equal cols */
   .s7-sub-panels--clientele { grid-template-columns: 1fr 1fr; }
-
-  /* Slide 6 — partners stack */
   .s7-sub-panels--partners { grid-template-columns: 1fr; }
-
-  /* Slide 8 — ambition chart stacks */
   .s5-body { grid-template-columns: 1fr; }
 }
 
-/* ── ≤1024px: tablets landscape & small laptops ── */
+/* ── ≤1024px: small laptops & tablets landscape ── */
 @media (max-width: 1024px) {
-  /* Slide 0 — video inner 2-col → 1-col */
   .screen-video-inner { grid-template-columns: 1fr; text-align: center; }
 
-  /* Slide 1 — facts 4-col → 2-col */
   .s1-facts { grid-template-columns: repeat(2, 1fr); }
   .s1-fact { border-right: none; border-bottom: 1px solid var(--hairline); }
   .s1-fact:nth-child(odd) { border-right: 1px solid var(--hairline); }
-  .s1-fact:last-child, .s1-fact:nth-last-child(2):nth-child(odd) { border-bottom: none; }
+  .s1-fact:last-child { border-bottom: none; }
 
-  /* Slide 2/3 — timeline nodes: allow scroll or wrap */
   .s2-timeline { overflow-x: auto; }
   .s2-tl-node { min-width: 140px; }
 
-  /* Slide 3 — milestones 4-col → 2-col */
   .s3-milestones { grid-template-columns: repeat(2, 1fr); }
 
-  /* Slide 4 — verticals 3-col → 2-col */
   .s4-cards { grid-template-columns: repeat(2, 1fr); }
 
-  /* Slide 5 — team 3-col → 2-col */
-  .s5t-grid { grid-template-columns: repeat(2, 1fr); }
-  .s5t-two-panel { flex-direction: column; }
-  .s5t-panel { width: 100% !important; }
+  /* Slide 5 team — panels stack vertically */
+  .s5t-two-panel { flex-direction: column; height: auto !important; }
+  .s5t-panel--left  { flex: none !important; width: 100%; }
+  .s5t-panel--right { flex: none !important; width: 100%; }
+  .s5t-people-grid  { grid-template-columns: repeat(2, 1fr); }
+  .s5t-bg-grid      { grid-template-columns: repeat(3, 1fr); grid-template-rows: unset; }
 
-  /* Slide 6 — stats auto-wrap tighter */
   .s7-stats { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
   .s7-sub-panels--clientele { grid-template-columns: 1fr; }
-  .s7-enterprises-grid { grid-template-columns: repeat(3, 1fr); }
 
-  /* Read mode */
   .r-stats-row { grid-template-columns: repeat(2, 1fr); }
   .r-verticals-grid { grid-template-columns: 1fr; }
 }
 
-/* ── ≤768px: tablets portrait & large phones ── */
+/* ── ≤768px: tablets portrait ── */
 @media (max-width: 768px) {
-  /* Slide 1 — facts 2-col → 1-col */
   .s1-facts { grid-template-columns: 1fr; }
-  .s1-fact { border-right: none; }
+  .s1-fact  { border-right: none; }
   .s1-fact:nth-child(odd) { border-right: none; }
 
-  /* Slide 3 — milestones 2-col → 1-col */
   .s3-milestones { grid-template-columns: 1fr; }
+  .s4-cards      { grid-template-columns: 1fr; }
 
-  /* Slide 4 — verticals 2-col → 1-col */
-  .s4-cards { grid-template-columns: 1fr; }
-
-  /* Slide 5 — team all → 1-col */
-  .s5t-grid { grid-template-columns: 1fr; }
-  .s5t-founders { grid-template-columns: 1fr; }
-  .s5t-pnl { grid-template-columns: 1fr; }
+  .s5t-grid       { grid-template-columns: 1fr; }
+  .s5t-founders   { grid-template-columns: 1fr; }
+  .s5t-pnl        { grid-template-columns: 1fr; }
   .s5t-people-grid { grid-template-columns: 1fr; }
-  .s5t-logo-grid { grid-template-columns: 1fr; }
+  .s5t-bg-grid    { grid-template-columns: repeat(2, 1fr); }
 
-  /* Slide 6 — stats 2-col */
-  .s7-stats { grid-template-columns: repeat(2, 1fr); }
-  .s7-logo-panels { grid-template-columns: 1fr; }
+  .s7-stats               { grid-template-columns: repeat(2, 1fr); }
+  .s7-logo-panels         { grid-template-columns: 1fr; }
   .s7-sub-panels--clientele { grid-template-columns: 1fr; }
-  .s7-sub-panels--partners { grid-template-columns: 1fr; }
-  .s7-enterprises-grid { grid-template-columns: repeat(2, 1fr); }
-  .s7-partner-grid--cw { grid-template-columns: 1fr; }
+  .s7-sub-panels--partners  { grid-template-columns: 1fr; }
+  .s7-enterprises-grid    { grid-template-columns: repeat(2, 1fr); }
+  .s7-partner-grid--cw    { grid-template-columns: 1fr; }
 
-  /* Read mode */
-  .r-stats-row { grid-template-columns: repeat(2, 1fr); }
+  .r-stats-row    { grid-template-columns: repeat(2, 1fr); }
   .book-team-grid { grid-template-columns: 1fr; }
   .book-verticals { grid-template-columns: 1fr; }
-  .book-stats { grid-template-columns: repeat(2, 1fr); }
+  .book-stats     { grid-template-columns: repeat(2, 1fr); }
   .book-org-facts { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
@@ -743,7 +722,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
     <div class="s5t-two-panel" style="height:clamp(320px,45vh,450px);align-items:stretch;">
 
       <!-- LEFT: LEADERSHIP TEAM -->
-      <div class="s5t-panel" style="flex:1.15;flex-direction:column;padding:24px 28px;display:flex;">
+      <div class="s5t-panel s5t-panel--left">
         <div style="font-size:clamp(12px,1.4vw,16px);font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--blue);margin-bottom:clamp(10px,1.5vw,18px);">Leadership Team</div>
         <div class="s5t-people-grid" style="flex:1;gap:22px;align-content:start;">
 
@@ -811,11 +790,11 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
       </div>
 
       <!-- RIGHT: THEIR BACKGROUND -->
-      <div class="s5t-panel" style="flex:0.85;flex-direction:column;padding:24px 28px;display:flex;gap:0;justify-content:flex-start;">
+      <div class="s5t-panel s5t-panel--right">
         <div style="font-size:clamp(12px,1.4vw,16px);font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--blue);margin-bottom:clamp(12px,1.6vw,20px);">Their Background</div>
 
         <!-- All 9 logos in a unified 3x3 grid filling the box -->
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:repeat(3,1fr);gap:clamp(8px,1.2vw,16px);flex:1;">
+        <div class="s5t-bg-grid">
           <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 1.png" alt="Goldman Sachs" style="width:100%;height:auto;max-height:clamp(36px,5vw,58px);object-fit:contain;"></div>
           <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 2.png" alt="Helion" style="width:100%;height:auto;max-height:clamp(36px,5vw,58px);object-fit:contain;"></div>
           <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 3.png" alt="Coca-Cola" style="width:100%;height:auto;max-height:clamp(24px,3.5vw,38px);object-fit:contain;"></div>
