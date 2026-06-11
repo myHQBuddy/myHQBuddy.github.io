@@ -217,17 +217,27 @@ body { font-family: var(--sans); background: var(--blue-wash); color: var(--blue
   margin-top: 10px; min-height: 18px; letter-spacing: 0.04em;
 }
 .diff-row {
-  padding: 12px 0; border-bottom: 1px solid var(--border);
+  padding: 14px 0; border-bottom: 1px solid var(--border);
   display: grid; grid-template-columns: 120px 1fr 1fr auto; gap: 12px; align-items: start;
+  transition: opacity 0.2s;
 }
 .diff-row:last-child { border-bottom: none; }
-.diff-field-label { font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue-soft); padding-top: 4px; }
-.diff-old { font-size: 12px; color: #c62828; background: #fff5f5; padding: 6px 10px; border-left: 3px solid #f44336; line-height: 1.5; }
-.diff-new { font-size: 12px; color: #2e7d32; background: #f1f8f1; padding: 6px 10px; border-left: 3px solid #4caf50; line-height: 1.5; }
+.diff-row.state-accepted { background: #f4fbf5; }
+.diff-row.state-rejected { opacity: 0.45; }
+.diff-field-label { font-family: var(--mono); font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue-soft); padding-top: 6px; }
+.diff-old { font-size: 12px; color: #c62828; background: #fff5f5; padding: 8px 10px; border-left: 3px solid #f44336; line-height: 1.5; }
+.diff-new { font-size: 12px; color: #2e7d32; background: #f1f8f1; padding: 0; border-left: 3px solid #4caf50; line-height: 1.5; position: relative; }
+.diff-new-text { padding: 8px 10px; display: block; }
+.diff-new-input { display: none; width: 100%; font-family: var(--sans); font-size: 12px; color: #1b5e20; background: #f1f8f1; border: none; border-top: 1px dashed #4caf50; padding: 6px 10px; resize: vertical; min-height: 36px; outline: none; }
+.diff-new-edit-btn { position: absolute; top: 4px; right: 6px; font-size: 8px; font-family: var(--mono); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #2e7d32; background: none; border: none; cursor: pointer; text-decoration: underline; padding: 0; }
 .diff-same { font-size: 12px; color: var(--blue-soft); padding: 6px 10px; font-style: italic; grid-column: 2 / 4; }
-.diff-actions { display: flex; flex-direction: column; gap: 6px; }
-.diff-accept { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 10px; background: #e6f9e9; color: #2e7d32; border: 1px solid #BEE5C2; cursor: pointer; }
-.diff-reject { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 10px; background: #fff5f5; color: #c62828; border: 1px solid #ffcdd2; cursor: pointer; }
+.diff-actions { display: flex; flex-direction: column; gap: 6px; padding-top: 2px; }
+.diff-accept { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 10px; background: #e6f9e9; color: #2e7d32; border: 1px solid #BEE5C2; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+.diff-accept.active { background: #2e7d32; color: #fff; border-color: #2e7d32; }
+.diff-reject { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 10px; background: #fff5f5; color: #c62828; border: 1px solid #ffcdd2; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+.diff-reject.active { background: #c62828; color: #fff; border-color: #c62828; }
+.diff-push-btn { padding: 13px 28px; font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; background: var(--blue); color: #fff; border: none; cursor: pointer; transition: background 0.15s, opacity 0.15s; }
+.diff-push-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 .chapter-pill {
   padding: 8px 16px; font-size: 12px; font-weight: 700;
   border: 1.5px solid var(--border); background: var(--white);
@@ -335,26 +345,30 @@ body { font-family: var(--sans); background: var(--blue-wash); color: var(--blue
       <div id="edit-chapter-pills" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
     </div>
 
-    <!-- Step 3: Editor -->
+    <!-- Step 3a: Editor view -->
     <div class="card" id="edit-editor-card" style="display:none;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <div class="card-title" style="margin-bottom:0;" id="edit-chapter-label"></div>
         <div class="draft-indicator" id="draft-indicator"></div>
       </div>
       <div id="edit-fields"></div>
-
-      <!-- MasterAdmin diff review -->
-      <div id="diff-area" style="display:none;margin-top:24px;">
-        <div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--blue-soft);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);">Changes vs Live</div>
-        <div id="diff-rows"></div>
-        <div style="display:flex;gap:10px;margin-top:16px;">
-          <button class="sync-btn" onclick="acceptAllChanges()" style="background:#2e7d32;">Accept All &amp; Push Live →</button>
-          <button onclick="rejectAllChanges()" style="padding:12px 20px;font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:none;color:#c62828;border:1px solid #c62828;cursor:pointer;">Reject All</button>
-        </div>
-        <div class="sync-msg" id="sync-msg"></div>
-      </div>
-
       <div id="sync-area" style="margin-top:16px;"></div>
+    </div>
+
+    <!-- Step 3b: Diff / review view (masterAdmin only) -->
+    <div class="card" id="diff-card" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div class="card-title" style="margin-bottom:0;">Review Changes — <span id="diff-chapter-label" style="color:var(--blue-mid);"></span></div>
+        <button onclick="showEditorView()" style="background:none;border:none;font-family:var(--mono);font-size:9px;font-weight:700;color:var(--blue-soft);cursor:pointer;letter-spacing:0.08em;text-transform:uppercase;text-decoration:underline;">← Back to Edit</button>
+      </div>
+      <div id="diff-rows"></div>
+      <div style="display:flex;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);align-items:center;flex-wrap:wrap;">
+        <button onclick="acceptAllFields()" style="padding:10px 20px;font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:#e6f9e9;color:#2e7d32;border:1px solid #BEE5C2;cursor:pointer;">✓ Accept All</button>
+        <button onclick="rejectAllFields()" style="padding:10px 20px;font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;background:#fff5f5;color:#c62828;border:1px solid #ffcdd2;cursor:pointer;">✕ Reject All</button>
+        <div style="flex:1;"></div>
+        <button class="diff-push-btn" id="push-live-btn" onclick="pushLive()" disabled>Push to Live →</button>
+      </div>
+      <div class="sync-msg" id="sync-msg"></div>
     </div>
 
   </div>
@@ -719,7 +733,7 @@ async function loadChapter(chId, btn) {
   document.getElementById('edit-chapter-label').textContent = def.label;
   document.getElementById('draft-indicator').textContent = '';
   document.getElementById('sync-msg').textContent = '';
-  document.getElementById('diff-area').style.display = 'none';
+  document.getElementById('diff-card').style.display = 'none';
   document.getElementById('edit-editor-card').style.display = '';
   fieldAccepted = {};
 
@@ -779,13 +793,16 @@ async function saveDraft() {
   document.getElementById('draft-indicator').textContent = 'Draft saved ✓';
 }
 
-function showDiff() {
-  const def     = CHAPTER_DEFS[currentChapterId];
-  const diffArea = document.getElementById('diff-area');
-  const diffRows = document.getElementById('diff-rows');
-  fieldAccepted  = {};
+// fieldAccepted: null = pending, true = accepted, false = rejected
+// changedFields: set of field ids that actually differ from live
 
-  // Read current input values as the draft
+let changedFields = new Set();
+
+function showDiff() {
+  const def = CHAPTER_DEFS[currentChapterId];
+  fieldAccepted = {};
+  changedFields = new Set();
+
   const currentDraft = {};
   def.fields.forEach(f => {
     const el = document.getElementById('field-' + f.id);
@@ -793,21 +810,33 @@ function showDiff() {
   });
 
   const rows = def.fields.map(f => {
-    const live    = liveData[f.id]    !== undefined ? liveData[f.id]    : f.default;
-    const draft   = currentDraft[f.id] !== undefined ? currentDraft[f.id] : f.default;
+    const live  = liveData[f.id]    !== undefined ? liveData[f.id]    : f.default;
+    const draft = currentDraft[f.id] !== undefined ? currentDraft[f.id] : f.default;
     const changed = live !== draft;
-    fieldAccepted[f.id] = true; // default accept all
 
     if (!changed) {
       return `<div class="diff-row">
-        <div class="diff-field-label">${f.label}</div>
-        <div class="diff-same">No change</div>
+        <div class="diff-field-label">${escHtml(f.label)}</div>
+        <div class="diff-same">No change — ${escHtml(live)}</div>
       </div>`;
     }
+
+    fieldAccepted[f.id] = null; // pending — not yet decided
+    changedFields.add(f.id);
+
     return `<div class="diff-row" id="diff-row-${f.id}">
-      <div class="diff-field-label">${f.label}</div>
-      <div class="diff-old"><span style="font-family:var(--mono);font-size:8px;color:#c62828;letter-spacing:0.06em;display:block;margin-bottom:4px;">LIVE</span>${escHtml(live)}</div>
-      <div class="diff-new"><span style="font-family:var(--mono);font-size:8px;color:#2e7d32;letter-spacing:0.06em;display:block;margin-bottom:4px;">DRAFT</span>${escHtml(draft)}</div>
+      <div class="diff-field-label">${escHtml(f.label)}</div>
+      <div class="diff-old">
+        <span style="font-family:var(--mono);font-size:8px;color:#c62828;letter-spacing:0.06em;display:block;margin-bottom:4px;">LIVE</span>
+        ${escHtml(live)}
+      </div>
+      <div class="diff-new">
+        <span style="font-family:var(--mono);font-size:8px;color:#2e7d32;letter-spacing:0.06em;display:block;margin-bottom:4px;padding:8px 10px 0;">DRAFT
+          <button class="diff-new-edit-btn" id="edit-btn-${f.id}" onclick="toggleDraftEdit('${f.id}')">Edit</button>
+        </span>
+        <span class="diff-new-text" id="draft-text-${f.id}">${escHtml(draft)}</span>
+        <textarea class="diff-new-input" id="draft-input-${f.id}" oninput="onDraftInputChange('${f.id}')">${escHtml(draft)}</textarea>
+      </div>
       <div class="diff-actions">
         <button class="diff-accept" id="accept-${f.id}" onclick="toggleFieldAccept('${f.id}', true)">✓ Accept</button>
         <button class="diff-reject" id="reject-${f.id}" onclick="toggleFieldAccept('${f.id}', false)">✕ Reject</button>
@@ -815,44 +844,116 @@ function showDiff() {
     </div>`;
   }).join('');
 
-  diffRows.innerHTML = rows;
-  diffArea.style.display = '';
+  document.getElementById('diff-rows').innerHTML = rows;
+  document.getElementById('diff-chapter-label').textContent = def.label;
+  document.getElementById('sync-msg').textContent = '';
+  document.getElementById('push-live-btn').disabled = true;
+  document.getElementById('edit-editor-card').style.display = 'none';
+  document.getElementById('diff-card').style.display = '';
+}
+
+function toggleDraftEdit(fieldId) {
+  const textEl  = document.getElementById('draft-text-' + fieldId);
+  const inputEl = document.getElementById('draft-input-' + fieldId);
+  const btnEl   = document.getElementById('edit-btn-' + fieldId);
+  const editing = inputEl.style.display === 'block';
+  if (editing) {
+    // save edit back
+    const newVal = inputEl.value;
+    textEl.textContent = newVal;
+    textEl.style.display = 'block';
+    inputEl.style.display = 'none';
+    btnEl.textContent = 'Edit';
+    // if field was already accepted, re-evaluate against live
+    const live = liveData[fieldId] !== undefined ? liveData[fieldId] : '';
+    if (newVal === live) {
+      // no longer different — remove from changedFields
+      changedFields.delete(fieldId);
+      delete fieldAccepted[fieldId];
+      const row = document.getElementById('diff-row-' + fieldId);
+      if (row) row.style.display = 'none';
+    }
+    updatePushButton();
+  } else {
+    textEl.style.display = 'none';
+    inputEl.style.display = 'block';
+    inputEl.focus();
+    btnEl.textContent = 'Done';
+  }
+}
+
+function onDraftInputChange(fieldId) {
+  // sync text preview live while editing
+  const inputEl = document.getElementById('draft-input-' + fieldId);
+  const textEl  = document.getElementById('draft-text-' + fieldId);
+  if (textEl) textEl.textContent = inputEl.value;
+}
+
+function showEditorView() {
+  document.getElementById('diff-card').style.display = 'none';
+  document.getElementById('edit-editor-card').style.display = '';
 }
 
 function toggleFieldAccept(fieldId, accept) {
-  fieldAccepted[fieldId] = accept;
-  const row = document.getElementById('diff-row-' + fieldId);
+  // If clicking the already-active state, deselect (back to pending)
+  const current = fieldAccepted[fieldId];
+  const newState = (current === accept) ? null : accept;
+  fieldAccepted[fieldId] = newState;
+
+  const row       = document.getElementById('diff-row-' + fieldId);
+  const acceptBtn = document.getElementById('accept-' + fieldId);
+  const rejectBtn = document.getElementById('reject-' + fieldId);
   if (!row) return;
-  row.querySelector('#accept-' + fieldId).style.fontWeight = accept ? '800' : '600';
-  row.querySelector('#reject-' + fieldId).style.fontWeight = !accept ? '800' : '600';
-  row.style.opacity = accept ? '1' : '0.45';
+
+  acceptBtn.classList.toggle('active', newState === true);
+  rejectBtn.classList.toggle('active', newState === false);
+  row.classList.remove('state-accepted', 'state-rejected');
+  if (newState === true)  row.classList.add('state-accepted');
+  if (newState === false) row.classList.add('state-rejected');
+
+  updatePushButton();
 }
 
-async function acceptAllChanges() {
+function updatePushButton() {
+  // Push enabled as soon as at least one field is accepted — pending fields are simply skipped
+  const anyAccepted = [...changedFields].some(id => fieldAccepted[id] === true);
+  document.getElementById('push-live-btn').disabled = !anyAccepted;
+}
+
+function acceptAllFields() {
+  changedFields.forEach(id => {
+    if (fieldAccepted[id] !== true) toggleFieldAccept(id, true);
+  });
+}
+
+function rejectAllFields() {
+  changedFields.forEach(id => {
+    if (fieldAccepted[id] !== false) toggleFieldAccept(id, false);
+  });
+}
+
+async function pushLive() {
   const def = CHAPTER_DEFS[currentChapterId];
   const toWrite = {};
   def.fields.forEach(f => {
-    if (fieldAccepted[f.id] !== false) {
-      const el = document.getElementById('field-' + f.id);
-      if (el) toWrite[f.id] = el.value;
-      else if (draftData[f.id] !== undefined) toWrite[f.id] = draftData[f.id];
-    } else {
-      // Rejected — keep live value
-      if (liveData[f.id] !== undefined) toWrite[f.id] = liveData[f.id];
+    if (fieldAccepted[f.id] === true) {
+      // Use draft-input value if it was edited in-diff, else draft-text
+      const inputEl = document.getElementById('draft-input-' + f.id);
+      const textEl  = document.getElementById('draft-text-' + f.id);
+      toWrite[f.id] = (inputEl && inputEl.style.display === 'block') ? inputEl.value : (textEl ? textEl.textContent : (draftData[f.id] || ''));
     }
+    // Rejected fields: keep live value — don't overwrite
   });
+  const btn = document.getElementById('push-live-btn');
+  btn.disabled = true;
+  btn.textContent = 'Pushing…';
   await db.collection('content').doc(currentChapterId).set(toWrite, { merge: true });
+  liveData = { ...liveData, ...toWrite };
   const now = new Date();
   const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
-  document.getElementById('sync-msg').textContent = `Pushed live at ${hhmm} — visible to all users.`;
-  document.getElementById('diff-area').style.display = 'none';
-  liveData = { ...liveData, ...toWrite };
-}
-
-async function rejectAllChanges() {
-  const def = CHAPTER_DEFS[currentChapterId];
-  def.fields.forEach(f => { fieldAccepted[f.id] = false; toggleFieldAccept(f.id, false); });
-  document.getElementById('sync-msg').textContent = 'All changes rejected — live content unchanged.';
+  document.getElementById('sync-msg').textContent = `Pushed live at ${hhmm} — accepted changes are now visible to all users.`;
+  btn.textContent = 'Push to Live →';
+  setTimeout(showEditorView, 1600);
 }
 </script>
 </body>
