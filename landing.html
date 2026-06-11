@@ -332,6 +332,15 @@ a.course-list-item:hover { background: #e4e7ff; }
     <!-- LOGGED IN: welcome + courses -->
     <div class="success-panel" id="success-panel">
       <div class="success-title">Welcome,<br><span class="success-name" id="success-name">—</span>.</div>
+      <div id="admin-portal-landing" style="display:none;">
+        <a href="admin.html" style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border:1px solid rgba(30,34,170,0.15);border-left:4px solid #1A1E9E;background:#f0f2ff;text-decoration:none;margin-bottom:4px;">
+          <div>
+            <div style="font-size:13px;font-weight:800;color:#1A1E9E;">⚙️ Admin Portal</div>
+            <div style="font-size:9px;font-weight:600;color:#7B7FE8;letter-spacing:0.08em;text-transform:uppercase;margin-top:2px;font-family:'JetBrains Mono',monospace;">Manage users &amp; content</div>
+          </div>
+          <span style="font-size:16px;color:#1A1E9E;">→</span>
+        </a>
+      </div>
       <div class="course-list">
         <div class="course-list-label">Your Courses</div>
         <a class="course-list-item" href="hub.html">
@@ -404,6 +413,12 @@ auth.onAuthStateChanged(function(user) {
     document.getElementById('success-name').textContent = (user.displayName || user.email).split(' ')[0];
     signinPanel.style.display = 'none';
     successPanel.classList.add('visible');
+    window.firebaseDB.collection('users').doc(user.uid).get().then(function(snap) {
+      var d = snap.exists ? snap.data() : {};
+      if (d.isAdmin || d.masterAdmin) {
+        document.getElementById('admin-portal-landing').style.display = '';
+      }
+    });
   } else {
     signinPanel.style.display = '';
     successPanel.classList.remove('visible');
