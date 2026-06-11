@@ -189,6 +189,8 @@ body { font-family: var(--sans); background: var(--blue-wash); color: var(--blue
   outline: none; cursor: pointer; width: 100%; max-width: 320px; margin-bottom: 24px;
   appearance: none; -webkit-appearance: none;
 }
+.edit-subtab { padding:8px 18px; font-family:var(--mono); font-size:9px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; background:none; border:none; border-bottom:2px solid transparent; color:var(--blue-soft); cursor:pointer; margin-bottom:-1px; }
+.edit-subtab.active { color:var(--blue); border-bottom-color:var(--blue); }
 .edit-field { margin-bottom: 18px; }
 .edit-label {
   font-family: var(--mono); font-size: 9px; font-weight: 600;
@@ -351,6 +353,11 @@ body { font-family: var(--sans); background: var(--blue-wash); color: var(--blue
         <div class="card-title" style="margin-bottom:0;" id="edit-chapter-label"></div>
         <div class="draft-indicator" id="draft-indicator"></div>
       </div>
+      <div id="edit-subtabs" style="display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid var(--border);">
+        <button class="edit-subtab active" id="subtab-slide" onclick="switchEditTab('slide')">Slide Content</button>
+        <button class="edit-subtab" id="subtab-content" onclick="switchEditTab('content')">Chapter Content</button>
+        <button class="edit-subtab" id="subtab-assess" onclick="switchEditTab('assess')">Assessment</button>
+      </div>
       <div id="edit-fields"></div>
       <div id="sync-area" style="margin-top:16px;"></div>
     </div>
@@ -388,21 +395,77 @@ const CHAPTER_DEFS = {
   ch1: {
     label: 'Where We Play',
     course: 'beginner',
-    fields: [
-      { id: 'slide-1-headline', label: 'Chapter Title',        placeholder: 'e.g. Where We Play',                              default: 'Where We Play' },
-      { id: 'slide-1-sub',      label: 'Slide 1 Tagline',      placeholder: "e.g. India's $1 trillion real estate market",     default: "Where We Play: India's $1 trillion real estate market." },
-      { id: 'slide-2-title',    label: 'Slide 2 Title',        placeholder: 'e.g. Real Estate: Two Worlds',                    default: 'Real Estate: Two Worlds' },
-      { id: 'slide-2-sub',      label: 'Slide 2 Subtitle',     placeholder: 'e.g. Residential vs Commercial',                  default: 'Residential: Emotion and aspiration.  ||  Commercial: Economics and growth.' }
+    slideFields: [
+      { id: 'slide-1-headline', label: 'Slide Headline', type: 'input', default: 'Where We Play' },
+      { id: 'slide-1-sub',      label: 'Slide Tagline',  type: 'input', default: "Where We Play: India's $1 trillion real estate market." },
+    ],
+    contentFields: [
+      { id: 'ch1-s01-title',    label: 'S01 Title',          type: 'input',    default: 'Indian Real Estate: The Big Picture' },
+      { id: 'ch1-s01-outcome',  label: 'S01 Learning Outcome', type: 'textarea', default: "The scale of India's real estate market — its size, its growth drivers, and why office space sits at its centre." },
+      { id: 'ch1-s01-body',     label: 'S01 Body',           type: 'textarea', default: '' },
+      { id: 'ch1-s01-takeaway', label: 'S01 Takeaway',       type: 'input',    default: '"We shape our buildings; thereafter they shape us." — Winston Churchill' },
+      { id: 'ch1-s02-title',    label: 'S02 Title',          type: 'input',    default: 'Residential vs Commercial' },
+      { id: 'ch1-s02-outcome',  label: 'S02 Learning Outcome', type: 'textarea', default: 'The difference between residential and commercial real estate, and why they behave like separate industries.' },
+      { id: 'ch1-s02-body',     label: 'S02 Body',           type: 'textarea', default: '' },
+      { id: 'ch1-s02-takeaway', label: 'S02 Takeaway',       type: 'input',    default: 'Residential sells dreams. Commercial solves problems.' },
+      { id: 'ch1-s03-title',    label: 'S03 Title',          type: 'input',    default: 'Commercial Real Estate (CRE)' },
+      { id: 'ch1-s03-outcome',  label: 'S03 Learning Outcome', type: 'textarea', default: 'Understand the major segments of commercial real estate, the key stakeholders involved, and the broader ecosystem that supports the industry.' },
+      { id: 'ch1-s03-body',     label: 'S03 Body',           type: 'textarea', default: '' },
+      { id: 'ch1-s04-title',    label: 'S04 Title',          type: 'input',    default: 'Office Leasing: Conventional vs Flex' },
+      { id: 'ch1-s04-outcome',  label: 'S04 Learning Outcome', type: 'textarea', default: 'The two routes through which companies get office space, and how each journey unfolds.' },
+      { id: 'ch1-s04-body',     label: 'S04 Body',           type: 'textarea', default: '' },
+      { id: 'ch1-s04-takeaway', label: 'S04 Takeaway',       type: 'input',    default: 'Conventional and flex are two distinct ecosystems — same buildings, fundamentally different journeys for the occupier.' },
+      { id: 'ch1-s05-title',    label: 'S05 Title',          type: 'input',    default: 'Key Stakeholders in Office Leasing' },
+      { id: 'ch1-s05-outcome',  label: 'S05 Learning Outcome', type: 'textarea', default: 'Players in the Office Leasing Ecosystem and Their Value Addition Across the Leasing Funnel.' },
+      { id: 'ch1-s05-body',     label: 'S05 Body',           type: 'textarea', default: '' },
+      { id: 'ch1-s05-takeaway', label: 'S05 Takeaway',       type: 'input',    default: 'Understanding all five players — and what each one adds — is what separates a transaction executor from a trusted advisor.' },
+      { id: 'ch1-s06-title',    label: 'S06 Title',          type: 'input',    default: 'Where myHQ Fits' },
+      { id: 'ch1-s06-outcome',  label: 'S06 Learning Outcome', type: 'textarea', default: "What myHQ does, where it sits in the market, and what makes its model distinctive." },
+      { id: 'ch1-s06-body',     label: 'S06 Body',           type: 'textarea', default: '' },
+      { id: 'ch1-s07-title',    label: 'S07 Title (Ref)',    type: 'input',    default: 'Market Data' },
+      { id: 'ch1-s07-body',     label: 'S07 Body (Ref)',     type: 'textarea', default: '' },
+      { id: 'ch1-s08-title',    label: 'S08 Title (Ref)',    type: 'input',    default: 'The 2030 View' },
+      { id: 'ch1-s08-body',     label: 'S08 Body (Ref)',     type: 'textarea', default: '' },
+    ],
+    assessFields: [
+      { id: 'ch1-assess-q1', label: 'Question 1', type: 'textarea', default: 'Compare Commercial Real Estate (CRE) and Residential Real Estate across factors such as supply, demand, user personas, decision-making, emotional drivers, investment objectives, transaction processes, and market dynamics. What are the key similarities and differences?' },
+      { id: 'ch1-assess-q2', label: 'Question 2', type: 'textarea', default: 'Pick one operator from the list below — Awfis, Smartworks, or WeWork India. How many centres do they have, in which cities, at roughly what seat count? What\'s their primary positioning — enterprise, SME, or mixed? What does their pricing model look like?' },
+      { id: 'ch1-assess-q3', label: 'Question 3', type: 'textarea', default: 'Compare the myHQ app and website. What user needs does each address, what transaction models do they facilitate, and which customer segments are they designed for?' },
+      { id: 'ch1-assess-q4', label: 'Question 4', type: 'textarea', default: "India's gross office absorption in 2025 was reported at ~80 million sq ft, but net absorption tells a different story. Look up the net absorption number for any one city (BLR, NCR, HYD, MUM). What's the gap? What does that gap tell you about the difference between gross and net absorption?" },
+      { id: 'ch1-assess-q5', label: 'Question 5', type: 'textarea', default: 'Flex penetration in India is currently ~22–25% of total Grade A stock. Some analysts say India will hit 30% by 2030. Others say the enterprise swing back to conventional will cap it. Take a side — Flex Penetration or Conventional Swing Back — and defend it.' },
     ]
   },
   ch2: {
     label: 'Who We Are',
     course: 'beginner',
-    fields: [
-      { id: 'slide-1-headline', label: 'Chapter Title',        placeholder: 'e.g. Who We Are',                                  default: 'Who We Are' },
-      { id: 'slide-1-sub',      label: 'Intro Subtitle',       placeholder: "e.g. Before you start...",                        default: "Before you start, let's know the story and journey of myHQ." },
-      { id: 'slide-2-headline', label: 'Phase 1 Headline',     placeholder: 'e.g. From underutilised real estate...',           default: 'From underutilised real estate to productive workspaces.' },
-      { id: 'slide-2-eyebrow',  label: 'Phase 1 Eyebrow',      placeholder: 'e.g. Phase 1 · 2015–2017',                        default: 'Phase 1 · 2015 – 2017' }
+    slideFields: [
+      { id: 'slide-1-headline', label: 'Slide Headline', type: 'input',    default: 'Who We Are' },
+      { id: 'slide-1-sub',      label: 'Slide Subtitle', type: 'input',    default: "Before you start, let's know the story and journey of myHQ." },
+    ],
+    contentFields: [
+      { id: 'ch2-intro-body',   label: 'Intro Body',         type: 'textarea', default: '' },
+      { id: 'ch2-s01-title',    label: 'S01 Title',          type: 'input',    default: 'The Story' },
+      { id: 'ch2-s01-outcome',  label: 'S01 Learning Outcome', type: 'textarea', default: "Understand every phase of myHQ's journey — the bets, the turning points, and what shaped the company it is today." },
+      { id: 'ch2-s01-body',     label: 'S01 Body',           type: 'textarea', default: '' },
+      { id: 'ch2-s02-title',    label: 'S02 Title',          type: 'input',    default: 'Business Verticals' },
+      { id: 'ch2-s02-outcome',  label: 'S02 Learning Outcome', type: 'textarea', default: "What myHQ's business verticals do, who they serve, and how they work together." },
+      { id: 'ch2-s03-title',    label: 'S03 Title',          type: 'input',    default: 'An entrepreneurial team using tech to disrupt commercial real estate.' },
+      { id: 'ch2-s03-outcome',  label: 'S03 Learning Outcome', type: 'textarea', default: 'Who leads myHQ, what they did before, and why the team composition matters.' },
+      { id: 'ch2-s03-body',     label: 'S03 Body',           type: 'textarea', default: '' },
+      { id: 'ch2-s04-title',    label: 'S04 Title',          type: 'input',    default: 'Org Structure' },
+      { id: 'ch2-s04-outcome',  label: 'S04 Learning Outcome', type: 'textarea', default: "How myHQ's departments, sub-teams, and functions connect to each other." },
+      { id: 'ch2-s05-title',    label: 'S05 Title',          type: 'input',    default: 'Scale & Reach' },
+      { id: 'ch2-s05-outcome',  label: 'S05 Learning Outcome', type: 'textarea', default: "myHQ's scale, partner network, and reach — the numbers that reflect platform depth and market trust." },
+      { id: 'ch2-s06-title',    label: 'S06 Title',          type: 'input',    default: 'The Ambition — 2030' },
+      { id: 'ch2-s06-outcome',  label: 'S06 Learning Outcome', type: 'textarea', default: "myHQ's 2030 growth plan — the numbers, the drivers, and the opportunity ahead." },
+      { id: 'ch2-s07-title',    label: 'S07 Title',          type: 'input',    default: 'Success Stories' },
+      { id: 'ch2-s07-outcome',  label: 'S07 Learning Outcome', type: 'textarea', default: 'Our leaders grew from within — understand the growth paths that are possible at myHQ.' },
+    ],
+    assessFields: [
+      { id: 'ch2-assess-q1', label: 'Question 1', type: 'textarea', default: 'The term "Assisted Marketplace" is a deliberate choice. What does it reveal about myHQ\'s approach to the brokerage business, and why does the company prefer this model over a traditional brokerage approach?' },
+      { id: 'ch2-assess-q2', label: 'Question 2', type: 'textarea', default: 'Pick anyone from the myHQ leadership team — a city lead, product lead, or business head — and tell their story. What brought them here and what have they built? (Not your direct manager.)' },
+      { id: 'ch2-assess-q3', label: 'Question 3', type: 'textarea', default: 'Go online and find 3 headlines about myHQ. What milestone was each one covering and why does it matter?' },
+      { id: 'ch2-assess-q4', label: 'Question 4', type: 'textarea', default: 'Write about Virtual Office — what is it, and what need does it solve for businesses?' },
     ]
   }
 };
@@ -698,6 +761,7 @@ async function loadUserResultById(uid) {
 let debounceTimer    = null;
 let currentChapterId = null;
 let currentEditCourse = 'beginner';
+let currentEditTab   = 'slide';
 let liveData         = {};
 let draftData        = {};
 let fieldAccepted    = {};
@@ -751,22 +815,11 @@ async function loadChapter(chId, btn) {
     if (rawDraft[k] !== liveData[k]) draftData[k] = rawDraft[k];
   });
 
-  // Use draft values if exist, else live, else default
-  const values = {};
-  def.fields.forEach(f => {
-    values[f.id] = draftData[f.id] !== undefined ? draftData[f.id]
-                 : liveData[f.id]  !== undefined ? liveData[f.id]
-                 : f.default;
+  currentEditTab = 'slide';
+  ['slide','content','assess'].forEach(t => {
+    document.getElementById('subtab-' + t).classList.toggle('active', t === 'slide');
   });
-
-  document.getElementById('edit-fields').innerHTML = def.fields.map(f => `
-    <div class="edit-field">
-      <label class="edit-label" for="field-${f.id}">${f.label}</label>
-      <input class="edit-input" id="field-${f.id}" type="text"
-        value="${escHtml(values[f.id])}"
-        placeholder="${escHtml(f.placeholder || '')}"
-        oninput="scheduleDraftSave()" />
-    </div>`).join('');
+  renderEditFields();
 
   // MasterAdmin: show sync button + diff if draft differs from live
   const syncArea = document.getElementById('sync-area');
@@ -781,6 +834,43 @@ function escHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+function switchEditTab(tab) {
+  currentEditTab = tab;
+  ['slide','content','assess'].forEach(t => {
+    document.getElementById('subtab-' + t).classList.toggle('active', t === tab);
+  });
+  renderEditFields();
+}
+
+function renderEditFields() {
+  const def = CHAPTER_DEFS[currentChapterId];
+  if (!def) return;
+  const fields = currentEditTab === 'slide'   ? def.slideFields
+               : currentEditTab === 'content' ? def.contentFields
+               : def.assessFields;
+
+  document.getElementById('edit-fields').innerHTML = fields.map(f => {
+    const val = draftData[f.id] !== undefined ? draftData[f.id]
+              : liveData[f.id]  !== undefined ? liveData[f.id]
+              : f.default;
+    if (f.type === 'textarea') {
+      return `<div class="edit-field">
+        <label class="edit-label" for="field-${f.id}">${f.label}</label>
+        <textarea class="edit-input" id="field-${f.id}" rows="4"
+          placeholder="${escHtml(f.placeholder || '')}"
+          oninput="scheduleDraftSave()" style="resize:vertical;min-height:80px;">${escHtml(val)}</textarea>
+      </div>`;
+    }
+    return `<div class="edit-field">
+      <label class="edit-label" for="field-${f.id}">${f.label}</label>
+      <input class="edit-input" id="field-${f.id}" type="text"
+        value="${escHtml(val)}"
+        placeholder="${escHtml(f.placeholder || '')}"
+        oninput="scheduleDraftSave()" />
+    </div>`;
+  }).join('');
+}
+
 function scheduleDraftSave() {
   clearTimeout(debounceTimer);
   document.getElementById('draft-indicator').textContent = 'Saving draft…';
@@ -790,9 +880,9 @@ function scheduleDraftSave() {
 async function saveDraft() {
   const def = CHAPTER_DEFS[currentChapterId];
   const data = {};
-  def.fields.forEach(f => {
+  [...def.slideFields, ...def.contentFields, ...def.assessFields].forEach(f => {
     const el = document.getElementById('field-' + f.id);
-    if (el) data[f.id] = el.value;
+    if (el) data[f.id] = el.value !== undefined ? el.value : el.textContent;
   });
   draftData = { ...draftData, ...data };
   await db.collection('content-drafts').doc(currentChapterId).set(data, { merge: true });
@@ -810,12 +900,12 @@ function showDiff() {
   changedFields = new Set();
 
   const currentDraft = {};
-  def.fields.forEach(f => {
+  [...def.slideFields, ...def.contentFields, ...def.assessFields].forEach(f => {
     const el = document.getElementById('field-' + f.id);
     if (el) currentDraft[f.id] = el.value;
   });
 
-  const rows = def.fields.map(f => {
+  const rows = [...def.slideFields, ...def.contentFields, ...def.assessFields].map(f => {
     const live  = liveData[f.id]    !== undefined ? liveData[f.id]    : f.default;
     const draft = currentDraft[f.id] !== undefined ? currentDraft[f.id] : f.default;
     const changed = live !== draft;
@@ -960,18 +1050,15 @@ async function pushLive() {
   const toWrite = {};
   const draftCleanup = {};
 
-  def.fields.forEach(f => {
+  [...def.slideFields, ...def.contentFields, ...def.assessFields].forEach(f => {
     if (fieldAccepted[f.id] === true) {
       const inputEl = document.getElementById('draft-input-' + f.id);
       const textEl  = document.getElementById('draft-text-' + f.id);
       toWrite[f.id] = (inputEl && inputEl.style.display === 'block') ? inputEl.value : (textEl ? textEl.textContent : (draftData[f.id] || ''));
-      // Remove accepted field from draft — it's now live
       draftCleanup[f.id] = firebase.firestore.FieldValue.delete();
     } else if (fieldAccepted[f.id] === false) {
-      // Rejected — remove from draft so it doesn't show up again next review
       draftCleanup[f.id] = firebase.firestore.FieldValue.delete();
     }
-    // Pending fields: left alone in draft for next review
   });
 
   const btn = document.getElementById('push-live-btn');
