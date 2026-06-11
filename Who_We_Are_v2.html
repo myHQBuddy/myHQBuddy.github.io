@@ -424,6 +424,40 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 .r-stat-lbl { font-size: 11px; color: var(--muted); line-height: 1.4; }
 
 .hidden { display: none !important; }
+
+/* ── RESPONSIVE BREAKPOINTS ── */
+@media (max-width: 1200px) {
+  /* Slide 6 — Scale & Reach: stats 5-col → 2-col+3-col auto */
+  .s7-stats { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+
+  /* Slide 6 — logo panels stack vertically */
+  .s7-logo-panels { grid-template-columns: 1fr; }
+
+  /* Slide 6 — clientele sub-panels go equal width */
+  .s7-sub-panels--clientele { grid-template-columns: 1fr 1fr; }
+
+  /* Slide 6 — partners sub-panels stack */
+  .s7-sub-panels--partners { grid-template-columns: 1fr; }
+
+  /* Slide 8 — Ambition body chart+sidebar stack */
+  .s5-body { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) {
+  /* Slide 1/2/3 cover text */
+  .screen-video-inner { grid-template-columns: 1fr; }
+
+  /* Slide 4 — verticals 3-col → 1-col */
+  .s4-cards { grid-template-columns: 1fr; }
+
+  /* Slide 5 — team grids */
+  .s5t-grid { grid-template-columns: 1fr 1fr; }
+  .s5t-pnl  { grid-template-columns: 1fr 1fr; }
+
+  /* Slide 6 — stat boxes single column */
+  .s7-stats { grid-template-columns: 1fr 1fr; }
+  .s7-sub-panels--clientele { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
