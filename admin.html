@@ -1183,6 +1183,7 @@ async function pushLive() {
     await db.collection('content-drafts').doc(currentChapterId).set(remaining);
   } else {
     await db.collection('content-drafts').doc(currentChapterId).delete();
+    draftData = {};
   }
 
   const now = new Date();
