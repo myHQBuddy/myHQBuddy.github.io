@@ -886,11 +886,18 @@ async function loadChapter(chId, btn) {
     Object.assign(liveData, missing);
   }
 
-  // Strip any draft field that is identical to live — those are stale rejected values
+  // Strip draft fields identical to live (stale/rejected values) and _draftStatus
   draftData = {};
   Object.keys(rawDraft).forEach(k => {
+    if (k === '_draftStatus') return;
     if (rawDraft[k] !== liveData[k]) draftData[k] = rawDraft[k];
   });
+
+  // If no real content differences remain, delete the draft doc entirely
+  if (Object.keys(draftData).length === 0 && draftSnap.exists) {
+    db.collection('content-drafts').doc(chId).delete();
+    updatePillStatus(chId, false, null);
+  }
 
   currentEditTab = 'slide';
   ['slide','content','assess'].forEach(t => {
