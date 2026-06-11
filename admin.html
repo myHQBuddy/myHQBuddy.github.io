@@ -357,7 +357,10 @@ body { font-family: var(--sans); background: var(--blue-wash); color: var(--blue
     <div class="card" id="edit-editor-card" style="display:none;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <div class="card-title" style="margin-bottom:0;" id="edit-chapter-label"></div>
-        <div class="draft-indicator" id="draft-indicator"></div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button id="reseed-btn" onclick="forceReseedHtmlFields()" style="display:none;padding:4px 10px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;background:#fff8e1;color:#f57f17;border:1px solid #ffe082;cursor:pointer;">↺ Restore HTML Defaults</button>
+          <div class="draft-indicator" id="draft-indicator"></div>
+        </div>
       </div>
       <div id="edit-subtabs" style="display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid var(--border);">
         <button class="edit-subtab active" id="subtab-slide" onclick="switchEditTab('slide')">Slide Content</button>
@@ -997,6 +1000,20 @@ function updatePillStatus(chId, hasDraft, draftStatus) {
   renderCoursePills();
 }
 
+async function forceReseedHtmlFields() {
+  const chId = currentChapterId;
+  if (!chId) return;
+  const def = CHAPTER_DEFS[chId];
+  const allFields = [...def.slideFields, ...def.contentFields, ...def.assessFields];
+  const updates = {};
+  allFields.forEach(f => { if (f.html && f.default) updates[f.id] = f.default; });
+  await db.collection('content').doc(chId).set(updates, { merge: true });
+  Object.assign(liveData, updates);
+  document.getElementById('draft-indicator').textContent = 'HTML defaults restored ✓';
+  setTimeout(() => { document.getElementById('draft-indicator').textContent = ''; }, 3000);
+  renderEditFields();
+}
+
 async function loadChapter(chId, btn) {
   currentChapterId = chId;
   document.querySelectorAll('.chapter-pill').forEach(p => p.classList.remove('active'));
@@ -1007,6 +1024,8 @@ async function loadChapter(chId, btn) {
   document.getElementById('edit-chapter-label').textContent = def.label;
   document.getElementById('draft-indicator').textContent = '';
   document.getElementById('sync-msg').textContent = '';
+  var hasHtmlFields = [...def.slideFields, ...def.contentFields, ...def.assessFields].some(f => f.html);
+  document.getElementById('reseed-btn').style.display = hasHtmlFields ? '' : 'none';
   document.getElementById('diff-card').style.display = 'none';
   document.getElementById('edit-editor-card').style.display = '';
   fieldAccepted = {};
@@ -1039,9 +1058,6 @@ async function loadChapter(chId, btn) {
     if (f.default === '') return;
     const stored = liveData[f.id];
     if (stored === undefined) {
-      missing[f.id] = f.default;
-    } else if (f.html && typeof stored === 'string' && /<[^>]+>/.test(f.default) && !/<[^>]+>/.test(stored)) {
-      // Stored value has no HTML but the default does — plain-text was saved previously; restore
       missing[f.id] = f.default;
     }
   });
