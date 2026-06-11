@@ -743,7 +743,13 @@ async function loadChapter(chId, btn) {
     db.collection('content-drafts').doc(chId).get()
   ]);
   liveData  = liveSnap.exists  ? liveSnap.data()  : {};
-  draftData = draftSnap.exists ? draftSnap.data() : {};
+  const rawDraft = draftSnap.exists ? draftSnap.data() : {};
+
+  // Strip any draft field that is identical to live — those are stale rejected values
+  draftData = {};
+  Object.keys(rawDraft).forEach(k => {
+    if (rawDraft[k] !== liveData[k]) draftData[k] = rawDraft[k];
+  });
 
   // Use draft values if exist, else live, else default
   const values = {};
@@ -957,7 +963,8 @@ async function pushLive() {
 
   const writes = [db.collection('content').doc(currentChapterId).set(toWrite, { merge: true })];
   if (Object.keys(draftCleanup).length) {
-    writes.push(db.collection('content-drafts').doc(currentChapterId).update(draftCleanup));
+    // use set+merge so it works even if some fields don't exist in the doc
+    writes.push(db.collection('content-drafts').doc(currentChapterId).set(draftCleanup, { merge: true }));
   }
   await Promise.all(writes);
 
