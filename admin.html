@@ -898,13 +898,16 @@ async function loadChapter(chId, btn) {
   });
   renderEditFields();
 
-  // MasterAdmin: show sync button + diff if draft differs from live
+  updateSyncArea();
+}
+
+function updateSyncArea() {
   const syncArea = document.getElementById('sync-area');
-  if (isMasterAdmin) {
-    syncArea.innerHTML = '<button class="sync-btn" onclick="showDiff()">Review &amp; Push Live →</button>';
-  } else {
-    syncArea.innerHTML = '';
-  }
+  if (!syncArea) return;
+  const hasPendingDraft = isMasterAdmin && Object.keys(draftData).filter(k => k !== '_draftStatus').length > 0;
+  syncArea.innerHTML = hasPendingDraft
+    ? '<button class="sync-btn" onclick="showDiff()">Review &amp; Push Live →</button>'
+    : '';
 }
 
 function escHtml(str) {
@@ -966,6 +969,7 @@ async function saveDraft() {
   await db.collection('content-drafts').doc(currentChapterId).set(data, { merge: true });
   document.getElementById('draft-indicator').textContent = 'Draft saved ✓';
   updatePillStatus(currentChapterId, true, 'pending');
+  updateSyncArea();
 }
 
 // fieldAccepted: null = pending, true = accepted, false = rejected
@@ -1067,6 +1071,7 @@ function onDraftInputChange(fieldId) {
 function showEditorView() {
   document.getElementById('diff-card').style.display = 'none';
   document.getElementById('edit-editor-card').style.display = '';
+  updateSyncArea();
 }
 
 function toggleFieldAccept(fieldId, accept) {
