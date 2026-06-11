@@ -1022,6 +1022,15 @@ function showDiff() {
     </div>`;
   }).join('');
 
+  // No actual changes — clear draft and return to editor
+  if (changedFields.size === 0) {
+    db.collection('content-drafts').doc(currentChapterId).delete();
+    draftData = {};
+    updatePillStatus(currentChapterId, false, null);
+    updateSyncArea();
+    return;
+  }
+
   document.getElementById('diff-rows').innerHTML = rows;
   document.getElementById('diff-chapter-label').textContent = def.label;
   document.getElementById('sync-msg').textContent = '';
