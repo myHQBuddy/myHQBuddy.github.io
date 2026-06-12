@@ -76,7 +76,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 .key-hint { position: fixed; bottom: clamp(10px,1.8vw,26px); right: clamp(16px,4vw,58px); font-size: clamp(9px,0.76vw,11px); font-weight: 500; color: var(--muted); display: flex; align-items: center; gap: clamp(4px,0.42vw,6px); transition: opacity 0.5s; z-index: 100; }
 .key-hint.hidden { opacity: 0; pointer-events: none; }
 
-.slides { position: fixed; top: clamp(44px,3.6vw,52px); left: 0; right: 0; bottom: 0; }
+.slides { position: fixed; top: clamp(44px,3.6vw,52px); left: 0; right: 0; bottom: 0; overflow: hidden; transform-origin: top left; }
 .screen { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); transform: translateY(20px); overflow: hidden; }
 .screen.active { opacity: 1; pointer-events: all; transform: translateY(0); }
 .screen.exit-up { opacity: 0; transform: translateY(-20px); }
@@ -223,7 +223,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 .s5t-card--founder .s5t-re { color: rgba(255,255,255,0.8); }
 
 /* ── NEW TEAM LAYOUT (matching image) ── */
-.s5t-two-panel { display: flex; align-items: stretch; gap: clamp(8px,1.2vw,16px); width: 100%; height: clamp(320px,45vh,450px); }
+.s5t-two-panel { display: flex; align-items: stretch; gap: clamp(8px,1.2vw,16px); width: 100%; height: 420px; }
 .s5t-panel { border: 1.5px solid var(--blue); border-radius: 12px; padding: 0; background: var(--white); overflow: hidden; display: inline-flex; }
 .s5t-panel img { display: block; width: 100%; height: auto; max-height: 75vh; object-fit: contain; }
 .s5t-panel-label { font-size: clamp(10px,1vw,12px); font-weight: 700; font-style: italic; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-bottom: clamp(10px,1.4vw,16px); }
@@ -468,7 +468,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
   /* Slide 5 team — scale down to fit fixed-height viewport */
   .screen-team { overflow-y: auto; padding: clamp(8px,1.2vw,16px) clamp(16px,3vw,40px) 56px; gap: 8px; }
   .s5t-title { font-size: clamp(1.1rem,2.2vw,1.8rem); }
-  .s5t-two-panel { height: clamp(240px,52vh,380px); gap: 8px; }
+  .s5t-two-panel { height: 380px; gap: 8px; }
   .s5t-panel--left  { padding: 12px 14px; }
   .s5t-panel--right { padding: 12px 14px; }
   .s5t-people-grid  { gap: 8px !important; }
@@ -508,7 +508,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
   .s5t-grid     { grid-template-columns: 1fr; }
   .s5t-founders { grid-template-columns: 1fr; }
   .s5t-pnl      { grid-template-columns: 1fr; }
-  .s5t-two-panel   { height: clamp(200px,58vh,360px); }
+  .s5t-two-panel   { height: 340px; }
   .s5t-photo       { width: 28px !important; height: 28px !important; }
   .s5t-person-name { font-size: 11px !important; }
   .s5t-person-prev { display: none; }
@@ -2380,6 +2380,30 @@ function updateCounter() {
   if (chap) chap.style.display = current === 0 ? '' : 'none';
 }
 
+function scaleSlides() {
+  const REF_W = 1440;
+  const REF_H = 900;
+  const wrap = document.getElementById('slides');
+  if (!wrap) return;
+  const topbar = document.querySelector('.topbar');
+  const topbarH = topbar ? topbar.offsetHeight : 52;
+  const vw = document.documentElement.clientWidth;
+  const vh = document.documentElement.clientHeight - topbarH;
+  const scale = Math.min(vw / REF_W, vh / REF_H);
+  const scaledW = REF_W * scale;
+  const scaledH = REF_H * scale;
+  const offsetX = Math.round((vw - scaledW) / 2);
+  const offsetY = Math.round((vh - scaledH) / 2);
+  wrap.style.width = REF_W + 'px';
+  wrap.style.height = REF_H + 'px';
+  wrap.style.left = offsetX + 'px';
+  wrap.style.top = (topbarH + offsetY) + 'px';
+  wrap.style.right = 'auto';
+  wrap.style.bottom = 'auto';
+  wrap.style.transform = `scale(${scale})`;
+}
+window.addEventListener('resize', scaleSlides);
+
 function goTo(index) {
   if (animating || index === current || index < 0 || index >= TOTAL) return;
   animating = true;
@@ -2446,6 +2470,7 @@ readSections.forEach(s => tocObserver.observe(s));
 
 /* ── INIT ── */
 window.addEventListener('DOMContentLoaded', () => {
+  scaleSlides();
   buildDots();
   document.querySelectorAll('.screen')[0].classList.add('active');
   updateCounter();
@@ -2582,7 +2607,7 @@ function showSubmittedState() {
   const MAX_VAL = 5000;
   const BLUE = '#1E22AA';
   const GREEN = '#2e7d36';
-  const MAX_H = '41vh'; // tallest bar height — vh keeps chart within screen at any zoom level
+  const MAX_H = '370px'; // tallest bar height — px fits within 900px canvas
 
   function buildChart(container) {
     container.innerHTML = '';
@@ -2612,7 +2637,7 @@ function showSubmittedState() {
 
       const barEl = document.createElement('div');
       barEl.className = 'ambition-bar';
-      barEl.style.height = ((bar.value / MAX_VAL) * 41).toFixed(3) + 'vh';
+      barEl.style.height = ((bar.value / MAX_VAL) * 370).toFixed(1) + 'px';
       if (bar.target) {
         barEl.style.background = 'rgba(30,100,60,0.06)';
         barEl.style.border = '1.5px dashed ' + GREEN;
