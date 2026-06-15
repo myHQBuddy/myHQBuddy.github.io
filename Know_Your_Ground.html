@@ -8,6 +8,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
 <style>
 
 /* ── SLIDE STYLES ── */
@@ -1842,10 +1846,18 @@ const QUESTION_CONFIG = {
 function getLoggedInFirstName() {
   const auth = window.firebaseAuth;
   if (auth && auth.currentUser) {
-    const name = auth.currentUser.displayName || auth.currentUser.email || '';
-    return name.split(' ')[0].split('@')[0];
+    const raw = auth.currentUser.displayName || auth.currentUser.email || '';
+    const name = raw.split(' ')[0].split('@')[0];
+    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
   }
   return 'User';
+}
+
+// Redirect to login if not authenticated
+if (window.firebaseAuth) {
+  window.firebaseAuth.onAuthStateChanged(function(user) {
+    if (!user) window.location.href = 'landing.html';
+  });
 }
 
 function getRenamedFile(qIndex, originalFile) {
