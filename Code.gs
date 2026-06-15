@@ -175,7 +175,7 @@ function doGet(e) {
 var UPLOAD_CHAPTERS = {
   'know_your_ground': {
     label: '01 - Know Your Ground',
-    folderId: 'FOLDER_ID_KYG',
+    folderId: '1rtaqTqSJlRJ7HmOrlObgjKxmmomHO_8b',
     questions: {
       'city_presentation': { subfolderName: 'City Presentations',  fileSuffix: 'City_Presentation'  },
       'storytelling_audio': { subfolderName: 'Storytelling Audio', fileSuffix: 'Storytelling_Audio' }
@@ -201,22 +201,21 @@ function doPost(e) {
 
     // ── FILE UPLOAD route ──────────────────────────────────────
     if (data.action === 'uploadFile') {
-      var chapterKey  = data.chapterKey;
-      var questionKey = data.questionKey;
-      var userName    = sanitizeUploadName(data.userName);
-      var fileData    = data.fileData;   // base64
-      var mimeType    = data.mimeType;
-      var fileExt     = data.fileExt;
+      var userName   = sanitizeUploadName(data.userName);
+      var fileSuffix = data.fileSuffix;
+      var fileData   = data.fileData;   // base64
+      var mimeType   = data.mimeType;
+      var fileExt    = data.fileExt;
+      var folderPath = data.folderPath; // e.g. "01 - Know Your Ground/City Presentations"
 
-      var chapter  = UPLOAD_CHAPTERS[chapterKey];
-      var question = chapter && chapter.questions[questionKey];
-      if (!chapter || !question) {
-        return jsonRes({ success: false, error: 'Invalid chapter or question key.' });
+      var fileName = userName + '_' + fileSuffix + '.' + fileExt;
+      var parts    = folderPath.split('/');
+      var root     = DriveApp.getFolderById('1rtaqTqSJlRJ7HmOrlObgjKxmmomHO_8b');
+
+      var subfolder = root;
+      for (var p = 0; p < parts.length; p++) {
+        subfolder = getOrCreateDriveFolder(subfolder, parts[p].trim());
       }
-
-      var fileName   = userName + '_' + question.fileSuffix + '.' + fileExt;
-      var parent     = DriveApp.getFolderById(chapter.folderId);
-      var subfolder  = getOrCreateDriveFolder(parent, question.subfolderName);
 
       // Trash any previous submission with same name
       var existing = subfolder.getFilesByName(fileName);
@@ -225,7 +224,7 @@ function doPost(e) {
       var blob = Utilities.newBlob(Utilities.base64Decode(fileData), mimeType, fileName);
       var file = subfolder.createFile(blob);
 
-      logUpload(chapter.label, userName, question.fileSuffix, fileName, file.getUrl());
+      logUpload(parts[0], userName, fileSuffix, fileName, file.getUrl());
 
       return jsonRes({ success: true, fileName: fileName, fileUrl: file.getUrl() });
     }
