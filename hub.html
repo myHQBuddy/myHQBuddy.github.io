@@ -717,6 +717,39 @@ auth.onAuthStateChanged(function(user) {
     } else {
       if (amch1UnlockSec) amch1UnlockSec.style.display = '';
     }
+
+    // ── AM CHAPTER 2 — Coworking & Flex ──────────────────────────
+    var amch2Card      = document.getElementById('card-amch2');
+    var amch2Status    = document.getElementById('status-amch2');
+    var amch2Footer    = document.getElementById('footer-amch2');
+    var amch2UnlockSec = document.getElementById('unlock-section-amch2');
+    var amch2Title     = document.getElementById('title-amch2');
+
+    var adminUnlockedAmch2 = unlocked.indexOf('amch2') !== -1;
+    var amch2Unlocked      = bothOrgDone || adminUnlockedAmch2;
+    var amch2Completed     = progress.amch2 && progress.amch2.completed;
+
+    if (bothOrgDone && !adminUnlockedAmch2) {
+      db.collection('users').doc(user.uid).set({
+        unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion('amch2') }
+      }, { merge: true });
+    }
+
+    if (amch2Unlocked) {
+      amch2Card.classList.remove('locked'); amch2Card.classList.add('unlocked');
+      if (amch2Title) amch2Title.style.color = '';
+      if (amch2UnlockSec) amch2UnlockSec.style.display = 'none';
+      if (amch2Completed) {
+        amch2Card.classList.add('completed');
+        amch2Status.textContent = 'Completed'; amch2Status.className = 'badge badge-mint';
+        amch2Footer.innerHTML = '<a class="card-cta cta-done" href="Coworking_Flex.html"><span>Review</span><span class="arrow">→</span></a>';
+      } else {
+        amch2Status.textContent = 'Unlocked'; amch2Status.className = 'badge badge-blue';
+        amch2Footer.innerHTML = '<a class="card-cta cta-primary" href="Coworking_Flex.html"><span>Start</span><span class="arrow">→</span></a>';
+      }
+    } else {
+      if (amch2UnlockSec) amch2UnlockSec.style.display = '';
+    }
   });
 });
 
