@@ -1839,8 +1839,8 @@ const filesSelected = { 1: false, 2: false };
 const UPLOAD_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwX0Z5vx6DSwdwZwK26pKZL3V3U9XwEyWgPa9Ek_cFEH1_tpULnWNcn7RlgE-wT8M9M/exec';
 
 const QUESTION_CONFIG = {
-  1: { folderPath: '01 - Know Your Ground/City Presentations', fileSuffix: 'City_Presentation'  },
-  2: { folderPath: '01 - Know Your Ground/Storytelling Audio', fileSuffix: 'Storytelling_Audio' }
+  1: { chapterKey: 'know_your_ground', questionKey: 'city_presentation',  fileSuffix: 'City_Presentation'  },
+  2: { chapterKey: 'know_your_ground', questionKey: 'storytelling_audio', fileSuffix: 'Storytelling_Audio' }
 };
 
 function getLoggedInFirstName() {
@@ -1932,13 +1932,13 @@ async function submitAssessment(e) {
       const base64 = await toBase64(file);
 
       const payload = {
-        action:     'uploadFile',
-        folderPath: cfg.folderPath,
-        fileSuffix: cfg.fileSuffix,
-        userName:   firstName,
-        fileData:   base64,
-        mimeType:   mimeType,
-        fileExt:    ext
+        action:      'uploadFile',
+        chapterKey:  cfg.chapterKey,
+        questionKey: cfg.questionKey,
+        userName:    firstName,
+        fileData:    base64,
+        mimeType:    mimeType,
+        fileExt:     ext
       };
 
       const res = await fetch(UPLOAD_SCRIPT_URL, {
