@@ -349,6 +349,10 @@ function getOrCreateDriveFolder(parent, name) {
   return it.hasNext() ? it.next() : parent.createFolder(name);
 }
 
+function getOrCreateFolder(parent, name) {
+  return getOrCreateDriveFolder(parent, name);
+}
+
 function sanitizeUploadName(name) {
   var clean = String(name).trim().replace(/[^a-zA-Z0-9 ]/g, '').split(' ')[0];
   return clean.charAt(0).toUpperCase() + clean.slice(1).toLowerCase();
