@@ -1955,7 +1955,7 @@ async function submitAssessment(e) {
 
     // Persist completion to Firestore so progress is device-independent
     const auth = window.firebaseAuth;
-    const db   = window.firebaseDb;
+    const db   = window.firebaseDB;
     if (auth && auth.currentUser && db) {
       db.collection('users').doc(auth.currentUser.uid).set(
         { amch1_submitted: true, amch1_submitted_at: new Date().toISOString() },
@@ -2006,7 +2006,7 @@ function restoreAssessment() {
   }
   // Fall back to Firestore (covers cross-device logins)
   const auth = window.firebaseAuth;
-  const db   = window.firebaseDb;
+  const db   = window.firebaseDB;
   if (auth && auth.currentUser && db) {
     db.collection('users').doc(auth.currentUser.uid).get().then(function(doc) {
       if (doc.exists && doc.data().amch1_submitted) {
