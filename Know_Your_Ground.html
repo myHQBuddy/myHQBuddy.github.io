@@ -1,0 +1,2032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AM Chapter 1: Know Your Ground | myHQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+
+/* ── SLIDE STYLES ── */
+
+:root {
+  --blue:       #1E22AA;
+  --blue-dark:  #161a8b;
+  --green:      #BEE5C2;
+  --coral:      #FF7351;
+  --amber:      #FFB848;
+  --ink:        #0B0F2C;
+  --body:       #4A4D63;
+  --muted:      #94909C;
+  --white:      #FFFFFF;
+  --hairline:   rgba(11,15,44,0.10);
+  --sans:       'Manrope', system-ui, sans-serif;
+  --radius:     8px;
+  --ease:       cubic-bezier(0.22,1,0.36,1);
+  --transition: 0.25s var(--ease);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--sans);
+  background: var(--white);
+  color: var(--ink);
+  overflow: hidden;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* TOP BAR */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: 52px; z-index: 200;
+  background: #ffffff;
+  background: rgba(255,255,255,0.97); backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(11,15,44,0.10);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 clamp(16px,4vw,48px);
+  will-change: transform;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-logo { font-size: 13px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.topbar-sep { color: var(--muted); font-size: 13px; }
+.topbar-chapter { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.topbar-center { font-size: 18px; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; position: absolute; left: 50%; transform: translateX(-50%); }
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+.screen-counter { font-size: 11px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.read-btn {
+  font-size: 11px; font-weight: 700; color: var(--white); background: var(--blue);
+  padding: 6px 14px; border-radius: var(--radius); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  border: none; cursor: pointer; font-family: var(--sans);
+  transition: var(--transition);
+}
+.read-btn:hover { background: var(--blue-dark); }
+.hub-btn {
+  font-size: 14px; color: var(--blue); background: transparent;
+  width: 32px; height: 32px; border-radius: var(--radius); text-decoration: none;
+  border: 1px solid rgba(30,34,170,0.3);
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: var(--transition);
+}
+.hub-btn:hover { background: rgba(30,34,170,0.06); border-color: var(--blue); }
+
+/* DOT NAV */
+.dot-nav {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 8px; z-index: 200;
+}
+.dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--hairline);
+  border: 1.5px solid rgba(11,15,44,0.2); cursor: pointer;
+  transition: var(--transition);
+}
+.dot.active { background: var(--blue); border-color: var(--blue); transform: scale(1.3); }
+/* light variant — dark slide */
+.dot-nav.on-dark .dot { background: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.35); }
+.dot-nav.on-dark .dot.active { background: var(--white); border-color: var(--white); transform: scale(1.3); }
+
+/* KEY HINT */
+.key-hint {
+  position: fixed; bottom: 26px; right: clamp(16px,4vw,48px);
+  font-size: 11px; font-weight: 500; color: var(--muted);
+  display: flex; align-items: center; gap: 6px;
+  transition: opacity 0.5s; z-index: 200;
+}
+.key-hint.hidden { opacity: 0; pointer-events: none; }
+.key-hint.on-dark { color: rgba(255,255,255,0.4); }
+
+/* SCREEN NEXT BTN */
+.screen-next-btn {
+  position: absolute; bottom: 56px; right: clamp(32px,5vw,64px);
+  background: transparent; color: var(--muted); border: 1px solid var(--hairline);
+  font-size: 11px; font-weight: 700; font-family: var(--sans);
+  padding: 8px 16px; border-radius: var(--radius); cursor: pointer;
+  display: flex; align-items: center; gap: 6px; transition: var(--transition);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.screen-next-btn:hover { color: var(--blue); border-color: rgba(30,34,170,0.3); }
+/* light variant — dark slide */
+.screen-next-btn.light { color: rgba(255,255,255,0.4); border-color: rgba(255,255,255,0.18); }
+.screen-next-btn.light:hover { color: var(--green); border-color: rgba(190,229,194,0.4); }
+
+/* SLIDES WRAPPER */
+.slides { position: fixed; top: 52px; left: 0; right: 0; bottom: 0; z-index: 1; }
+.screen {
+  position: absolute; inset: 0;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+  transform: translateY(20px);
+  overflow: hidden;
+}
+.screen.active {
+  opacity: 1; pointer-events: all;
+  transform: translateY(0);
+}
+.screen.exit-up { opacity: 0; transform: translateY(-20px); }
+
+/* hide helper */
+.hidden { display: none !important; }
+
+/* ═══════════════════════════════════════════════
+   SLIDE-SPECIFIC STYLES
+═══════════════════════════════════════════════ */
+
+/* SCREEN 0 — HERO */
+.screen-hero {
+  background: var(--white);
+  display: grid;
+  grid-template-columns: 46% 54%;
+  align-items: stretch;
+}
+.s0-left {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(32px,5vw,72px) clamp(28px,4vw,56px);
+}
+.s0-right {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(24px,4vw,52px) clamp(24px,4vw,52px);
+}
+.s0-headline {
+  font-size: clamp(2.2rem,3.8vw,3.8rem); font-weight: 800; line-height: 1.05;
+  letter-spacing: -0.04em; color: var(--ink); margin-bottom: 18px;
+}
+.s0-headline em { font-style: normal; color: var(--blue); }
+.s0-sub {
+  font-size: clamp(13px,1.3vw,15px); color: var(--body); line-height: 1.75;
+}
+/* city photo grid */
+.city-photo-grid {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 8px;
+}
+.city-photo-tile {
+  position: relative; border-radius: var(--radius); overflow: hidden;
+  aspect-ratio: 4/3; cursor: default;
+}
+.city-photo-img {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  transition: transform 0.4s var(--ease);
+}
+.city-photo-tile:hover .city-photo-img { transform: scale(1.07); }
+.city-photo-label { position: absolute; bottom: 0; left: 0; right: 0; padding: 22px 10px 8px; background: linear-gradient(to top, rgba(15,18,50,0.82) 0%, transparent 100%); pointer-events: none; }
+.city-photo-label-name { font-size: clamp(10px,1vw,13px); font-weight: 700; color: #fff; letter-spacing: -0.01em; }
+
+/* SCREEN 1 — CITY AT A GLANCE */
+.screen-glance {
+  display: grid; grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+}
+.glance-left {
+  background: var(--blue);
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(32px,5vw,72px) clamp(28px,4vw,60px);
+}
+.s1-eyebrow {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.14em; color: var(--green); margin-bottom: 16px;
+}
+.s1-city-name {
+  font-size: clamp(3.5rem,7vw,6rem); font-weight: 800; line-height: 0.95;
+  letter-spacing: -0.05em; color: var(--white); margin-bottom: 10px;
+}
+.s1-tagline {
+  font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.55);
+  margin-bottom: 24px; line-height: 1.5;
+}
+.s1-intro {
+  font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.78);
+  line-height: 1.7; max-width: 38ch;
+}
+.glance-reasons { display: flex; flex-direction: column; gap: 18px; }
+.glance-reason { padding-left: 16px; border-left: 2px solid rgba(190,229,194,0.5); }
+.glance-reason-title { font-size: clamp(13px,1.3vw,15px); font-weight: 800; color: var(--white); margin-bottom: 3px; }
+.glance-reason-body { font-size: clamp(12px,1.1vw,13px); font-weight: 500; color: rgba(255,255,255,0.65); line-height: 1.55; }
+.glance-reason--white { border-left-color: rgba(30,34,170,0.2); }
+.glance-reason-title--ink { color: var(--ink); }
+.glance-reason-body--muted { color: var(--body); }
+.glance-right {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  align-content: center;
+  padding: clamp(24px,4vw,52px) clamp(28px,4vw,56px);
+}
+.stat-card {
+  border: 1px solid var(--hairline); border-radius: var(--radius);
+  padding: 20px 22px; background: #FAFBFF;
+}
+.stat-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--muted); margin-bottom: 6px;
+}
+.stat-value {
+  font-size: clamp(1.4rem,2.5vw,2rem); font-weight: 800;
+  color: var(--blue); letter-spacing: -0.03em; line-height: 1.1;
+}
+.stat-sub { font-size: 11px; font-weight: 500; color: var(--muted); margin-top: 4px; }
+
+/* SCREEN 2 — HISTORY */
+.screen-history {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(20px,3vw,44px) clamp(32px,6vw,80px); gap: 20px;
+}
+.s2-header { }
+.s2-eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 8px; }
+.s2-title { font-size: clamp(1.8rem,3.5vw,2.8rem); font-weight: 800; letter-spacing: -0.03em; color: var(--ink); }
+.s2-sub { font-size: 14px; color: var(--body); margin-top: 6px; }
+
+/* Horizontal timeline */
+.htl-wrap { display: flex; align-items: flex-start; position: relative; }
+.htl-wrap::before {
+  content: ''; position: absolute; top: 8px; left: 9px; right: 9px;
+  height: 1px; background: var(--hairline); z-index: 0;
+}
+.htl-node { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
+.htl-dot {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--white); border: 2px solid var(--blue);
+  margin-bottom: 14px; flex-shrink: 0;
+}
+.htl-node:last-child .htl-dot { background: var(--blue); }
+.htl-year { font-size: 11px; font-weight: 800; color: var(--blue); margin-bottom: 6px; text-align: center; }
+.htl-text { font-size: 12px; font-weight: 500; color: var(--body); line-height: 1.55; text-align: center; padding: 0 8px; }
+
+.s2-facts { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+.fact-card {
+  border: 1px solid var(--hairline); border-radius: var(--radius);
+  padding: 18px 20px; background: #FAFBFF;
+  border-left: 3px solid var(--blue);
+}
+.fact-icon { font-size: 20px; margin-bottom: 8px; }
+.fact-title { font-size: 13px; font-weight: 800; color: var(--ink); margin-bottom: 5px; }
+.fact-body { font-size: 12px; color: var(--body); line-height: 1.6; }
+
+/* era cards — new history layout */
+.s2-era-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; }
+.era-card {
+  border: 1px solid var(--hairline); border-radius: var(--radius);
+  padding: 20px 22px; background: #FAFBFF;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.era-card--accent { background: var(--blue); border-color: var(--blue); }
+.era-badge {
+  display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--blue); background: rgba(30,34,170,0.08);
+  padding: 3px 8px; border-radius: 99px; width: fit-content;
+}
+.era-badge--mid { color: #2e7d32; background: rgba(46,125,50,0.09); }
+.era-badge--new { color: var(--white); background: rgba(255,255,255,0.18); }
+.era-title { font-size: clamp(13px,1.4vw,15px); font-weight: 800; color: var(--ink); line-height: 1.3; }
+.era-card--accent .era-title { color: var(--white); }
+.era-body { font-size: 12px; color: var(--body); line-height: 1.6; }
+.era-card--accent .era-body { color: rgba(255,255,255,0.75); }
+.era-list { margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 4px; }
+.era-list li { font-size: 11px; color: var(--body); line-height: 1.55; }
+.era-card--accent .era-list li { color: rgba(255,255,255,0.8); }
+
+/* SCREEN 3 — DEMOGRAPHICS */
+.screen-demo {
+  display: grid; grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+}
+.demo-left {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(24px,4vw,56px) clamp(28px,4vw,60px);
+  border-right: 1px solid var(--hairline);
+}
+.demo-right {
+  display: flex; flex-direction: column; justify-content: center; gap: 12px;
+  padding: clamp(24px,4vw,56px) clamp(28px,4vw,60px);
+}
+.s3-eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 8px; }
+.s3-title { font-size: clamp(1.6rem,3vw,2.4rem); font-weight: 800; letter-spacing: -0.03em; color: var(--ink); margin-bottom: 20px; }
+
+.bar-item { margin-bottom: 14px; }
+.bar-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.bar-label { font-size: 12px; font-weight: 700; color: var(--ink); }
+.bar-pct { font-size: 12px; font-weight: 800; color: var(--blue); }
+.bar-track { height: 7px; background: rgba(11,15,44,0.07); border-radius: 99px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 99px; }
+.bar-fill--blue   { background: var(--blue); }
+.bar-fill--green  { background: #2e7d32; }
+.bar-fill--teal   { background: #00796b; }
+.bar-fill--orange { background: #e65100; }
+.bar-fill--purple { background: #512da8; }
+
+.seg-card {
+  display: flex; align-items: flex-start; gap: 14px;
+  border: 1px solid var(--hairline); border-radius: var(--radius);
+  padding: 14px 16px; background: #FAFBFF;
+}
+.seg-icon {
+  width: 36px; height: 36px; border-radius: var(--radius);
+  background: rgba(30,34,170,0.1); color: var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.seg-title { font-size: 13px; font-weight: 800; color: var(--ink); margin-bottom: 3px; }
+.seg-body { font-size: 12px; color: var(--body); line-height: 1.55; }
+
+/* SCREEN 4 — CONNECTIVITY */
+.screen-connect {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(20px,3vw,44px) clamp(32px,6vw,80px); gap: 18px;
+}
+.s4-header { }
+.s4-eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 8px; }
+.s4-title { font-size: clamp(1.8rem,3.5vw,2.8rem); font-weight: 800; letter-spacing: -0.03em; color: var(--ink); }
+.s4-sub { font-size: 14px; color: var(--body); margin-top: 6px; }
+
+.connect-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px; }
+.connect-card {
+  border: 1px solid var(--hairline); border-radius: var(--radius);
+  padding: 22px 18px; background: #FAFBFF;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.connect-icon {
+  width: 40px; height: 40px; border-radius: var(--radius);
+  background: var(--blue); color: var(--white);
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+}
+.connect-mode { font-size: 14px; font-weight: 800; color: var(--ink); }
+.connect-desc { font-size: 12px; color: var(--body); line-height: 1.6; flex: 1; }
+.connect-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--green); color: #1b5e20;
+  padding: 3px 10px; border-radius: 4px;
+  font-size: 10px; font-weight: 700; width: fit-content;
+}
+
+.travel-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.travel-chip {
+  display: flex; align-items: center; gap: 8px;
+  border: 1px solid var(--hairline); border-radius: var(--radius);
+  padding: 7px 14px; font-size: 12px; color: var(--body); background: var(--white);
+}
+.travel-chip strong { color: var(--blue); font-weight: 800; }
+.travel-chip-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--blue); }
+
+/* SCREEN 5 — ECONOMIC ENGINE */
+.screen-economy {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(16px,2.5vw,32px) clamp(32px,6vw,80px) clamp(12px,2vw,28px); gap: 14px;
+}
+.s5-header { }
+.s5-eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 8px; }
+.s5-title { font-size: clamp(1.6rem,3vw,2.4rem); font-weight: 800; letter-spacing: -0.03em; color: var(--ink); }
+
+.hub-outer { position: relative; flex: 1; min-height: 0; }
+.hub-svg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  pointer-events: none; overflow: visible;
+}
+.hub-center {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+  width: clamp(80px,8vw,108px); height: clamp(80px,8vw,108px);
+  border-radius: 50%; background: var(--blue); color: var(--white);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; z-index: 3;
+  box-shadow: 0 0 0 8px rgba(30,34,170,0.1);
+}
+.hub-center-name { font-size: clamp(11px,1.2vw,14px); font-weight: 800; line-height: 1.15; }
+.hub-center-sub { font-size: 9px; font-weight: 700; color: var(--green); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.06em; }
+.hub-node {
+  position: absolute; width: clamp(130px,12vw,170px);
+  background: var(--white); border: 1px solid var(--hairline); border-radius: var(--radius);
+  padding: 10px 12px; z-index: 2;
+  transition: var(--transition);
+}
+.hub-node:hover { border-color: rgba(30,34,170,0.3); box-shadow: 0 4px 16px rgba(30,34,170,0.08); }
+.hub-node-icon { font-size: 15px; margin-bottom: 5px; color: var(--blue); }
+.hub-node-title { font-size: 12px; font-weight: 800; color: var(--ink); margin-bottom: 3px; }
+.hub-node-sub { font-size: 11px; color: var(--body); line-height: 1.4; }
+.hub-n1 { left: 3%; top: 8%; }
+.hub-n2 { left: 37%; top: 2%; }
+.hub-n3 { right: 3%; top: 8%; }
+.hub-n4 { left: 3%; bottom: 8%; }
+.hub-n5 { left: 37%; bottom: 2%; }
+.hub-n6 { right: 3%; bottom: 8%; }
+
+.econ-stats {
+  display: flex; border: 1px solid var(--hairline); border-radius: var(--radius);
+  overflow: hidden; background: #FAFBFF;
+}
+.econ-stat {
+  flex: 1; padding: 10px 16px; text-align: center;
+  border-right: 1px solid var(--hairline);
+}
+.econ-stat:last-child { border-right: none; }
+.econ-val { font-size: clamp(1rem,1.8vw,1.3rem); font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.econ-lbl { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.econ-grid { display: grid; grid-template-columns: repeat(3,1fr); grid-auto-rows: min-content; gap: 12px; }
+.econ-sector-card { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 12px 16px; background: #FAFBFF; display: flex; flex-direction: column; gap: 4px; transition: var(--transition); }
+.econ-sector-card:hover { border-color: rgba(30,34,170,0.25); box-shadow: 0 4px 16px rgba(30,34,170,0.08); }
+.econ-sector-icon { width: 30px; height: 30px; border-radius: 7px; background: rgba(30,34,170,0.08); display: flex; align-items: center; justify-content: center; color: var(--blue); font-size: 13px; margin-bottom: 4px; }
+.econ-sector-title { font-size: clamp(12px,1.15vw,14px); font-weight: 800; color: var(--ink); }
+.econ-sector-cos { font-size: 11px; color: var(--muted); line-height: 1.55; }
+.econ-sector-tag { margin-top: 4px; font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); }
+/* City at a Glance — last slide */
+.screen-cityglance { display: flex; flex-direction: column; justify-content: center; padding: clamp(20px,3vw,48px) clamp(32px,6vw,80px); gap: 20px; }
+.cityglance-header { text-align: left; }
+.cityglance-eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 6px; }
+.cityglance-title { font-size: clamp(1.6rem,3vw,2.4rem); font-weight: 800; letter-spacing: -0.03em; color: var(--ink); }
+.stat-cards-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+.stat-card { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 16px 20px; background: #FAFBFF; display: flex; flex-direction: column; gap: 2px; }
+.stat-card-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 4px; }
+.stat-card-value { font-size: clamp(1.6rem,3vw,2.4rem); font-weight: 800; color: var(--blue); letter-spacing: -0.03em; line-height: 1.1; }
+.stat-card-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* SCREEN 6 — LOCALITIES */
+.screen-localities {
+  display: grid; grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+}
+.loc-left {
+  display: flex; flex-direction: column;
+  padding: clamp(20px,3vw,44px) clamp(24px,4vw,52px);
+  border-right: 1px solid var(--hairline);
+}
+.loc-right {
+  display: flex; flex-direction: column;
+  padding: clamp(16px,2.5vw,36px) clamp(20px,3.5vw,44px);
+  overflow-y: auto;
+}
+.s6-eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 6px; }
+.s6-title { font-size: clamp(1.4rem,2.5vw,2rem); font-weight: 800; letter-spacing: -0.03em; color: var(--ink); margin-bottom: 12px; }
+
+.zone-map {
+  flex: 1; background: #FAFBFF; border: 1px solid var(--hairline);
+  border-radius: var(--radius); overflow: hidden; position: relative;
+}
+.zone-grid {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr; height: 100%;
+}
+.zone-cell {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 6px; text-align: center;
+  border: 1px solid rgba(11,15,44,0.05);
+}
+.zone-cell.core { background: var(--blue); }
+.zone-cell.hi { background: rgba(30,34,170,0.05); }
+.zone-cell-name { font-size: 10px; font-weight: 800; color: var(--ink); line-height: 1.3; }
+.zone-cell.core .zone-cell-name { color: var(--white); font-size: 11px; }
+.zone-cell-tag { font-size: 9px; font-weight: 600; color: var(--muted); margin-top: 2px; }
+.zone-cell.core .zone-cell-tag { color: var(--green); }
+.zone-compass {
+  position: absolute; font-size: 8px; font-weight: 700; color: var(--muted);
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+.zone-compass.n { top: 5px; left: 50%; transform: translateX(-50%); }
+.zone-compass.s { bottom: 5px; left: 50%; transform: translateX(-50%); }
+
+.loc-list { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.loc-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  border: 1px solid var(--hairline); border-radius: var(--radius);
+  padding: 10px 14px; background: #FAFBFF;
+  border-left: 3px solid transparent; transition: border-left-color 0.2s;
+}
+.loc-item.prime { border-left-color: var(--blue); }
+.loc-num { font-size: 11px; font-weight: 700; color: var(--blue); flex-shrink: 0; margin-top: 2px; }
+.loc-name { font-size: 13px; font-weight: 800; color: var(--ink); margin-bottom: 2px; }
+.loc-desc { font-size: 11px; color: var(--body); line-height: 1.5; }
+.loc-badge {
+  margin-left: auto; flex-shrink: 0; font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 4px; background: var(--green); color: #1b5e20;
+}
+.loc-dev { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--blue); opacity: 0.7; margin-top: 1px; }
+.loc-list--sm { gap: 5px; }
+.loc-list--sm .loc-item { padding: 7px 12px; }
+.map-placeholder {
+  flex: 1; background: #F5F6FF; border: 1.5px dashed rgba(30,34,170,0.18);
+  border-radius: var(--radius); display: flex; align-items: center; justify-content: center; min-height: 180px;
+}
+.map-ph-inner { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.map-ph-inner i { font-size: 40px; color: rgba(30,34,170,0.20); }
+.map-ph-label { font-size: 13px; font-weight: 700; color: var(--muted); }
+.map-ph-sub { font-size: 11px; color: var(--muted); opacity: 0.65; }
+.map-ph-full { min-height: 420px; margin-bottom: 32px; }
+.section-subhead { font-size: clamp(1.05rem,1.6vw,1.25rem); font-weight: 800; color: var(--ink); letter-spacing: -0.02em; margin-top: 36px; margin-bottom: 12px; }
+.section-subhead:first-child { margin-top: 0; }
+/* Read mode — locality profiles */
+.loc-profile { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 16px; background: #FAFBFF; }
+.loc-profile-hd { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
+.loc-profile-num { font-size: 11px; font-weight: 700; color: var(--blue); flex-shrink: 0; }
+.loc-profile-name { font-size: 16px; font-weight: 800; color: var(--ink); }
+.loc-profile-dna { margin-left: auto; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--blue); background: rgba(30,34,170,0.07); padding: 3px 9px; border-radius: 4px; }
+.loc-profile-body { font-size: 14px; color: var(--body); line-height: 1.7; margin-bottom: 12px; }
+.loc-profile-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.loc-profile-sub { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 6px; }
+
+/* SCREEN 7 — KNOW EVERY CORNER */
+.screen-corners {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(20px,3vw,44px) clamp(32px,6vw,80px) clamp(60px,6vw,80px); gap: 16px;
+  background: var(--white); overflow: hidden; width: 100%; box-sizing: border-box;
+}
+.s7-header { }
+.s7-eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 8px; }
+.s7-title { font-size: clamp(1.8rem,3.5vw,2.8rem); font-weight: 800; letter-spacing: -0.03em; color: var(--ink); }
+.s7-sub { font-size: 14px; color: var(--body); margin-top: 6px; max-width: 72ch; }
+
+.corners-grid {
+  display: grid; grid-template-columns: repeat(3, minmax(0,1fr));
+  grid-auto-rows: auto; gap: 10px; flex: 1; min-width: 0; width: 100%; overflow: hidden;
+  align-content: center;
+}
+.corner-card {
+  border: 1px solid var(--hairline); border-radius: var(--radius);
+  padding: clamp(9px,1.05vw,14px) clamp(10px,1.2vw,16px); background: #FAFBFF;
+  display: flex; flex-direction: column; gap: clamp(3px,0.4vw,5px);
+  transition: var(--transition); min-width: 0; overflow: hidden;
+}
+.corner-card:hover { border-color: rgba(30,34,170,0.25); }
+.corner-icon {
+  width: 32px; height: 32px; border-radius: 7px;
+  background: rgba(30,34,170,0.08); color: var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  font-size: clamp(12px,1.2vw,15px); flex-shrink: 0;
+}
+.corner-name { font-size: clamp(11px,1vw,13px); font-weight: 800; color: var(--ink); overflow-wrap: break-word; }
+.corner-type { font-size: clamp(8px,0.75vw,10px); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--blue); }
+.corner-why { font-size: clamp(9px,0.85vw,11px); color: var(--body); line-height: 1.5; }
+
+/* SCREEN 8 — myHQ IN THE CITY */
+.screen-myhq {
+  display: grid; grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  background: linear-gradient(135deg, var(--ink) 0%, #1a1f52 100%);
+}
+.myhq-left {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(32px,5vw,72px) clamp(28px,4vw,60px);
+  border-right: 1px solid rgba(255,255,255,0.07);
+}
+.myhq-right {
+  display: flex; flex-direction: column; justify-content: center; gap: 12px;
+  padding: clamp(32px,5vw,72px) clamp(28px,4vw,60px);
+}
+.s8-eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--green); margin-bottom: 14px; }
+.s8-title { font-size: clamp(2rem,4vw,3.2rem); font-weight: 800; letter-spacing: -0.04em; color: var(--white); line-height: 1.1; margin-bottom: 24px; }
+.myhq-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+.myhq-list-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius);
+  font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8);
+}
+.myhq-list-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.myhq-cta {
+  padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08);
+  font-size: 15px; font-weight: 700; color: var(--white); line-height: 1.5;
+}
+.myhq-cta em { color: var(--green); font-style: normal; }
+
+.serve-card {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09);
+  border-radius: var(--radius); padding: 14px 16px;
+}
+.serve-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--green); margin-bottom: 4px; }
+.serve-body { font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.6; }
+
+
+/* ══════════════════════════════════════
+   READ MODE STYLES
+══════════════════════════════════════ */
+:root {
+  --blue: #1E22AA;
+  --green: #BEE5C2;
+  --ink: #0B0F2C;
+  --white: #FFFFFF;
+  --muted: #8B8FA8;
+  --hairline: #E8E9F0;
+  --radius: 8px;
+}
+
+#read-mode { margin-top: 52px; }
+.r-layout {
+  display: flex; max-width: 100%; margin: 0;
+  padding: 0 48px 80px 0; align-items: flex-start;
+}
+.r-sidebar {
+  width: 240px; flex-shrink: 0;
+  position: sticky; top: 72px;
+  padding: 32px 24px 0 24px;
+  max-height: calc(100vh - 72px); overflow-y: auto;
+}
+.r-content { flex: 1; min-width: 0; padding: 40px 0 0 48px; }
+
+.toc-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 10px; }
+.toc-link {
+  display: block; font-size: 12px; font-weight: 500; color: var(--muted);
+  text-decoration: none; padding: 6px 10px; border-radius: 6px; margin-bottom: 1px;
+  transition: all 0.15s; line-height: 1.4; border-left: 2px solid transparent;
+}
+.toc-link:hover { color: var(--ink); background: rgba(0,0,0,0.04); }
+.toc-link.active { color: var(--blue); font-weight: 700; border-left-color: var(--blue); background: rgba(30,34,170,0.05); }
+.toc-chapter { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 12px; padding: 0 10px; }
+.toc-link--intro { margin-bottom: 8px; }
+.toc-link--num { color: var(--muted); }
+
+.section { margin-bottom: 60px; }
+.intro-card { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 28px 32px; }
+.intro-card .section-body { margin-bottom: 16px; }
+.intro-card .section-body:last-child { margin-bottom: 0; }
+.section-num { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 6px; }
+h2.section-title { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1.15; margin-bottom: 18px; }
+.section-body { font-size: 15px; color: #2A2E4A; line-height: 1.75; margin-bottom: 14px; }
+.visual { margin: 24px 0; }
+
+.stat-card-r { background: var(--blue); border-radius: var(--radius); padding: 28px 32px; display: flex; align-items: center; gap: 28px; }
+.stat-big { font-size: 4.5rem; font-weight: 800; color: var(--white); letter-spacing: -0.04em; line-height: 1; flex-shrink: 0; }
+.stat-big span { color: var(--green); }
+.stat-headline { font-size: 1rem; font-weight: 700; color: var(--white); line-height: 1.35; margin-bottom: 6px; }
+.stat-sub-r { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+
+.market-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin: 16px 0; }
+.ms-card { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 14px 16px; }
+.ms-num { font-size: 1.4rem; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; }
+.ms-label { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+
+.takeaway { background: rgba(190,229,194,0.22); border-left: 3px solid #4CAF74; border-radius: 0 6px 6px 0; padding: 13px 18px; font-size: 14px; font-weight: 600; color: var(--ink); margin: 22px 0 12px; }
+.takeaway::before { content: '✦  '; color: #4CAF74; }
+/* Sector profiles (s05) */
+.sector-profiles { margin: 20px 0 8px; border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; }
+.sector-row { display: grid; grid-template-columns: 148px 1fr; gap: 0; border-bottom: 1px solid var(--hairline); padding: 14px 18px; align-items: start; }
+.sector-row:last-child { border-bottom: none; }
+.sector-row:nth-child(odd) { background: #FAFBFF; }
+.sector-tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--blue); padding-top: 2px; }
+.sector-detail { display: flex; flex-direction: column; gap: 2px; }
+.sector-cos { font-size: 13px; font-weight: 600; color: var(--ink); }
+.sector-zone { font-size: 11px; color: var(--muted); }
+.sector-note { font-size: 13px; color: var(--body); line-height: 1.5; margin-top: 5px; grid-column: 2; }
+
+.bullets { list-style: none; margin: 18px 0; display: flex; flex-direction: column; gap: 7px; }
+.bullets li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--ink); line-height: 1.6; }
+.bullets li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--blue); margin-top: 7px; flex-shrink: 0; }
+
+/* Read-mode timeline (vertical) */
+.timeline { display: flex; flex-direction: column; position: relative; padding-left: 28px; }
+.timeline::before { content: ''; position: absolute; left: 0; top: 6px; bottom: 6px; width: 1px; background: var(--hairline); }
+.tl-item { position: relative; padding: 0 0 32px 28px; }
+.tl-item:last-child { padding-bottom: 0; }
+.tl-dot { position: absolute; left: -5px; top: 4px; width: 11px; height: 11px; border-radius: 50%; background: var(--white); border: 2px solid var(--blue); }
+.tl-item:last-child .tl-dot { background: var(--blue); }
+.tl-year { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 5px; }
+.tl-title { font-size: 14px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; margin-bottom: 5px; }
+.tl-desc { font-size: 13px; color: #4A4E6A; line-height: 1.65; }
+
+/* ── ASSESSMENT ── */
+.aq-tracker {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 36px; padding: 16px 20px;
+  background: #FAFBFF; border: 1px solid var(--hairline); border-radius: var(--radius);
+}
+.aq-tracker-bar { flex: 1; height: 6px; background: var(--hairline); border-radius: 99px; overflow: hidden; }
+.aq-tracker-fill { height: 100%; width: 0%; background: var(--blue); border-radius: 99px; transition: width 0.4s var(--ease); }
+.aq-tracker-label { font-size: 12px; font-weight: 700; color: var(--blue); white-space: nowrap; letter-spacing: 0.02em; }
+
+.aq-question {
+  margin-bottom: 36px; padding: 24px 28px;
+  border: 1px solid var(--hairline); border-radius: 12px;
+  background: var(--white); transition: border-color 0.2s;
+}
+.aq-question.is-filled { border-color: rgba(30,34,170,0.35); }
+.aq-q-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.aq-q-num {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--blue); background: rgba(30,34,170,0.08); padding: 3px 10px; border-radius: 99px;
+}
+.aq-q-status { font-size: 12px; font-weight: 600; color: var(--muted); }
+.aq-q-status.done { color: #2a7d3f; }
+.aq-q-text { font-size: 14px; color: var(--ink); line-height: 1.7; margin-bottom: 14px; font-weight: 500; }
+.aq-textarea {
+  width: 100%; padding: 12px 16px;
+  border: 1px solid var(--hairline); border-radius: 8px;
+  font-family: var(--sans); font-size: 14px; color: var(--ink);
+  line-height: 1.65; resize: vertical; min-height: 120px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: #FAFBFF;
+}
+.aq-textarea:focus {
+  outline: none; border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(30,34,170,0.1);
+  background: var(--white);
+}
+.aq-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 12px; padding-top: 24px;
+  border-top: 1px solid var(--hairline);
+}
+.aq-footer-note { font-size: 13px; color: var(--muted); }
+.aq-submit-btn {
+  padding: 10px 28px; background: var(--blue); color: var(--white);
+  font-size: 13px; font-weight: 700; border: none; border-radius: var(--radius);
+  cursor: pointer; font-family: var(--sans); transition: var(--transition);
+}
+.aq-submit-btn:hover:not(:disabled) { background: var(--blue-dark); }
+.aq-submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.aq-error {
+  margin-top: 12px; padding: 12px 16px; background: #fff3f3;
+  border: 1px solid #f5c6c6; border-radius: 8px; font-size: 13px; color: #c0392b;
+}
+.aq-submitted {
+  text-align: center; padding: 48px 24px;
+  border: 1px solid rgba(30,34,170,0.2); border-radius: 12px;
+  background: #FAFBFF; margin-bottom: 24px;
+}
+.aq-submitted-icon { font-size: 40px; color: #2a7d3f; margin-bottom: 16px; }
+.aq-submitted-title { font-size: 20px; font-weight: 800; color: var(--ink); margin-bottom: 8px; }
+.aq-submitted-body { font-size: 14px; color: var(--body); line-height: 1.7; max-width: 440px; margin: 0 auto; }
+.aq-upload-zone {
+  position: relative; border: 1.5px dashed rgba(30,34,170,0.30); border-radius: var(--radius);
+  background: #F8F9FF; padding: 32px 24px; text-align: center; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.aq-upload-zone:hover { border-color: var(--blue); background: rgba(30,34,170,0.04); }
+.aq-upload-zone.has-file { border-color: #2a7d3f; background: rgba(42,125,63,0.05); }
+.aq-upload-zone i { font-size: 28px; color: rgba(30,34,170,0.30); margin-bottom: 10px; display: block; }
+.aq-upload-zone.has-file i { color: #2a7d3f; }
+.aq-upload-label { font-size: 13px; font-weight: 700; color: var(--body); margin-bottom: 4px; }
+.aq-upload-sub { font-size: 11px; color: var(--muted); }
+.aq-file-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.aq-fname { font-size: 12px; font-weight: 600; color: #2a7d3f; margin-top: 8px; display: none; }
+.aq-unlock-note { margin-top: 32px; padding: 16px 20px; background: rgba(30,34,170,0.05); border-radius: var(--radius); border-left: 3px solid var(--blue); font-size: 13px; color: var(--body); line-height: 1.65; }
+</style>
+</head>
+<body>
+
+<!-- ═══ TOPBAR ═══ -->
+<header class="topbar" id="topbar">
+  <div class="topbar-left">
+    <span class="topbar-logo">myHQ</span>
+    <span class="topbar-chapter" id="chapterLabel">AM CHAPTER 1</span>
+  </div>
+  <div class="topbar-center">Know Your Ground</div>
+  <div class="topbar-right">
+    <a class="hub-btn" href="../../hub.html" title="Back to Hub"><i class="fa-solid fa-house"></i></a>
+    <span class="screen-counter" id="screenCounter">1 / 9</span>
+    <button class="read-btn" id="btnRead" onclick="setMode('read')">
+      <i class="fa-solid fa-book-open"></i>&nbsp;Read Full Chapter
+    </button>
+  </div>
+</header>
+
+<!-- ═══ DOT NAV ═══ -->
+<nav class="dot-nav" id="dotNav"></nav>
+
+<!-- ═══════════════════════════════════
+     SLIDE MODE
+═══════════════════════════════════ -->
+<div id="slide-mode">
+<div class="slides" id="slides">
+
+<!-- SCREEN 0: HERO -->
+<div class="screen screen-hero">
+
+  <div class="s0-left">
+    <h1 class="s0-headline">Every City Has a Story.<br>The Best Consultants<br>Know How to <em>Tell It.</em></h1>
+    <p class="s0-sub">Geography knowledge is the foundation of real estate consulting.</p>
+  </div>
+
+  <div class="s0-right">
+    <div class="city-photo-grid">
+
+      <!-- Delhi -->
+      <div class="city-photo-tile">
+        <div class="city-photo-img" style="background-image:url('city_images_KYG/delhi.webp')"></div>
+        <div class="city-photo-label"><div class="city-photo-label-name">Delhi</div></div>
+      </div>
+
+      <!-- Mumbai -->
+      <div class="city-photo-tile">
+        <div class="city-photo-img" style="background-image:url('city_images_KYG/mumbai.jpeg')"></div>
+        <div class="city-photo-label"><div class="city-photo-label-name">Mumbai</div></div>
+      </div>
+
+      <!-- Hyderabad -->
+      <div class="city-photo-tile">
+        <div class="city-photo-img" style="background-image:url('city_images_KYG/hyderabad.jpeg')"></div>
+        <div class="city-photo-label"><div class="city-photo-label-name">Hyderabad</div></div>
+      </div>
+
+      <!-- Bangalore -->
+      <div class="city-photo-tile">
+        <div class="city-photo-img" style="background-image:url('city_images_KYG/bangalore.jpg')"></div>
+        <div class="city-photo-label"><div class="city-photo-label-name">Bengaluru</div></div>
+      </div>
+
+      <!-- Chennai -->
+      <div class="city-photo-tile">
+        <div class="city-photo-img" style="background-image:url('city_images_KYG/chennai.jpg')"></div>
+        <div class="city-photo-label"><div class="city-photo-label-name">Chennai</div></div>
+      </div>
+
+      <!-- Pune -->
+      <div class="city-photo-tile">
+        <div class="city-photo-img" style="background-image:url('city_images_KYG/pune.avif')"></div>
+        <div class="city-photo-label"><div class="city-photo-label-name">Pune</div></div>
+      </div>
+
+      <!-- Noida -->
+      <div class="city-photo-tile">
+        <div class="city-photo-img" style="background-image:url('city_images_KYG/noida.avif')"></div>
+        <div class="city-photo-label"><div class="city-photo-label-name">Noida</div></div>
+      </div>
+
+      <!-- Gurugram -->
+      <div class="city-photo-tile">
+        <div class="city-photo-img" style="background-image:url('city_images_KYG/gurugram.jpg')"></div>
+        <div class="city-photo-label"><div class="city-photo-label-name">Gurugram</div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<!-- SCREEN 1: HISTORY -->
+<div class="screen screen-history">
+  <div class="s2-header">
+    <div class="s2-eyebrow">Gurugram · History</div>
+    <h2 class="s2-title">From Villages to a Global Business Hub</h2>
+    <p class="s2-sub">Three transformations that built modern Gurugram — each one changing who lived here and why.</p>
+  </div>
+
+  <div class="s2-era-grid">
+    <div class="era-card">
+      <div class="era-badge">Before 1990s</div>
+      <div class="era-title">Villages &amp; Agriculture</div>
+      <div class="era-body">Gurgaon was a collection of villages surrounded by agricultural land. The economy revolved around farming, livestock, and small local businesses. Connectivity was limited — few imagined this region would become one of India's most important business destinations.</div>
+      <ul class="era-list">
+        <li>Predominantly rural, agriculture-based economy</li>
+        <li>Strong local village communities</li>
+        <li>Low population density</li>
+        <li>Minimal urban infrastructure</li>
+        <li>Name rooted in Dronacharya — guru of the Pandavas</li>
+      </ul>
+    </div>
+    <div class="era-card">
+      <div class="era-badge era-badge--mid">1970s–80s — Maruti Arrives</div>
+      <div class="era-title">Manufacturing Creates the First City</div>
+      <div class="era-body">The establishment of Maruti Suzuki transformed Gurgaon into an industrial hub. Thousands of jobs were created, supporting industries emerged, and infrastructure investment began to flow. For the first time, Gurgaon became an employment center — not just a rural district.</div>
+      <ul class="era-list">
+        <li>Workers migrated from across Haryana</li>
+        <li>Supporting industries &amp; supply chain grew</li>
+        <li>Housing demand and colonies emerged</li>
+        <li>NH-48 corridor began to develop</li>
+      </ul>
+    </div>
+    <div class="era-card era-card--accent">
+      <div class="era-badge era-badge--new">2003+ — Private Capital Builds a City</div>
+      <div class="era-title">DLF &amp; Developer-Led Transformation</div>
+      <div class="era-body">Unlike most Indian cities that grew through government planning, Gurgaon was built by private capital. DLF assembled large land parcels, built roads, and created modern commercial districts — turning farmland into Grade-A office complexes, residential townships, and business parks within a generation.</div>
+      <ul class="era-list">
+        <li>Private-sector-led urban development</li>
+        <li>Grade-A commercial real estate at scale</li>
+        <li>Fortune 500 &amp; MNC headquarters</li>
+        <li>International workplace standards</li>
+      </ul>
+    </div>
+  </div>
+
+  <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<!-- SCREEN 2: CITY AT A GLANCE -->
+<div class="screen screen-glance" data-dark="true">
+  <div class="glance-left">
+    <div class="s1-city-name">Gurugram</div>
+    <div class="s1-tagline">Millennium City · Corporate Capital of North India</div>
+  </div>
+  <div class="glance-right" style="display:flex; flex-direction:column; justify-content:center; gap:16px; padding:clamp(32px,5vw,72px) clamp(28px,4vw,60px);">
+    <div class="glance-reason glance-reason--white">
+      <div class="glance-reason-title glance-reason-title--ink">Delhi Adjacency</div>
+      <div class="glance-reason-body glance-reason-body--muted">Shares its boundary with New Delhi — minutes from ministries, embassies, regulators, and national industry bodies. Delhi's modern business extension.</div>
+    </div>
+    <div class="glance-reason glance-reason--white">
+      <div class="glance-reason-title glance-reason-title--ink">IGI Airport — 15–25 Min</div>
+      <div class="glance-reason-body glance-reason-body--muted">India's busiest international gateway is closer to Gurugram's CBD than any other major Indian office market. Fastest international travel in North India.</div>
+    </div>
+    <div class="glance-reason glance-reason--white">
+      <div class="glance-reason-title glance-reason-title--ink">NH-48 — Economic Spine</div>
+      <div class="glance-reason-body glance-reason-body--muted">India's most important economic highway runs through the city — direct access to Delhi and North India's industrial hubs.</div>
+    </div>
+    <div class="glance-reason glance-reason--white">
+      <div class="glance-reason-title glance-reason-title--ink">NCR Ecosystem</div>
+      <div class="glance-reason-body glance-reason-body--muted">30M+ population. India's largest urban market for consumers, talent, suppliers, and business partners — all within reach.</div>
+    </div>
+    <div class="glance-reason glance-reason--white">
+      <div class="glance-reason-title glance-reason-title--ink">North India HQ Advantage</div>
+      <div class="glance-reason-body glance-reason-body--muted">Gateway to Chandigarh, Jaipur, Lucknow, and Amritsar. The natural base for managing large North India operations from one location.</div>
+    </div>
+  </div>
+  <button class="screen-next-btn light" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<!-- SCREEN 3: LOCALITIES -->
+<div class="screen screen-localities">
+  <div class="loc-left">
+    <div class="s6-eyebrow">Know the Map</div>
+    <h2 class="s6-title">Gurugram's Commercial Zones</h2>
+    <div class="zone-map">
+      <div class="zone-compass n">↑ NORTH · DELHI</div>
+      <div class="zone-compass s">↓ SOUTH · SOHNA</div>
+      <div class="zone-grid">
+        <div class="zone-cell"><div class="zone-cell-name">IGI Airport</div><div class="zone-cell-tag">15–25 min</div></div>
+        <div class="zone-cell"><div class="zone-cell-name">Dwarka Expwy</div><div class="zone-cell-tag">Rising</div></div>
+        <div class="zone-cell"><div class="zone-cell-name">Delhi Border</div><div class="zone-cell-tag">Shankar Chowk</div></div>
+        <div class="zone-cell hi"><div class="zone-cell-name">Udyog Vihar</div><div class="zone-cell-tag">IT + Industrial</div></div>
+        <div class="zone-cell core"><div class="zone-cell-name">Cyber City</div><div class="zone-cell-tag">CBD Core</div></div>
+        <div class="zone-cell hi"><div class="zone-cell-name">Golf Course Rd</div><div class="zone-cell-tag">Premium</div></div>
+        <div class="zone-cell"><div class="zone-cell-name">Sector 44</div><div class="zone-cell-tag">Institutional</div></div>
+        <div class="zone-cell"><div class="zone-cell-name">Golf Course Ext.</div><div class="zone-cell-tag">Rising</div></div>
+        <div class="zone-cell"><div class="zone-cell-name">SPR · Sohna Rd</div><div class="zone-cell-tag">Emerging</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loc-right">
+    <div class="s6-eyebrow">Key Localities</div>
+    <div class="loc-list loc-list--sm">
+      <div class="loc-item prime">
+        <div class="loc-num">01</div>
+        <div>
+          <div class="loc-name">Golf Course Road</div>
+          <div class="loc-dev">₹120–160 / sqft / mo</div>
+          <div class="loc-desc">Gurugram's "Wall Street." Premium Grade-A offices, PE funds, consulting firms. Highest prestige address.</div>
+        </div>
+      </div>
+      <div class="loc-item prime">
+        <div class="loc-num">02</div>
+        <div>
+          <div class="loc-name">Cyber City / Cyber Hub</div>
+          <div class="loc-dev">₹140–200 / sqft / mo</div>
+          <div class="loc-desc">The CBD. Fortune 500 HQs. Amex, EY, Google. Rapid Metro direct. Highest rents in the city.</div>
+        </div>
+        <div class="loc-badge">CBD</div>
+      </div>
+      <div class="loc-item">
+        <div class="loc-num">03</div>
+        <div>
+          <div class="loc-name">Udyog Vihar (Ph 1–5)</div>
+          <div class="loc-dev">₹65–95 / sqft / mo</div>
+          <div class="loc-desc">Original IT hub. Large BPO/KPO campuses, airport proximity. Cost-effective for operations-heavy clients.</div>
+        </div>
+      </div>
+      <div class="loc-item">
+        <div class="loc-num">04</div>
+        <div>
+          <div class="loc-name">Sector 44</div>
+          <div class="loc-dev">₹75–100 / sqft / mo</div>
+          <div class="loc-desc">Institutional office district near HUDA City Centre. Consulting, coworking, mid-to-large enterprises.</div>
+        </div>
+      </div>
+      <div class="loc-item">
+        <div class="loc-num">05</div>
+        <div>
+          <div class="loc-name">Golf Course Ext. Road</div>
+          <div class="loc-dev">₹90–130 / sqft / mo</div>
+          <div class="loc-desc">New-age Grade-A supply, Sectors 58–67. Cost-conscious MNCs wanting premium address without CBD rates.</div>
+        </div>
+        <div class="loc-badge">Rising</div>
+      </div>
+      <div class="loc-item">
+        <div class="loc-num">06</div>
+        <div>
+          <div class="loc-name">Sohna Road</div>
+          <div class="loc-dev">₹55–80 / sqft / mo</div>
+          <div class="loc-desc">Value corridor. Startups, SMEs seeking alternatives to premium CBD rents. Strong residential catchment.</div>
+        </div>
+      </div>
+      <div class="loc-item">
+        <div class="loc-num">07</div>
+        <div>
+          <div class="loc-name">SPR (Southern Peripheral Road)</div>
+          <div class="loc-dev">₹65–90 / sqft / mo</div>
+          <div class="loc-desc">Emerging corridor connecting GCER to NH-48. Infrastructure-led growth. Next major business destination.</div>
+        </div>
+        <div class="loc-badge">Rising</div>
+      </div>
+      <div class="loc-item">
+        <div class="loc-num">08</div>
+        <div>
+          <div class="loc-name">Dwarka Expressway</div>
+          <div class="loc-dev">₹55–80 / sqft / mo</div>
+          <div class="loc-desc">Newest growth engine. Direct Delhi and IGI connectivity. Massive residential + future commercial expansion.</div>
+        </div>
+        <div class="loc-badge">Rising</div>
+      </div>
+    </div>
+  </div>
+  <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<!-- SCREEN 4: CONNECTIVITY -->
+<div class="screen screen-connect">
+  <div class="s4-header">
+    <div class="s4-eyebrow">Connectivity</div>
+    <h2 class="s4-title">How the City Connects to Its Localities</h2>
+    <p class="s4-sub">Every transport mode has a natural catchment. Know which mode serves which zone.</p>
+  </div>
+
+  <div class="connect-grid">
+    <div class="connect-card">
+      <div class="connect-icon"><i class="fa-solid fa-plane"></i></div>
+      <div class="connect-mode">Airport — IGI</div>
+      <div class="connect-desc">Adjacent to Indira Gandhi International Airport — India's busiest international gateway. Accessible via NH-48 (15–25 min) and Dwarka Expressway. Extensive domestic and global connectivity. No other Indian CBD sits this close to an international airport.</div>
+      <div class="connect-tag"><i class="fa-solid fa-clock" style="font-size:9px;"></i> 15–25 min to IGI</div>
+    </div>
+    <div class="connect-card">
+      <div class="connect-icon"><i class="fa-solid fa-train-subway"></i></div>
+      <div class="connect-mode">Metro — Yellow &amp; Rapid</div>
+      <div class="connect-desc">Yellow Line stations: Millennium City Centre · IFFCO Chowk · MG Road · Sikanderpur · Guru Dronacharya. Rapid Metro serves Cyber City, Cyber Hub, DLF Phase 2, and Golf Course Road. Sikanderpur is the interchange between both networks.</div>
+      <div class="connect-tag"><i class="fa-solid fa-map-marker-alt" style="font-size:9px;"></i> Sikanderpur interchange · Cyber City direct</div>
+    </div>
+    <div class="connect-card">
+      <div class="connect-icon"><i class="fa-solid fa-car"></i></div>
+      <div class="connect-mode">Regional Roads — NH-48</div>
+      <div class="connect-desc">NH-48 connects Delhi → Gurugram → Manesar → Jaipur → Ahmedabad → Mumbai. Dwarka Expressway: high-speed link to Delhi and IGI. Gurugram–Faridabad Road links South Delhi and Faridabad. Strong NCR-wide road connectivity.</div>
+      <div class="connect-tag"><i class="fa-solid fa-road" style="font-size:9px;"></i> NH-48 · Dwarka Expwy · Faridabad Road</div>
+    </div>
+    <div class="connect-card">
+      <div class="connect-icon"><i class="fa-solid fa-map-road"></i></div>
+      <div class="connect-mode">Internal Road Network</div>
+      <div class="connect-desc">Golf Course Road (Cyber City → GCER) · Golf Course Extension Road (west sector growth) · SPR (east-west connector: Sohna Rd ↔ GCER ↔ NH-48) · Sohna Road (central to south Gurugram) · Cyber City Road Network (Udyog Vihar and office parks).</div>
+      <div class="connect-tag"><i class="fa-solid fa-sitemap" style="font-size:9px;"></i> GCR · GCER · SPR · Sohna Rd</div>
+    </div>
+  </div>
+
+  <div class="travel-row">
+    <div class="travel-chip"><span class="travel-chip-dot"></span>IGI Airport <strong>15–25 min</strong></div>
+    <div class="travel-chip"><span class="travel-chip-dot"></span>Connaught Place <strong>45–60 min</strong></div>
+    <div class="travel-chip"><span class="travel-chip-dot"></span>Noida <strong>60–90 min</strong></div>
+    <div class="travel-chip"><span class="travel-chip-dot"></span>Faridabad <strong>30–45 min</strong></div>
+    <div class="travel-chip"><span class="travel-chip-dot"></span>Manesar <strong>25 min</strong></div>
+  </div>
+
+  <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<!-- SCREEN 6: ECONOMIC ENGINE -->
+<div class="screen screen-economy">
+  <div class="s5-header">
+    <div class="s5-eyebrow">Economic Profile</div>
+    <h2 class="s5-title">India's Most Concentrated Corporate Address</h2>
+  </div>
+
+  <div class="econ-grid">
+    <div class="econ-sector-card">
+      <div class="econ-sector-icon"><i class="fa-solid fa-microchip"></i></div>
+      <div class="econ-sector-title">IT &amp; ITeS</div>
+      <div class="econ-sector-cos">Infosys, Wipro, HCL, Accenture</div>
+      <div class="econ-sector-tag">Cyber City · Udyog Vihar</div>
+    </div>
+    <div class="econ-sector-card">
+      <div class="econ-sector-icon"><i class="fa-solid fa-globe"></i></div>
+      <div class="econ-sector-title">GCCs (300+)</div>
+      <div class="econ-sector-cos">American Express, Google, Motorola, Honeywell</div>
+      <div class="econ-sector-tag">Global Capability Centres</div>
+    </div>
+    <div class="econ-sector-card">
+      <div class="econ-sector-icon"><i class="fa-solid fa-landmark"></i></div>
+      <div class="econ-sector-title">BFSI</div>
+      <div class="econ-sector-cos">Standard Chartered, HDFC, Genpact, Muthoot</div>
+      <div class="econ-sector-tag">Financial Services Corridor</div>
+    </div>
+    <div class="econ-sector-card">
+      <div class="econ-sector-icon"><i class="fa-solid fa-briefcase"></i></div>
+      <div class="econ-sector-title">Professional Services</div>
+      <div class="econ-sector-cos">Deloitte, PwC, McKinsey, BCG, EY</div>
+      <div class="econ-sector-tag">Advisory · Consulting</div>
+    </div>
+    <div class="econ-sector-card">
+      <div class="econ-sector-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
+      <div class="econ-sector-title">New-Age Enterprises</div>
+      <div class="econ-sector-cos">Zomato, PolicyBazaar, IndiaMart, OYO</div>
+      <div class="econ-sector-tag">India's Unicorn Corridor</div>
+    </div>
+    <div class="econ-sector-card">
+      <div class="econ-sector-icon"><i class="fa-solid fa-industry"></i></div>
+      <div class="econ-sector-title">Manufacturing</div>
+      <div class="econ-sector-cos">Maruti Suzuki, Hero MotoCorp, IMT Manesar</div>
+      <div class="econ-sector-tag">Auto · Industrial Belt</div>
+    </div>
+  </div>
+
+  <div class="econ-stats">
+    <div class="econ-stat"><div class="econ-val">250+</div><div class="econ-lbl">Fortune 500 Cos.</div></div>
+    <div class="econ-stat"><div class="econ-val">50+</div><div class="econ-lbl">NIFTY 100 Cos.</div></div>
+    <div class="econ-stat"><div class="econ-val">₹3.4L Cr</div><div class="econ-lbl">GDP Contribution</div></div>
+    <div class="econ-stat"><div class="econ-val">22%</div><div class="econ-lbl">NCR Flex Share</div></div>
+    <div class="econ-stat"><div class="econ-val">₹80–180</div><div class="econ-lbl">sqft/month avg</div></div>
+  </div>
+
+  <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<!-- SCREEN 7: KNOW EVERY CORNER -->
+<div class="screen screen-corners">
+  <div class="s7-header">
+    <div class="s7-eyebrow">On the Ground</div>
+    <h2 class="s7-title">Know Every Corner</h2>
+    <p class="s7-sub">Local expertise is demonstrated through details, not directions.</p>
+  </div>
+
+  <div class="corners-grid">
+    <div class="corner-card">
+      <div class="corner-icon"><i class="fa-solid fa-city"></i></div>
+      <div class="corner-name">DLF Cyber Hub</div>
+      <div class="corner-type">Corporate + F&amp;B Landmark</div>
+      <div class="corner-why">The social heart of Cyber City. Every post-work client dinner happens here. Mention it — they'll nod.</div>
+    </div>
+    <div class="corner-card">
+      <div class="corner-icon"><i class="fa-solid fa-train-subway"></i></div>
+      <div class="corner-name">MG Road Station</div>
+      <div class="corner-type">Metro Interchange</div>
+      <div class="corner-why">Yellow Line + Rapid Metro. Clients commuting from Delhi use this. Critical for site visits.</div>
+    </div>
+    <div class="corner-card">
+      <div class="corner-icon"><i class="fa-solid fa-bag-shopping"></i></div>
+      <div class="corner-name">Ambience Mall</div>
+      <div class="corner-type">Retail Anchor</div>
+      <div class="corner-why">NH-48 landmark. Client says "near Ambience" — you know exactly where they are. NW Gurugram reference.</div>
+    </div>
+    <div class="corner-card">
+      <div class="corner-icon"><i class="fa-solid fa-building"></i></div>
+      <div class="corner-name">Signature Tower</div>
+      <div class="corner-type">Legacy Office Tower</div>
+      <div class="corner-why">1990s landmark on NH-48. Maruti Suzuki corporate HQ. Old-guard clients know it as the original address.</div>
+    </div>
+    <div class="corner-card">
+      <div class="corner-icon"><i class="fa-solid fa-utensils"></i></div>
+      <div class="corner-name">Sector 29 Food Street</div>
+      <div class="corner-type">After-Work Hub</div>
+      <div class="corner-why">Closest F&amp;B cluster to Rapid Metro Leisure Valley station. Where startup teams gather. Build rapport here.</div>
+    </div>
+    <div class="corner-card">
+      <div class="corner-icon"><i class="fa-solid fa-hospital"></i></div>
+      <div class="corner-name">AIIMS Gurugram</div>
+      <div class="corner-type">Institutional Anchor</div>
+      <div class="corner-why">NH-48. Gives the zone credibility. Adjacent residential and commercial supply has grown around it.</div>
+    </div>
+    <div class="corner-card">
+      <div class="corner-icon"><i class="fa-solid fa-masks-theater"></i></div>
+      <div class="corner-name">Kingdom of Dreams</div>
+      <div class="corner-type">MICE Venue</div>
+      <div class="corner-why">Sector 29. Corporate offsites and team events. Good conversation opener with enterprise clients.</div>
+    </div>
+    <div class="corner-card">
+      <div class="corner-icon"><i class="fa-solid fa-leaf"></i></div>
+      <div class="corner-name">Aravalli Biodiversity Park</div>
+      <div class="corner-type">Green Landmark</div>
+      <div class="corner-why">Golf Course Ext. Road. Premium residential marker. Tells you the client demographic in that zone.</div>
+    </div>
+    <div class="corner-card">
+      <div class="corner-icon"><i class="fa-solid fa-road"></i></div>
+      <div class="corner-name">IFFCO Chowk</div>
+      <div class="corner-type">Major Junction</div>
+      <div class="corner-why">NH-48 + Rapid Metro. Gateway between Delhi and Cyber City. Every client knows it as the commute bottleneck.</div>
+    </div>
+  </div>
+  <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<!-- SCREEN 8: CITY AT A GLANCE -->
+<div class="screen screen-cityglance">
+  <div class="cityglance-header">
+    <div class="cityglance-eyebrow">Gurugram — By the Numbers</div>
+    <h2 class="cityglance-title">City at a Glance</h2>
+  </div>
+  <div class="stat-cards-grid">
+    <div class="stat-card">
+      <div class="stat-card-label">Grade A Stock</div>
+      <div class="stat-card-value">70M+</div>
+      <div class="stat-card-sub">sq ft of office space</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Fortune 500 Cos.</div>
+      <div class="stat-card-value">250+</div>
+      <div class="stat-card-sub">have operations here</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">GCCs</div>
+      <div class="stat-card-value">300+</div>
+      <div class="stat-card-sub">Global Capability Centres</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Daily Workforce</div>
+      <div class="stat-card-value">1M+</div>
+      <div class="stat-card-sub">commuters from across NCR</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Avg Flex Rental</div>
+      <div class="stat-card-value">₹80–180</div>
+      <div class="stat-card-sub">per sqft / month</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Airport</div>
+      <div class="stat-card-value">15–25 min</div>
+      <div class="stat-card-sub">to IGI via NH-48</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">NIFTY 100 Cos.</div>
+      <div class="stat-card-value">50+</div>
+      <div class="stat-card-sub">listed companies present here</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">NCR Flex Share</div>
+      <div class="stat-card-value">22%</div>
+      <div class="stat-card-sub">of total NCR flex market</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">Unicorn Startups</div>
+      <div class="stat-card-value">10+</div>
+      <div class="stat-card-sub">headquartered in the city</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /.slides -->
+</div><!-- /#slide-mode -->
+
+
+<!-- ═══════════════════════════════════
+     READ MODE
+═══════════════════════════════════ -->
+<div id="read-mode" class="hidden" style="margin-top:52px;">
+  <div class="r-layout">
+    <aside class="r-sidebar">
+      <div class="toc-chapter">AM CHAPTER 1</div>
+      <a class="toc-link toc-link--intro" href="#s-intro">Introduction</a>
+      <a class="toc-link toc-link--num" href="#s01">01 · History</a>
+      <a class="toc-link toc-link--num" href="#s02">02 · Why Gurugram</a>
+      <a class="toc-link toc-link--num" href="#s03">03 · Localities</a>
+      <a class="toc-link toc-link--num" href="#s04">04 · Connectivity</a>
+      <a class="toc-link toc-link--num" href="#s05">05 · Economic Profile</a>
+      <a class="toc-link toc-link--num" href="#s07">06 · City at a Glance</a>
+      <a class="toc-link" href="#s-assess">Assessment</a>
+    </aside>
+
+    <main class="r-content">
+
+      <!-- INTRO -->
+      <section class="section" id="s-intro">
+        <div class="intro-card">
+          <p class="section-body">In real estate consulting, credibility is built on how well you know your city, understand its real estate, and narrate its story. This chapter builds that foundation for Gurugram — The Millennium City of India and India's most concentrated corporate address — the primary market you'll be operating in.</p>
+          <p class="section-body">Gurugram's rise mirrors India's economic ascent. Home to Fortune 500 companies, premium business districts, and cutting-edge infrastructure, it represents the country's modern corporate ambitions.</p>
+        </div>
+      </section>
+
+      <!-- 01 -->
+      <section class="section" id="s01">
+        <div class="section-num">01</div>
+        <h2 class="section-title">History — From Villages to Millennium City</h2>
+        <p class="section-body">A few decades ago, Gurgaon was not the city we know today. It was largely a collection of villages surrounded by agricultural land on the outskirts of Delhi. The economy was driven by farming, livestock, and small local businesses. Connectivity was limited, and few would have imagined that this region would become one of India's most important business destinations.</p>
+        <p class="section-body">The name "Gurugram" itself is believed to originate from ancient times, when the land was associated with Dronacharya — the guru of the Pandavas and Kauravas in the Mahabharata. It's a name rooted in the idea of knowledge and mentorship, which is an interesting parallel to the city's modern identity as an aspirational address for professionals.</p>
+        <div class="visual">
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-dot"></div>
+              <div class="tl-year">Pre-1990s</div>
+              <div class="tl-title">Agricultural villages</div>
+              <div class="tl-desc">Gurgaon was a cluster of farming communities — open land, no urban planning, limited connectivity. The Haryana government's willingness to allow private land acquisition set the stage for a city built entirely by private capital.</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot"></div>
+              <div class="tl-year">1970s–80s</div>
+              <div class="tl-title">Manufacturing arrives — Maruti Suzuki</div>
+              <div class="tl-desc">The first major turning point came with manufacturing. The establishment of Maruti Suzuki transformed Gurgaon into an industrial hub — thousands of jobs were created, supporting industries emerged, and infrastructure investment began to flow. For the first time, Gurgaon became an employment center, not just a rural district.</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot"></div>
+              <div class="tl-year">2003+</div>
+              <div class="tl-title">DLF and private-sector urban development</div>
+              <div class="tl-desc">The defining moment came with DLF's large-scale development. Unlike many Indian cities that grew through government-led planning, Gurgaon witnessed private-sector urbanization — large land parcels assembled, roads built, and modern commercial districts created. What was once farmland became office complexes, residential townships, shopping malls, business parks, and luxury housing communities. MNCs flooded in. The transformation from farming village to Fortune 500 address was complete within a generation.</div>
+            </div>
+          </div>
+        </div>
+        <div class="takeaway">The city was built by private capital on agricultural land. DLF dominates supply. Infrastructure has always been reactive — roads and metro came after the offices. Understanding this history explains why commute time is still the #1 client objection.</div>
+      </section>
+
+      <!-- 02 -->
+      <section class="section" id="s02">
+        <div class="section-num">02</div>
+        <h2 class="section-title">Why Gurugram</h2>
+        <p class="section-body">Gurugram's rise is no accident. Its geography places it at the intersection of India's political power, economic activity, transportation networks, and talent pool. Few cities in the country enjoy such a combination of strategic advantages.</p>
+
+        <h3 class="section-subhead">1. Immediate Access to Delhi</h3>
+        <p class="section-body">Gurugram shares its eastern boundary with New Delhi, placing businesses within minutes of India's political and administrative center. For multinational corporations, consulting firms, legal firms, and government-facing businesses, this means direct access to:</p>
+        <ul class="bullets">
+          <li>Central government ministries and departments</li>
+          <li>Regulatory authorities and policy makers</li>
+          <li>Foreign embassies and diplomatic missions</li>
+          <li>National industry associations</li>
+          <li>Corporate headquarters located in Delhi</li>
+        </ul>
+        <p class="section-body">It effectively functions as Delhi's modern business extension — proximity to decision-makers without Delhi's space constraints and operational challenges.</p>
+
+        <h3 class="section-subhead">2. Airport Connectivity</h3>
+        <p class="section-body">One of Gurugram's greatest advantages is its proximity to Indira Gandhi International Airport — India's busiest international gateway. Many of the city's key business districts are within a 15–25 min drive. This enables:</p>
+        <ul class="bullets">
+          <li>Faster domestic and international travel</li>
+          <li>Efficient client and investor visits</li>
+          <li>Easy access for expatriate employees</li>
+          <li>Strong connectivity to global business centers</li>
+        </ul>
+        <p class="section-body">Few major Indian office markets offer such close integration with an international airport. For companies operating across multiple geographies, this significantly reduces travel time and improves operational efficiency.</p>
+
+        <h3 class="section-subhead">3. National Highway 48 Connectivity</h3>
+        <p class="section-body">Gurugram developed along NH-48, one of India's most important economic corridors. This strategic location provides:</p>
+        <ul class="bullets">
+          <li>Direct road connectivity to Delhi</li>
+          <li>Access to major industrial hubs across North and West India</li>
+          <li>Efficient movement of goods and services</li>
+          <li>Strong regional connectivity for businesses and employees</li>
+        </ul>
+        <p class="section-body">The highway has acted as the city's economic spine — attracting office developments, industrial clusters, logistics operations, hotels, and commercial districts along its length.</p>
+
+        <h3 class="section-subhead">4. NCR Advantage</h3>
+        <p class="section-body">As part of the National Capital Region, Gurugram benefits from being integrated into India's largest urban and economic ecosystem. This gives businesses access to:</p>
+        <ul class="bullets">
+          <li>A population base exceeding 30 million people</li>
+          <li>One of India's largest consumer markets</li>
+          <li>Multiple business districts across NCR</li>
+          <li>Extensive supplier and vendor networks</li>
+          <li>A vast professional workforce</li>
+        </ul>
+        <p class="section-body">Companies can operate from Gurugram while serving customers and partners across Delhi, Noida, Ghaziabad, Faridabad, Greater Noida, and other NCR markets.</p>
+
+        <h3 class="section-subhead">5. Access to a Massive Talent Pool</h3>
+        <p class="section-body">Gurugram sits at the center of one of India's deepest talent markets. The city draws professionals from Delhi, Haryana, Uttar Pradesh, Rajasthan, Punjab, Uttarakhand, and other major cities. Its proximity to leading universities, management institutes, engineering colleges, and professional training centers ensures a continuous supply of skilled talent across technology, consulting, finance, sales, and operations. This is one of the key reasons multinational corporations continue expanding here.</p>
+
+        <h3 class="section-subhead">6. Gateway to North India</h3>
+        <p class="section-body">For many companies, Gurugram serves as their headquarters for North India operations. From the city, businesses can efficiently access:</p>
+        <ul class="bullets">
+          <li>Delhi NCR · Chandigarh · Jaipur · Lucknow</li>
+          <li>Ludhiana · Amritsar · Dehradun · Kanpur</li>
+        </ul>
+        <p class="section-body">This strategic position allows organizations to manage large regional operations from a single location while remaining connected to the country's political and commercial centers.</p>
+
+        <h3 class="section-subhead">7. Multi-Modal Transportation Network</h3>
+        <p class="section-body">Beyond highways and airports, Gurugram benefits from strong regional connectivity through Delhi Metro, Rapid Metro, inter-city rail links, expressways, and proposed future transit infrastructure. This integrated transport ecosystem allows employees, clients, and businesses to move efficiently across NCR.</p>
+
+        <h3 class="section-subhead">8. Scale for Future Expansion</h3>
+        <p class="section-body">Unlike established business districts in central Indian cities, Gurugram had large tracts of developable land during its growth phase. This enabled large corporate campuses, integrated business parks, mixed-use developments, and modern residential communities — allowing companies to consolidate operations and build long-term headquarters rather than occupying fragmented office spaces.</p>
+
+        <div class="takeaway"><strong>The Perfect Intersection:</strong> Few cities combine capital access (proximity to India's government and policy ecosystem), global connectivity (immediate access to an international airport), and commercial infrastructure (world-class offices, talent, and business ecosystems) in the way Gurugram does. This combination transformed it from a peripheral town into one of Asia's most important corporate destinations.</div>
+      </section>
+
+      <!-- 03 -->
+      <section class="section" id="s03">
+        <div class="section-num">03</div>
+        <h2 class="section-title">Localities — Developer-Led Overview</h2>
+        <p class="section-body">Gurugram's commercial geography was shaped almost entirely by private developers — each corridor has a dominant developer DNA that explains the product type, pricing, and client profile you'll find there.</p>
+
+        <h3 class="section-subhead">Gurugram's Commercial Zones</h3>
+        <div style="border-radius: var(--radius); overflow: hidden; margin-bottom: 32px; text-align: center;">
+          <img src="city_images_KYG/gurugram_map.png" alt="Gurugram Commercial Zones Map" style="width:75%; display:inline-block; border-radius: var(--radius);">
+        </div>
+
+        <div class="loc-profile">
+          <div class="loc-profile-hd">
+            <span class="loc-profile-num">01</span>
+            <div class="loc-profile-name">Golf Course Road</div>
+            <span class="loc-profile-dna">₹120–160 / sqft / mo</span>
+          </div>
+          <p class="loc-profile-body">The most prestigious commercial and residential corridor in Gurugram. Golf Course Road connects Cyber City to premium residential communities and is considered the city's "Wall Street." It houses global corporates, PE funds, consulting firms, and luxury residences.</p>
+          <div class="loc-profile-cols">
+            <div>
+              <div class="loc-profile-sub">Key Developers</div>
+              <ul class="bullets"><li>DLF (dominant)</li><li>Emaar India</li><li>Unitech</li></ul>
+            </div>
+            <div>
+              <div class="loc-profile-sub">Known For</div>
+              <ul class="bullets"><li>Premium Grade-A offices</li><li>Luxury housing</li><li>Rapid Metro connectivity</li><li>Highest office rentals in Gurugram</li></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="loc-profile">
+          <div class="loc-profile-hd">
+            <span class="loc-profile-num">02</span>
+            <div class="loc-profile-name">Cyber City</div>
+            <span class="loc-profile-dna">₹140–200 / sqft / mo</span>
+          </div>
+          <p class="loc-profile-body">The central business district (CBD) of Gurugram and the symbol of the city's corporate transformation. Home to multinational corporations, Fortune 500 companies, and one of India's largest concentrations of Grade-A office space.</p>
+          <div class="loc-profile-cols">
+            <div>
+              <div class="loc-profile-sub">Key Developer</div>
+              <ul class="bullets"><li>DLF</li></ul>
+            </div>
+            <div>
+              <div class="loc-profile-sub">Known For</div>
+              <ul class="bullets"><li>Corporate headquarters</li><li>Fortune 500 presence</li><li>Cyber Hub F&amp;B hub</li><li>Airport connectivity</li></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="loc-profile">
+          <div class="loc-profile-hd">
+            <span class="loc-profile-num">03</span>
+            <div class="loc-profile-name">Udyog Vihar</div>
+            <span class="loc-profile-dna">₹65–95 / sqft / mo</span>
+          </div>
+          <p class="loc-profile-body">Gurugram's original industrial and business district along the Delhi border. Over time it evolved from industrial plots into a major IT, BPO, and operations hub. Cost-effective for large-headcount clients.</p>
+          <div class="loc-profile-cols">
+            <div>
+              <div class="loc-profile-sub">Key Developers</div>
+              <ul class="bullets"><li>HSIIDC</li><li>Brookfield Properties (Candor TechSpace)</li><li>DLF</li></ul>
+            </div>
+            <div>
+              <div class="loc-profile-sub">Known For</div>
+              <ul class="bullets"><li>Large office campuses</li><li>BPO / KPO operations</li><li>Airport proximity</li><li>Cost-effective office stock</li></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="loc-profile">
+          <div class="loc-profile-hd">
+            <span class="loc-profile-num">04</span>
+            <div class="loc-profile-name">Sector 44</div>
+            <span class="loc-profile-dna">₹75–100 / sqft / mo</span>
+          </div>
+          <p class="loc-profile-body">One of Gurugram's earliest institutional and office districts. Located near HUDA City Centre, it remains a popular destination for consulting firms, coworking operators, and mid-to-large enterprises.</p>
+          <div class="loc-profile-cols">
+            <div>
+              <div class="loc-profile-sub">Key Developers</div>
+              <ul class="bullets"><li>Unitech</li><li>Institutional developments</li></ul>
+            </div>
+            <div>
+              <div class="loc-profile-sub">Known For</div>
+              <ul class="bullets"><li>Unitech Cyber Park</li><li>Metro accessibility</li><li>Established corporate ecosystem</li></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="loc-profile">
+          <div class="loc-profile-hd">
+            <span class="loc-profile-num">05</span>
+            <div class="loc-profile-name">Golf Course Extension Road (GCER)</div>
+            <span class="loc-profile-dna">₹90–130 / sqft / mo</span>
+          </div>
+          <p class="loc-profile-body">The natural expansion of Golf Course Road. Modern infrastructure, new-age Grade-A offices, and luxury residential developments have made it one of Gurugram's fastest-growing corridors. Sectors 58–67.</p>
+          <div class="loc-profile-cols">
+            <div>
+              <div class="loc-profile-sub">Key Developers</div>
+              <ul class="bullets"><li>M3M India</li><li>Emaar India</li><li>AIPL</li><li>IREO</li></ul>
+            </div>
+            <div>
+              <div class="loc-profile-sub">Known For</div>
+              <ul class="bullets"><li>New Grade-A office supply</li><li>Mixed-use developments</li><li>Luxury residential catchment</li><li>Strong future growth potential</li></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="loc-profile">
+          <div class="loc-profile-hd">
+            <span class="loc-profile-num">06</span>
+            <div class="loc-profile-name">Sohna Road</div>
+            <span class="loc-profile-dna">₹55–80 / sqft / mo</span>
+          </div>
+          <p class="loc-profile-body">A value-driven commercial corridor that emerged as companies sought alternatives to the premium rentals of Golf Course Road and Cyber City. Popular among startups, SMEs, and growing businesses.</p>
+          <div class="loc-profile-cols">
+            <div>
+              <div class="loc-profile-sub">Key Developers</div>
+              <ul class="bullets"><li>Vatika Group</li><li>Bestech Group</li><li>JMD Group</li><li>Spaze Group</li></ul>
+            </div>
+            <div>
+              <div class="loc-profile-sub">Known For</div>
+              <ul class="bullets"><li>Mid-market offices</li><li>Startup ecosystem</li><li>Affordable commercial spaces</li><li>Strong residential demand</li></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="loc-profile">
+          <div class="loc-profile-hd">
+            <span class="loc-profile-num">07</span>
+            <div class="loc-profile-name">SPR — Southern Peripheral Road</div>
+            <span class="loc-profile-dna">₹65–90 / sqft / mo</span>
+          </div>
+          <p class="loc-profile-body">The emerging growth corridor connecting Golf Course Extension Road to NH-48. Large infrastructure investments and new launches are positioning SPR as Gurugram's next major business and residential destination.</p>
+          <div class="loc-profile-cols">
+            <div>
+              <div class="loc-profile-sub">Key Developers</div>
+              <ul class="bullets"><li>M3M India</li><li>DLF</li><li>Signature Global</li><li>Smartworld Developers</li></ul>
+            </div>
+            <div>
+              <div class="loc-profile-sub">Known For</div>
+              <ul class="bullets"><li>Future business district</li><li>Large land parcels</li><li>Infrastructure-led growth</li><li>New commercial inventory</li></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="loc-profile">
+          <div class="loc-profile-hd">
+            <span class="loc-profile-num">08</span>
+            <div class="loc-profile-name">Dwarka Expressway</div>
+            <span class="loc-profile-dna">₹55–80 / sqft / mo</span>
+          </div>
+          <p class="loc-profile-body">The newest growth engine of Gurugram, connecting directly to Delhi and the airport region. Massive infrastructure upgrades and large-scale residential developments have transformed it into one of India's most active real estate corridors.</p>
+          <div class="loc-profile-cols">
+            <div>
+              <div class="loc-profile-sub">Key Developers</div>
+              <ul class="bullets"><li>Elan Group</li><li>Signature Global</li><li>Sobha Limited</li><li>Godrej Properties</li><li>M3M India</li></ul>
+            </div>
+            <div>
+              <div class="loc-profile-sub">Known For</div>
+              <ul class="bullets"><li>Direct Delhi connectivity</li><li>Airport access</li><li>Massive residential expansion</li><li>Future commercial hubs</li></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 -->
+      <section class="section" id="s04">
+        <div class="section-num">04</div>
+        <h2 class="section-title">Connectivity</h2>
+
+        <h3 class="section-subhead">Regional Road Connectivity</h3>
+        <p class="section-body">Located on NH-48, one of India's busiest economic corridors connecting Delhi, Gurugram, Manesar, Jaipur, Ahmedabad, and Mumbai. Dwarka Expressway provides a high-speed link between Gurugram, Delhi, and IGI Airport. Gurugram–Faridabad Road connects the city to South Delhi and Faridabad.</p>
+        <ul class="bullets">
+          <li>Direct road connectivity to Delhi via NH-48</li>
+          <li>Dwarka Expressway — high-speed link to IGI Airport</li>
+          <li>Gurugram–Faridabad Road — South Delhi and Faridabad access</li>
+          <li>Strong connectivity to Noida, Ghaziabad, Manesar, and wider NCR</li>
+        </ul>
+
+        <h3 class="section-subhead">Internal Road Network</h3>
+        <p class="section-body">Gurugram's business districts are connected through a well-developed network of arterial roads:</p>
+        <ul class="bullets">
+          <li><strong>Golf Course Road</strong> — Premium commercial corridor connecting Cyber City to Golf Course Extension Road</li>
+          <li><strong>Golf Course Extension Road</strong> — Fast-growing office and residential corridor in the city's western sector</li>
+          <li><strong>Southern Peripheral Road (SPR)</strong> — Key east-west connector linking Sohna Road, GCER, and NH-48</li>
+          <li><strong>Sohna Road</strong> — Major commercial and residential corridor connecting central Gurugram to South Gurugram</li>
+          <li><strong>Dwarka Expressway (NPR)</strong> — Supports New Gurugram connectivity to Delhi</li>
+          <li><strong>Cyber City Road Network</strong> — Seamless access to Cyber City, Udyog Vihar, and major office parks</li>
+        </ul>
+
+        <h3 class="section-subhead">Metro Connectivity</h3>
+        <p class="section-body">Directly connected to Delhi through the Delhi Metro Yellow Line. Major stations include Millennium City Centre, IFFCO Chowk, MG Road, Sikanderpur, and Guru Dronacharya. The Rapid Metro Gurgaon connects Cyber City, Cyber Hub, DLF Phase 2, and Golf Course Road. Sikanderpur serves as the interchange between the Delhi Metro and Rapid Metro networks.</p>
+        <ul class="bullets">
+          <li>Yellow Line: Millennium City Centre · IFFCO Chowk · MG Road · Sikanderpur · Guru Dronacharya</li>
+          <li>Rapid Metro: Cyber City · Cyber Hub · DLF Phase 2 · Golf Course Road</li>
+          <li>Sikanderpur — interchange between both networks</li>
+          <li>Note: IFFCO Chowk and MG Road are Yellow Line, not Rapid Metro — clients will test you on this</li>
+        </ul>
+
+        <h3 class="section-subhead">Airport Connectivity</h3>
+        <p class="section-body">Located adjacent to Indira Gandhi International Airport, India's busiest international airport. Offers extensive domestic and global air connectivity. Easily accessible via NH-48 and Dwarka Expressway. No other major Indian CBD sits this close to an international airport — a material reason MNCs chose Gurugram.</p>
+
+        <div class="takeaway">Key travel times: IGI Airport 15–25 min · Connaught Place 45–60 min · Noida 60–90 min · Faridabad 30–45 min · Manesar 25 min</div>
+      </section>
+
+      <!-- 05 -->
+      <section class="section" id="s05">
+        <div class="section-num">05</div>
+        <h2 class="section-title">Economic Profile — India's Most Concentrated Corporate Address</h2>
+        <p class="section-body">Gurugram's economy runs on six sectors. Each sector has a distinct footprint, a concentration zone, and a client profile you need to recognise on sight.</p>
+
+        <div class="sector-profiles">
+          <div class="sector-row">
+            <div class="sector-tag">IT &amp; ITeS</div>
+            <div class="sector-detail"><span class="sector-cos">Infosys · Wipro · HCL · Accenture</span><span class="sector-zone">Cyber City, Udyog Vihar</span></div>
+            <div class="sector-note">Largest employer in the city — the reason Grade-A stock keeps getting absorbed.</div>
+          </div>
+          <div class="sector-row">
+            <div class="sector-tag">GCCs</div>
+            <div class="sector-detail"><span class="sector-cos">American Express · Google · Motorola · Honeywell</span><span class="sector-zone">Cyber City, Golf Course Road</span></div>
+            <div class="sector-note">300+ Global Capability Centres. The prestige anchor that pulled the entire ecosystem in.</div>
+          </div>
+          <div class="sector-row">
+            <div class="sector-tag">BFSI</div>
+            <div class="sector-detail"><span class="sector-cos">HDFC · Axis · Kotak · Insurance majors</span><span class="sector-zone">MG Road, Sector 44</span></div>
+            <div class="sector-note">Financial corridor — dense with banks, NBFCs, and insurance operations.</div>
+          </div>
+          <div class="sector-row">
+            <div class="sector-tag">Professional Services</div>
+            <div class="sector-detail"><span class="sector-cos">Deloitte · PwC · McKinsey · BCG · EY</span><span class="sector-zone">Golf Course Road, Cyber City</span></div>
+            <div class="sector-note">Large advisory practices. High per-sqft-paying clients; premium address matters.</div>
+          </div>
+          <div class="sector-row">
+            <div class="sector-tag">New-Age Tech</div>
+            <div class="sector-detail"><span class="sector-cos">Zomato · PolicyBazaar · IndiaMart · OYO</span><span class="sector-zone">GCER, Sohna Road</span></div>
+            <div class="sector-note">India's unicorn corridor — flex-first occupiers, fast-scaling headcounts.</div>
+          </div>
+          <div class="sector-row">
+            <div class="sector-tag">Manufacturing</div>
+            <div class="sector-detail"><span class="sector-cos">Maruti Suzuki · Hero MotoCorp</span><span class="sector-zone">IMT Manesar, Udyog Vihar</span></div>
+            <div class="sector-note">Industrial south anchor — where Gurgaon's story began. Still one of India's largest auto clusters.</div>
+          </div>
+        </div>
+
+        <div class="takeaway">The GCC anchor-tenant model: when American Express takes a floor, they anchor a building and create downstream demand for 50-person startups that follow. This is why premium supply gets absorbed so fast.</div>
+        <ul class="bullets">
+          <li>250+ Fortune 500 companies have operations here</li>
+          <li>50+ NIFTY 100 listed companies present</li>
+          <li>₹3.4 lakh crore GDP contribution</li>
+          <li>22% of NCR flex office market</li>
+          <li>₹80–180 per sqft/month average flex rental</li>
+        </ul>
+      </section>
+
+      <!-- 06 -->
+      <!-- 07 -->
+      <section class="section" id="s07">
+        <div class="section-num">07</div>
+        <h2 class="section-title">Gurugram — City at a Glance</h2>
+        <div class="visual">
+          <div class="market-stats">
+            <div class="ms-card"><div class="ms-num">70M+</div><div class="ms-label">sq ft Grade A office stock</div></div>
+            <div class="ms-card"><div class="ms-num">250+</div><div class="ms-label">Fortune 500 companies</div></div>
+            <div class="ms-card"><div class="ms-num">300+</div><div class="ms-label">Global Capability Centres</div></div>
+            <div class="ms-card"><div class="ms-num">1M+</div><div class="ms-label">daily commuters from NCR</div></div>
+            <div class="ms-card"><div class="ms-num">₹80–180</div><div class="ms-label">per sqft/month (flex avg)</div></div>
+            <div class="ms-card"><div class="ms-num">15–25 min</div><div class="ms-label">to IGI Airport via NH-48</div></div>
+            <div class="ms-card"><div class="ms-num">50+</div><div class="ms-label">NIFTY 100 companies</div></div>
+            <div class="ms-card"><div class="ms-num">22%</div><div class="ms-label">of NCR flex market</div></div>
+            <div class="ms-card"><div class="ms-num">10+</div><div class="ms-label">unicorn startups headquartered here</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ASSESSMENT -->
+      <section class="section" id="s-assess" style="margin-top:64px;padding-top:48px;border-top:2px solid var(--hairline);">
+        <div class="section-num">Assessment</div>
+        <h2 class="section-title">Chapter Questions</h2>
+        <p class="section-body" style="margin-bottom:32px;">Answer the questions. Let us know a better version of your city.</p>
+
+        <div class="aq-tracker" id="aqTracker">
+          <div class="aq-tracker-bar"><div class="aq-tracker-fill" id="aqTrackerFill"></div></div>
+          <span class="aq-tracker-label" id="aqTrackerLabel">0 / 2 submitted</span>
+        </div>
+
+        <form class="aq-form" id="aqForm" onsubmit="return submitAssessment(event);">
+
+          <div class="aq-question" id="aq1">
+            <div class="aq-q-header">
+              <span class="aq-q-num">Q1</span>
+              <span class="aq-q-status" id="aq1-status"></span>
+            </div>
+            <p class="aq-q-text">Make a presentation of your city and attach.</p>
+            <div class="aq-upload-zone" id="aq1-zone">
+              <i class="fa-solid fa-file-powerpoint"></i>
+              <div class="aq-upload-label">Click to upload or drag &amp; drop</div>
+              <div class="aq-upload-sub">Accepted: .ppt · .pptx · .pdf · .key</div>
+              <input type="file" class="aq-file-input" id="aq1-file" accept=".ppt,.pptx,.pdf,.key,.odp" onchange="onFileSelect(1)">
+            </div>
+            <div class="aq-fname" id="aq1-fname"></div>
+          </div>
+
+          <div class="aq-question" id="aq2">
+            <div class="aq-q-header">
+              <span class="aq-q-num">Q2</span>
+              <span class="aq-q-status" id="aq2-status"></span>
+            </div>
+            <p class="aq-q-text">Record a 5–7 min storytelling of your city and attach.</p>
+            <div class="aq-upload-zone" id="aq2-zone">
+              <i class="fa-solid fa-video"></i>
+              <div class="aq-upload-label">Click to upload or drag &amp; drop</div>
+              <div class="aq-upload-sub">Accepted: .mp4 · .mov · .mp3 · .m4a · .webm</div>
+              <input type="file" class="aq-file-input" id="aq2-file" accept=".mp4,.mov,.mp3,.m4a,.webm,.avi" onchange="onFileSelect(2)">
+            </div>
+            <div class="aq-fname" id="aq2-fname"></div>
+          </div>
+
+          <div class="aq-footer" id="aqFooter">
+            <span class="aq-footer-note" id="aqFooterNote"></span>
+            <button class="aq-submit-btn" type="submit" id="aqSubmitBtn" disabled>Submit</button>
+          </div>
+          <div class="aq-error" id="aqError" style="display:none;"></div>
+        </form>
+
+        <div class="aq-submitted" id="aqSubmitted" style="display:none;">
+          <div class="aq-submitted-icon">✅</div>
+          <div class="aq-submitted-title">AM Chapter 1 Complete</div>
+          <p class="aq-submitted-body">Your submissions have been saved. Your manager will review them and unlock AM Chapter 2 once approved.</p>
+        </div>
+
+
+      </section>
+
+    </main>
+  </div>
+</div>
+
+
+<!-- ═══ SCRIPTS ═══ -->
+<script>
+/* ── MODE TOGGLE ── */
+let currentMode = 'slide';
+
+function setMode(mode) {
+  currentMode = mode;
+  const isSlide = mode === 'slide';
+  document.getElementById('slide-mode').style.display = isSlide ? '' : 'none';
+  const readEl = document.getElementById('read-mode');
+  readEl.classList.toggle('hidden', isSlide);
+  document.body.style.overflow = isSlide ? 'hidden' : 'auto';
+  document.getElementById('screenCounter').style.display = isSlide ? '' : 'none';
+  document.getElementById('dotNav').style.display = isSlide ? '' : 'none';
+  const keyHintEl = document.getElementById('keyHint');
+  if (keyHintEl) keyHintEl.style.display = isSlide ? '' : 'none';
+  const chapterLabelEl = document.getElementById('chapterLabel');
+  if (chapterLabelEl) chapterLabelEl.style.display = isSlide ? '' : 'none';
+  const btn = document.getElementById('btnRead');
+  if (isSlide) {
+    btn.innerHTML = '<i class="fa-solid fa-book-open"></i>&nbsp;Read Full Chapter';
+    btn.onclick = function() { setMode('read'); };
+  } else {
+    btn.innerHTML = '<i class="fa-solid fa-display"></i>&nbsp;Back to Slides';
+    btn.onclick = function() { setMode('slide'); };
+  }
+  if (!isSlide) restoreAssessment();
+}
+
+/* ── SLIDE ENGINE ── */
+const TOTAL = document.querySelectorAll('.screen').length;
+let current = 0;
+let animating = false;
+
+function buildDots() {
+  const nav = document.getElementById('dotNav');
+  nav.innerHTML = '';
+  for (let i = 0; i < TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    nav.appendChild(d);
+  }
+}
+
+function updateCounter() {
+  document.getElementById('screenCounter').textContent = (current + 1) + ' / ' + TOTAL;
+}
+
+function setDarkMode(isDark) {
+  const dotNav = document.getElementById('dotNav');
+  const keyHint = document.getElementById('keyHint');
+  dotNav.classList.toggle('on-dark', isDark);
+  if (keyHint) keyHint.classList.toggle('on-dark', isDark);
+}
+
+function goTo(index) {
+  if (animating || index === current || index < 0 || index >= TOTAL) return;
+  animating = true;
+  const screens = document.querySelectorAll('.screen');
+  const dots = document.querySelectorAll('.dot');
+  const prev = current;
+  current = index;
+
+  screens[prev].classList.add('exit-up');
+  screens[prev].classList.remove('active');
+  setTimeout(() => screens[prev].classList.remove('exit-up'), 500);
+
+  screens[current].classList.add('active');
+  dots[prev].classList.remove('active');
+  dots[current].classList.add('active');
+  updateCounter();
+
+  const keyHint = document.getElementById('keyHint');
+  if (keyHint) keyHint.classList.add('hidden');
+
+  setDarkMode(screens[current].dataset.dark === 'true');
+
+  const chapterLabel = document.getElementById('chapterLabel');
+  if (chapterLabel) chapterLabel.style.display = current === 0 ? '' : 'none';
+
+  setTimeout(() => { animating = false; }, 520);
+}
+
+function next() { goTo(current + 1); }
+function prev() { goTo(current - 1); }
+
+/* ── KEYBOARD ── */
+document.addEventListener('keydown', e => {
+  if (currentMode !== 'slide') return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prev();
+});
+
+/* ── TOUCH / SWIPE ── */
+let touchStartX = 0, touchStartY = 0;
+document.addEventListener('touchstart', e => {
+  touchStartX = e.changedTouches[0].clientX;
+  touchStartY = e.changedTouches[0].clientY;
+}, { passive: true });
+document.addEventListener('touchend', e => {
+  if (currentMode !== 'slide') return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) dx < 0 ? next() : prev();
+}, { passive: true });
+
+/* ── ASSESSMENT ── */
+const TOTAL_Q      = 2;
+const LS_SUBMITTED = 'myhq_ch3_submitted';
+const LS_COMPLETE  = 'myhq_ch3_complete';
+const LS_UNLOCK    = 'myhq_ch4_unlocked';
+const filesSelected = { 1: false, 2: false };
+
+// Apps Script Web App URL — replace after deploying Code.gs
+const UPLOAD_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwX0Z5vx6DSwdwZwK26pKZL3V3U9XwEyWgPa9Ek_cFEH1_tpULnWNcn7RlgE-wT8M9M/exec';
+
+const QUESTION_CONFIG = {
+  1: { folderPath: '01 - Know Your Ground/City Presentations', fileSuffix: 'City_Presentation'  },
+  2: { folderPath: '01 - Know Your Ground/Storytelling Audio', fileSuffix: 'Storytelling_Audio' }
+};
+
+function getLoggedInFirstName() {
+  const auth = window.firebaseAuth;
+  if (auth && auth.currentUser) {
+    const name = auth.currentUser.displayName || auth.currentUser.email || '';
+    return name.split(' ')[0].split('@')[0];
+  }
+  return 'User';
+}
+
+function getRenamedFile(qIndex, originalFile) {
+  const cfg  = QUESTION_CONFIG[qIndex];
+  const ext  = originalFile.name.split('.').pop();
+  const firstName = getLoggedInFirstName();
+  const newName = firstName + '_' + cfg.fileSuffix + '.' + ext;
+  return { newName, ext, mimeType: originalFile.type || 'application/octet-stream' };
+}
+
+function onFileSelect(i) {
+  const input = document.getElementById('aq' + i + '-file');
+  const zone  = document.getElementById('aq' + i + '-zone');
+  const fname = document.getElementById('aq' + i + '-fname');
+  const q     = document.getElementById('aq' + i);
+  if (input && input.files && input.files.length > 0) {
+    const f = input.files[0];
+    filesSelected[i] = true;
+    const { newName } = getRenamedFile(i, f);
+    if (zone)  zone.classList.add('has-file');
+    if (fname) { fname.textContent = '📎 Will be saved as: ' + newName; fname.style.display = 'block'; }
+    if (q)     q.classList.add('is-filled');
+  } else {
+    filesSelected[i] = false;
+    if (zone)  zone.classList.remove('has-file');
+    if (fname) fname.style.display = 'none';
+    if (q)     q.classList.remove('is-filled');
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  let n = 0;
+  for (let i = 1; i <= TOTAL_Q; i++) {
+    const st = document.getElementById('aq' + i + '-status');
+    const ok = filesSelected[i];
+    if (ok) n++;
+    if (st) { st.textContent = ok ? 'Attached ✓' : ''; st.className = 'aq-q-status' + (ok ? ' done' : ''); }
+  }
+  const pct  = Math.round((n / TOTAL_Q) * 100);
+  const fill = document.getElementById('aqTrackerFill');
+  const lbl  = document.getElementById('aqTrackerLabel');
+  const btn  = document.getElementById('aqSubmitBtn');
+  const note = document.getElementById('aqFooterNote');
+  if (fill) fill.style.width = pct + '%';
+  if (lbl)  lbl.textContent = n + ' / ' + TOTAL_Q + ' attached';
+  if (btn)  btn.disabled = n < TOTAL_Q;
+  if (note) note.textContent = n === TOTAL_Q ? 'Ready to submit!' : 'Attach both files to submit.';
+}
+
+async function submitAssessment(e) {
+  e.preventDefault();
+  if (!filesSelected[1] || !filesSelected[2]) {
+    showError('Please attach both files before submitting.');
+    return false;
+  }
+
+  const btn = document.getElementById('aqSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Uploading…';
+
+  const firstName = getLoggedInFirstName();
+
+  try {
+    for (let i = 1; i <= TOTAL_Q; i++) {
+      const input = document.getElementById('aq' + i + '-file');
+      const file  = input.files[0];
+      const cfg   = QUESTION_CONFIG[i];
+      const { ext, mimeType } = getRenamedFile(i, file);
+
+      const base64 = await toBase64(file);
+
+      const payload = {
+        action:     'uploadFile',
+        folderPath: cfg.folderPath,
+        fileSuffix: cfg.fileSuffix,
+        userName:   firstName,
+        fileData:   base64,
+        mimeType:   mimeType,
+        fileExt:    ext
+      };
+
+      const res = await fetch(UPLOAD_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify(payload)
+      });
+      // no-cors means we can't read the response — trust the execution log
+    }
+
+    localStorage.setItem(LS_SUBMITTED, 'true');
+    localStorage.setItem(LS_COMPLETE,  'true');
+    localStorage.setItem(LS_UNLOCK,    'true');
+
+    const form = document.getElementById('aqForm');
+    const done = document.getElementById('aqSubmitted');
+    if (form) form.style.display = 'none';
+    if (done) done.style.display = 'block';
+
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = 'Submit';
+    showError('Upload failed: ' + err.message + '. Please try again.');
+  }
+
+  return false;
+}
+
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function showError(msg) {
+  const err = document.getElementById('aqError');
+  if (err) { err.textContent = msg; err.style.display = 'block'; setTimeout(() => err.style.display = 'none', 5000); }
+}
+
+function restoreAssessment() {
+  if (localStorage.getItem(LS_SUBMITTED)) {
+    const form = document.getElementById('aqForm');
+    const done = document.getElementById('aqSubmitted');
+    if (form) form.style.display = 'none';
+    if (done) done.style.display = 'block';
+  } else {
+    updateProgress();
+  }
+}
+
+/* ── TOC SIDEBAR ── */
+function initToc() {
+  const links = document.querySelectorAll('.r-sidebar .toc-link');
+  const OFFSET = 76; // 52px topbar + 24px breathing room
+
+  // Smooth scroll with offset + set active immediately on click
+  links.forEach(link => {
+    link.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (!href || !href.startsWith('#')) return;
+      e.preventDefault();
+      const target = document.getElementById(href.slice(1));
+      if (!target) return;
+      const top = target.getBoundingClientRect().top + window.scrollY - OFFSET;
+      window.scrollTo({ top, behavior: 'smooth' });
+      links.forEach(l => l.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // Update active on scroll via IntersectionObserver
+  const sectionIds = ['s-intro', 's01', 's02', 's03', 's04', 's05', 's07', 's-assess'];
+  const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + entry.target.id));
+      }
+    });
+  }, { rootMargin: '-76px 0px -55% 0px', threshold: 0 });
+  sections.forEach(s => obs.observe(s));
+
+  // Set intro as active by default
+  const introLink = document.querySelector('.r-sidebar .toc-link');
+  if (introLink) introLink.classList.add('active');
+}
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', () => {
+  buildDots();
+  const firstScreen = document.querySelectorAll('.screen')[0];
+  firstScreen.classList.add('active');
+  updateCounter();
+  setDarkMode(firstScreen.dataset.dark === 'true');
+  restoreAssessment();
+  initToc();
+});
+</script>
+
+</body>
+</html>

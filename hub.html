@@ -421,18 +421,22 @@ body {
   <div class="courses-heading">AM Chapters</div>
   <div class="courses-grid">
 
-    <!-- AM CHAPTER 1 -->
-    <div class="course-card locked">
+    <!-- AM CHAPTER 1 — Know Your Ground -->
+    <div class="course-card locked" id="card-amch1">
       <div class="card-top-bar"></div>
       <div class="card-inner">
         <div class="card-head">
           <div class="card-num">AM · Chapter 01</div>
-          <div class="card-title" style="color:var(--blue-pale);">Chapter 1</div>
-          <div class="badge badge-locked">Coming Soon</div>
+          <div class="card-title" id="title-amch1">Know Your Ground</div>
+          <div class="badge badge-locked" id="status-amch1">Locked</div>
         </div>
       </div>
-      <div class="card-cta-wrap">
+      <div class="card-cta-wrap" id="footer-amch1">
         <button class="card-cta cta-locked" disabled>Locked</button>
+      </div>
+      <div class="unlock-section" id="unlock-section-amch1" style="display:none;">
+        <div class="unlock-label">AM Chapter 1 is locked</div>
+        <div class="unlock-hint">Complete both Org chapters to unlock Know Your Ground.</div>
       </div>
     </div>
 
@@ -672,6 +676,42 @@ auth.onAuthStateChanged(function(user) {
         status2.textContent = 'Unlocked'; status2.className = 'badge badge-blue';
         footer2.innerHTML = '<a class="card-cta cta-primary" href="Who_We_Are_v2.html"><span>Start</span><span class="arrow">→</span></a>';
       }
+    }
+
+    // ── AM Chapter 1 — Know Your Ground ──
+    var amch1Card      = document.getElementById('card-amch1');
+    var amch1Status    = document.getElementById('status-amch1');
+    var amch1Footer    = document.getElementById('footer-amch1');
+    var amch1UnlockSec = document.getElementById('unlock-section-amch1');
+    var amch1Title     = document.getElementById('title-amch1');
+
+    // Unlock condition: both org chapters completed OR admin manually unlocked
+    var bothOrgDone    = ch1Completed && ch2Completed;
+    var adminUnlocked  = unlocked.indexOf('amch1') !== -1;
+    var amch1Unlocked  = bothOrgDone || adminUnlocked;
+    var amch1Completed = progress.amch1 && progress.amch1.completed;
+
+    // Auto-unlock in Firestore if both org chapters done and not already unlocked
+    if (bothOrgDone && !adminUnlocked) {
+      db.collection('users').doc(user.uid).set({
+        unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion('amch1') }
+      }, { merge: true });
+    }
+
+    if (amch1Unlocked) {
+      amch1Card.classList.remove('locked'); amch1Card.classList.add('unlocked');
+      amch1Title.style.color = '';
+      if (amch1UnlockSec) amch1UnlockSec.style.display = 'none';
+      if (amch1Completed) {
+        amch1Card.classList.add('completed');
+        amch1Status.textContent = 'Completed'; amch1Status.className = 'badge badge-mint';
+        amch1Footer.innerHTML = '<a class="card-cta cta-done" href="Know_Your_Ground.html"><span>Review</span><span class="arrow">→</span></a>';
+      } else {
+        amch1Status.textContent = 'Unlocked'; amch1Status.className = 'badge badge-blue';
+        amch1Footer.innerHTML = '<a class="card-cta cta-primary" href="Know_Your_Ground.html"><span>Start</span><span class="arrow">→</span></a>';
+      }
+    } else {
+      if (amch1UnlockSec) amch1UnlockSec.style.display = '';
     }
   });
 });

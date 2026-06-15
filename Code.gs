@@ -167,9 +167,70 @@ function doGet(e) {
   return ContentService.createTextOutput('OK');
 }
 
+// ═══════════════════════════════════════════════════════════════
+//  FILE UPLOAD CONFIG
+//  Add future chapters here — each needs a Drive folderId and
+//  a questions map: questionKey → { subfolderName, fileSuffix }
+// ═══════════════════════════════════════════════════════════════
+var UPLOAD_CHAPTERS = {
+  'know_your_ground': {
+    label: '01 - Know Your Ground',
+    folderId: 'FOLDER_ID_KYG',
+    questions: {
+      'city_presentation': { subfolderName: 'City Presentations',  fileSuffix: 'City_Presentation'  },
+      'storytelling_audio': { subfolderName: 'Storytelling Audio', fileSuffix: 'Storytelling_Audio' }
+    }
+  },
+  'coworking_flex': {
+    label: '02 - Coworking and Flex',
+    folderId: 'FOLDER_ID_COWORKING',
+    questions: {
+      'micromarket_map':    { subfolderName: 'Q1 - City Micromarket Map', fileSuffix: 'City_Micromarket_Map' },
+      'inventory_tracker':  { subfolderName: 'Q2 - Inventory Tracker',    fileSuffix: 'Inventory_Tracker'    },
+      'brand_analysis':     { subfolderName: 'Q3 - Brand Analysis',        fileSuffix: 'Brand_Analysis'       }
+    }
+  }
+  // ── Add future chapters below ──
+};
+
+var LOG_SHEET_ID = 'YOUR_SHEET_ID'; // ← replace with your Google Sheet ID
+
 function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
+
+    // ── FILE UPLOAD route ──────────────────────────────────────
+    if (data.action === 'uploadFile') {
+      var chapterKey  = data.chapterKey;
+      var questionKey = data.questionKey;
+      var userName    = sanitizeUploadName(data.userName);
+      var fileData    = data.fileData;   // base64
+      var mimeType    = data.mimeType;
+      var fileExt     = data.fileExt;
+
+      var chapter  = UPLOAD_CHAPTERS[chapterKey];
+      var question = chapter && chapter.questions[questionKey];
+      if (!chapter || !question) {
+        return jsonRes({ success: false, error: 'Invalid chapter or question key.' });
+      }
+
+      var fileName   = userName + '_' + question.fileSuffix + '.' + fileExt;
+      var parent     = DriveApp.getFolderById(chapter.folderId);
+      var subfolder  = getOrCreateDriveFolder(parent, question.subfolderName);
+
+      // Trash any previous submission with same name
+      var existing = subfolder.getFilesByName(fileName);
+      while (existing.hasNext()) existing.next().setTrashed(true);
+
+      var blob = Utilities.newBlob(Utilities.base64Decode(fileData), mimeType, fileName);
+      var file = subfolder.createFile(blob);
+
+      logUpload(chapter.label, userName, question.fileSuffix, fileName, file.getUrl());
+
+      return jsonRes({ success: true, fileName: fileName, fileUrl: file.getUrl() });
+    }
+
+    // ── TEXT RESPONSE route (existing logic below) ─────────────
     var ss = SpreadsheetApp.getActiveSpreadsheet();
 
     // Sheet name is always "[chapterName] Responses" — created automatically if it doesn't exist
@@ -280,4 +341,40 @@ function getOrCreateProgressSheet(ss) {
     sheet.appendRow(['Email', 'Name', 'Course', 'Last Login']);
   }
   return sheet;
+}
+
+// ── FILE UPLOAD HELPERS ──────────────────────────────────────────
+
+function getOrCreateDriveFolder(parent, name) {
+  var it = parent.getFoldersByName(name);
+  return it.hasNext() ? it.next() : parent.createFolder(name);
+}
+
+function sanitizeUploadName(name) {
+  var clean = String(name).trim().replace(/[^a-zA-Z0-9 ]/g, '').split(' ')[0];
+  return clean.charAt(0).toUpperCase() + clean.slice(1).toLowerCase();
+}
+
+function logUpload(chapterLabel, userName, fileType, fileName, fileUrl) {
+  var ss    = SpreadsheetApp.openById(LOG_SHEET_ID);
+  var sheet = ss.getSheetByName(chapterLabel);
+  if (!sheet) {
+    sheet = ss.insertSheet(chapterLabel);
+    sheet.appendRow(['Name', 'File Type', 'Filename', 'Uploaded At', 'Drive Link']);
+    sheet.getRange(1, 1, 1, 5).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+  }
+  sheet.appendRow([
+    userName,
+    fileType.replace(/_/g, ' '),
+    fileName,
+    nowIST(),
+    fileUrl
+  ]);
+}
+
+function jsonRes(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
 }
