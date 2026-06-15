@@ -38,6 +38,9 @@
     .topbar-sep { width: 1px; height: 16px; background: var(--hairline); }
     .topbar-chap { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.14em; }
     .topbar-title { font-size: 18px; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; position: absolute; left: 50%; transform: translateX(-50%); }
+    .topbar-right { margin-left: auto; display: flex; align-items: center; }
+    .hub-btn { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--hairline); color: var(--blue); font-size: 15px; text-decoration: none; transition: background 0.15s; }
+    .hub-btn:hover { background: rgba(30,34,170,0.07); }
 
     /* ── LAYOUT ── */
     .r-layout { display: flex; padding-top: 52px; min-height: 100vh; }
@@ -255,7 +258,11 @@
 <header class="topbar">
   <div class="topbar-logo">myHQ</div>
   <div class="topbar-sep"></div>
-  <div class="topbar-title">Flex Operators</div>
+  <div class="topbar-chap">AM Chapter 2</div>
+  <div class="topbar-title">Coworking &amp; Flex</div>
+  <div class="topbar-right">
+    <a class="hub-btn" href="hub.html" title="Back to Hub"><i class="fa-solid fa-house"></i></a>
+  </div>
 </header>
 
 <div class="r-layout">
