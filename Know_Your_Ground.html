@@ -1853,10 +1853,11 @@ function getLoggedInFirstName() {
   return 'User';
 }
 
-// Redirect to login if not authenticated
+// Redirect to login if not authenticated; restore assessment state once user is known
 if (window.firebaseAuth) {
   window.firebaseAuth.onAuthStateChanged(function(user) {
-    if (!user) window.location.href = 'landing.html';
+    if (!user) { window.location.href = 'landing.html'; return; }
+    restoreAssessment();
   });
 }
 
@@ -1952,6 +1953,16 @@ async function submitAssessment(e) {
     localStorage.setItem(LS_COMPLETE,  'true');
     localStorage.setItem(LS_UNLOCK,    'true');
 
+    // Persist completion to Firestore so progress is device-independent
+    const auth = window.firebaseAuth;
+    const db   = window.firebaseDb;
+    if (auth && auth.currentUser && db) {
+      db.collection('users').doc(auth.currentUser.uid).set(
+        { amch1_submitted: true, amch1_submitted_at: new Date().toISOString() },
+        { merge: true }
+      );
+    }
+
     const form = document.getElementById('aqForm');
     const done = document.getElementById('aqSubmitted');
     if (form) form.style.display = 'none';
@@ -1980,12 +1991,31 @@ function showError(msg) {
   if (err) { err.textContent = msg; err.style.display = 'block'; setTimeout(() => err.style.display = 'none', 5000); }
 }
 
+function markAssessmentDone() {
+  const form = document.getElementById('aqForm');
+  const done = document.getElementById('aqSubmitted');
+  if (form) form.style.display = 'none';
+  if (done) done.style.display = 'block';
+}
+
 function restoreAssessment() {
+  // Check localStorage first (instant, no network)
   if (localStorage.getItem(LS_SUBMITTED)) {
-    const form = document.getElementById('aqForm');
-    const done = document.getElementById('aqSubmitted');
-    if (form) form.style.display = 'none';
-    if (done) done.style.display = 'block';
+    markAssessmentDone();
+    return;
+  }
+  // Fall back to Firestore (covers cross-device logins)
+  const auth = window.firebaseAuth;
+  const db   = window.firebaseDb;
+  if (auth && auth.currentUser && db) {
+    db.collection('users').doc(auth.currentUser.uid).get().then(function(doc) {
+      if (doc.exists && doc.data().amch1_submitted) {
+        localStorage.setItem(LS_SUBMITTED, 'true');
+        markAssessmentDone();
+      } else {
+        updateProgress();
+      }
+    }).catch(function() { updateProgress(); });
   } else {
     updateProgress();
   }
