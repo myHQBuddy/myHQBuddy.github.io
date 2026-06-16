@@ -1665,7 +1665,7 @@ h2.section-title { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.03em;
 
         <div class="aq-tracker" id="aqTracker">
           <div class="aq-tracker-bar"><div class="aq-tracker-fill" id="aqTrackerFill"></div></div>
-          <span class="aq-tracker-label" id="aqTrackerLabel">0 / 2 submitted</span>
+          <span class="aq-tracker-label" id="aqTrackerLabel">0 / 2 attached</span>
         </div>
 
         <form class="aq-form" id="aqForm" onsubmit="return submitAssessment(event);">
@@ -1992,10 +1992,12 @@ function showError(msg) {
 }
 
 function markAssessmentDone() {
-  const form = document.getElementById('aqForm');
-  const done = document.getElementById('aqSubmitted');
-  if (form) form.style.display = 'none';
-  if (done) done.style.display = 'block';
+  const form    = document.getElementById('aqForm');
+  const done    = document.getElementById('aqSubmitted');
+  const tracker = document.getElementById('aqTracker');
+  if (form)    form.style.display    = 'none';
+  if (tracker) tracker.style.display = 'none';
+  if (done)    done.style.display    = 'block';
 }
 
 function restoreAssessment() {

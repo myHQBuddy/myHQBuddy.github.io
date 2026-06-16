@@ -193,7 +193,8 @@ var UPLOAD_CHAPTERS = {
   // ── Add future chapters below ──
 };
 
-var LOG_SHEET_ID = 'YOUR_SHEET_ID'; // ← replace with your Google Sheet ID
+// Log sheet lives in the same spreadsheet as everything else
+
 
 function doPost(e) {
   try {
@@ -359,7 +360,7 @@ function sanitizeUploadName(name) {
 }
 
 function logUpload(chapterLabel, userName, fileType, fileName, fileUrl) {
-  var ss    = SpreadsheetApp.openById(LOG_SHEET_ID);
+  var ss    = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName(chapterLabel);
   if (!sheet) {
     sheet = ss.insertSheet(chapterLabel);
