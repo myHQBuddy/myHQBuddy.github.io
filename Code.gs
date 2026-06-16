@@ -173,16 +173,16 @@ function doGet(e) {
 //  a questions map: questionKey → { subfolderName, fileSuffix }
 // ═══════════════════════════════════════════════════════════════
 var UPLOAD_CHAPTERS = {
-  'know_your_ground': {
-    label: '01 - Know Your Ground',
+  'know_your_city': {
+    label: '01 - Know Your City',
     folderId: '1rtaqTqSJlRJ7HmOrlObgjKxmmomHO_8b',
     questions: {
       'city_presentation': { subfolderName: 'City Presentations',  fileSuffix: 'City_Presentation'  },
       'storytelling_audio': { subfolderName: 'Storytelling Audio', fileSuffix: 'Storytelling_Audio' }
     }
   },
-  'coworking_flex': {
-    label: '02 - Coworking and Flex',
+  'know_your_spaces': {
+    label: '02 - Know Your Spaces',
     folderId: 'FOLDER_ID_COWORKING',
     questions: {
       'micromarket_map':    { subfolderName: 'Q1 - City Micromarket Map', fileSuffix: 'City_Micromarket_Map' },
