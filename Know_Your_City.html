@@ -1711,6 +1711,9 @@ h2.section-title { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.03em;
           <div class="aq-submitted-icon"><i class="fa-solid fa-circle-check" style="font-size:40px;color:#2a7d3f;"></i></div>
           <div class="aq-submitted-title">AM Chapter 1 Complete</div>
           <p class="aq-submitted-body">Your submissions have been saved and are under review. AM Chapter 2 will be unlocked once approved.</p>
+          <button onclick="clearSubmission()" style="margin-top:18px;background:none;border:1px solid var(--hairline);border-radius:8px;padding:8px 18px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='#c0392b';this.style.color='#c0392b'" onmouseout="this.style.borderColor='var(--hairline)';this.style.color='var(--muted)'">
+            <i class="fa-solid fa-rotate-left" style="margin-right:6px;"></i>Clear &amp; Resubmit
+          </button>
         </div>
 
 
@@ -1998,6 +2001,26 @@ function markAssessmentDone() {
   if (form)    form.style.display    = 'none';
   if (tracker) tracker.style.display = 'none';
   if (done)    done.style.display    = 'block';
+}
+
+function clearSubmission() {
+  if (!confirm('This will clear your submission status so you can resubmit. Your previously uploaded files will remain on record. Continue?')) return;
+  localStorage.removeItem(LS_SUBMITTED);
+  const auth = window.firebaseAuth;
+  const db   = window.firebaseDB;
+  if (auth && auth.currentUser && db) {
+    db.collection('users').doc(auth.currentUser.uid).set(
+      { amch1_submitted: false },
+      { merge: true }
+    );
+  }
+  const form    = document.getElementById('aqForm');
+  const done    = document.getElementById('aqSubmitted');
+  const tracker = document.getElementById('aqTracker');
+  if (done)    done.style.display    = 'none';
+  if (form)    form.style.display    = '';
+  if (tracker) tracker.style.display = '';
+  updateProgress();
 }
 
 function restoreAssessment() {
