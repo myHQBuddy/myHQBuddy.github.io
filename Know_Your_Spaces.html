@@ -663,6 +663,7 @@
 const TOTAL_Q      = 3;
 const LS_SUBMITTED = 'myhq_amch2_submitted';
 const filesSelected = { 1: false, 2: false, 3: false };
+const MAX_FILE_MB  = 35;
 
 const UPLOAD_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwX0Z5vx6DSwdwZwK26pKZL3V3U9XwEyWgPa9Ek_cFEH1_tpULnWNcn7RlgE-wT8M9M/exec';
 
@@ -705,6 +706,16 @@ function onFileSelect(i) {
   const q     = document.getElementById('aq' + i);
   if (input && input.files && input.files.length > 0) {
     const f = input.files[0];
+    if (f.size > MAX_FILE_MB * 1024 * 1024) {
+      alert('File is too large (' + (f.size / 1024 / 1024).toFixed(1) + ' MB). Please keep files under ' + MAX_FILE_MB + ' MB.');
+      input.value = '';
+      filesSelected[i] = false;
+      if (zone)  zone.classList.remove('has-file');
+      if (fname) fname.style.display = 'none';
+      if (q)     q.classList.remove('is-filled');
+      updateProgress();
+      return;
+    }
     filesSelected[i] = true;
     const { newName } = getRenamedFile(i, f);
     if (zone)  zone.classList.add('has-file');
