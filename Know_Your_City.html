@@ -471,13 +471,29 @@ body {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   padding: 6px; text-align: center;
   border: 1px solid rgba(11,15,44,0.05);
+  position: relative;
 }
-.zone-cell.core { background: var(--blue); }
+.zone-cell.core { background: var(--blue); overflow: visible; }
 .zone-cell.hi { background: rgba(30,34,170,0.05); }
 .zone-cell-name { font-size: 10px; font-weight: 800; color: var(--ink); line-height: 1.3; }
 .zone-cell.core .zone-cell-name { color: var(--white); font-size: 11px; }
 .zone-cell-tag { font-size: 9px; font-weight: 600; color: var(--muted); margin-top: 2px; }
 .zone-cell.core .zone-cell-tag { color: var(--green); }
+.zone-cell-rent { font-size: 8px; font-weight: 700; color: var(--blue); margin-top: 3px; opacity: 0.75; letter-spacing: 0.02em; }
+.zone-cell.core .zone-cell-rent { color: rgba(255,255,255,0.6); }
+/* Pulse ring on CBD Core */
+.zone-cell.core::after {
+  content: ''; position: absolute; inset: -1px;
+  border-radius: 2px;
+  border: 2px solid rgba(30,34,170,0.5);
+  animation: cbd-pulse 2.4s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes cbd-pulse {
+  0%   { transform: scale(1);    opacity: 0.7; }
+  70%  { transform: scale(1.08); opacity: 0; }
+  100% { transform: scale(1.08); opacity: 0; }
+}
 .zone-compass {
   position: absolute; font-size: 8px; font-weight: 700; color: var(--muted);
   letter-spacing: 0.05em; text-transform: uppercase;
@@ -492,7 +508,11 @@ body {
   padding: 10px 14px; background: #FAFBFF;
   border-left: 3px solid transparent; transition: border-left-color 0.2s;
 }
-.loc-item.prime { border-left-color: var(--blue); }
+.loc-item.prime   { border-left-color: var(--blue); }
+.loc-item.rising  { border-left-color: var(--amber); }
+.loc-item.value   { border-left-color: #4caf50; }
+.loc-badge.badge-rising { background: rgba(255,184,72,0.15); color: #a06800; }
+.loc-badge.badge-cbd    { background: rgba(30,34,170,0.10); color: var(--blue); }
 .loc-num { font-size: 11px; font-weight: 700; color: var(--blue); flex-shrink: 0; margin-top: 2px; }
 .loc-name { font-size: 13px; font-weight: 800; color: var(--ink); margin-bottom: 2px; }
 .loc-desc { font-size: 11px; color: var(--body); line-height: 1.5; }
@@ -941,14 +961,14 @@ h2.section-title { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.03em;
       <div class="zone-compass s">↓ SOUTH · SOHNA</div>
       <div class="zone-grid">
         <div class="zone-cell"><div class="zone-cell-name">IGI Airport</div><div class="zone-cell-tag">15–25 min</div></div>
-        <div class="zone-cell"><div class="zone-cell-name">Dwarka Expwy</div><div class="zone-cell-tag">Rising</div></div>
+        <div class="zone-cell"><div class="zone-cell-name">Dwarka Expwy</div><div class="zone-cell-tag">Rising</div><div class="zone-cell-rent">₹55–80/sqft</div></div>
         <div class="zone-cell"><div class="zone-cell-name">Delhi Border</div><div class="zone-cell-tag">Shankar Chowk</div></div>
-        <div class="zone-cell hi"><div class="zone-cell-name">Udyog Vihar</div><div class="zone-cell-tag">IT + Industrial</div></div>
-        <div class="zone-cell core"><div class="zone-cell-name">Cyber City</div><div class="zone-cell-tag">CBD Core</div></div>
-        <div class="zone-cell hi"><div class="zone-cell-name">Golf Course Rd</div><div class="zone-cell-tag">Premium</div></div>
-        <div class="zone-cell"><div class="zone-cell-name">Sector 44</div><div class="zone-cell-tag">Institutional</div></div>
-        <div class="zone-cell"><div class="zone-cell-name">Golf Course Ext.</div><div class="zone-cell-tag">Rising</div></div>
-        <div class="zone-cell"><div class="zone-cell-name">SPR · Sohna Rd</div><div class="zone-cell-tag">Emerging</div></div>
+        <div class="zone-cell hi"><div class="zone-cell-name">Udyog Vihar</div><div class="zone-cell-tag">IT + Industrial</div><div class="zone-cell-rent">₹65–95/sqft</div></div>
+        <div class="zone-cell core"><div class="zone-cell-name">Cyber City</div><div class="zone-cell-tag">CBD Core</div><div class="zone-cell-rent">₹140–200/sqft</div></div>
+        <div class="zone-cell hi"><div class="zone-cell-name">Golf Course Rd</div><div class="zone-cell-tag">Premium</div><div class="zone-cell-rent">₹120–160/sqft</div></div>
+        <div class="zone-cell"><div class="zone-cell-name">Sector 44</div><div class="zone-cell-tag">Institutional</div><div class="zone-cell-rent">₹75–100/sqft</div></div>
+        <div class="zone-cell"><div class="zone-cell-name">Golf Course Ext.</div><div class="zone-cell-tag">Rising</div><div class="zone-cell-rent">₹90–130/sqft</div></div>
+        <div class="zone-cell"><div class="zone-cell-name">SPR · Sohna Rd</div><div class="zone-cell-tag">Emerging</div><div class="zone-cell-rent">₹55–90/sqft</div></div>
       </div>
     </div>
   </div>
@@ -971,9 +991,9 @@ h2.section-title { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.03em;
           <div class="loc-dev">₹140–200 / sqft / mo</div>
           <div class="loc-desc">The CBD. Fortune 500 HQs. Amex, EY, Google. Rapid Metro direct. Highest rents in the city.</div>
         </div>
-        <div class="loc-badge">CBD</div>
+        <div class="loc-badge badge-cbd">CBD</div>
       </div>
-      <div class="loc-item">
+      <div class="loc-item value">
         <div class="loc-num">03</div>
         <div>
           <div class="loc-name">Udyog Vihar (Ph 1–5)</div>
@@ -981,7 +1001,7 @@ h2.section-title { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.03em;
           <div class="loc-desc">Original IT hub. Large BPO/KPO campuses, airport proximity. Cost-effective for operations-heavy clients.</div>
         </div>
       </div>
-      <div class="loc-item">
+      <div class="loc-item prime">
         <div class="loc-num">04</div>
         <div>
           <div class="loc-name">Sector 44</div>
@@ -989,16 +1009,16 @@ h2.section-title { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.03em;
           <div class="loc-desc">Institutional office district near HUDA City Centre. Consulting, coworking, mid-to-large enterprises.</div>
         </div>
       </div>
-      <div class="loc-item">
+      <div class="loc-item rising">
         <div class="loc-num">05</div>
         <div>
           <div class="loc-name">Golf Course Ext. Road</div>
           <div class="loc-dev">₹90–130 / sqft / mo</div>
           <div class="loc-desc">New-age Grade-A supply, Sectors 58–67. Cost-conscious MNCs wanting premium address without CBD rates.</div>
         </div>
-        <div class="loc-badge">Rising</div>
+        <div class="loc-badge badge-rising">Rising</div>
       </div>
-      <div class="loc-item">
+      <div class="loc-item value">
         <div class="loc-num">06</div>
         <div>
           <div class="loc-name">Sohna Road</div>
@@ -1006,16 +1026,16 @@ h2.section-title { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.03em;
           <div class="loc-desc">Value corridor. Startups, SMEs seeking alternatives to premium CBD rents. Strong residential catchment.</div>
         </div>
       </div>
-      <div class="loc-item">
+      <div class="loc-item rising">
         <div class="loc-num">07</div>
         <div>
           <div class="loc-name">SPR (Southern Peripheral Road)</div>
           <div class="loc-dev">₹65–90 / sqft / mo</div>
           <div class="loc-desc">Emerging corridor connecting GCER to NH-48. Infrastructure-led growth. Next major business destination.</div>
         </div>
-        <div class="loc-badge">Rising</div>
+        <div class="loc-badge badge-rising">Rising</div>
       </div>
-      <div class="loc-item">
+      <div class="loc-item rising">
         <div class="loc-num">08</div>
         <div>
           <div class="loc-name">Dwarka Expressway</div>
