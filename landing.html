@@ -418,6 +418,13 @@ auth.onAuthStateChanged(function(user) {
       if (d.isAdmin || d.masterAdmin) {
         document.getElementById('admin-portal-landing').style.display = '';
       }
+      // Ensure ch1 is always unlocked for every authenticated user
+      var unlocked = (d.unlockedChapters && d.unlockedChapters.beginner) || [];
+      if (unlocked.indexOf('ch1') === -1) {
+        window.firebaseDB.collection('users').doc(user.uid).set({
+          unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion('ch1') }
+        }, { merge: true });
+      }
     });
   } else {
     signinPanel.style.display = '';
