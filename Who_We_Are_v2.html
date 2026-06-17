@@ -2526,8 +2526,9 @@ function submitAssessment(e) {
   btn.disabled = true;
   btn.textContent = 'Submitting…';
 
-  const name = localStorage.getItem('myhq_name') || '—';
-  const email = localStorage.getItem('myhq_email') || '—';
+  var fbUser = window.firebaseAuth.currentUser;
+  const name  = (fbUser && fbUser.displayName) || localStorage.getItem('myhq_name') || '—';
+  const email = (fbUser && fbUser.email)       || localStorage.getItem('myhq_email') || '—';
   const answers = {};
   for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
     answers['q' + i] = document.getElementById('aq' + i + '-ans').value.trim();
@@ -2536,9 +2537,6 @@ function submitAssessment(e) {
   localStorage.setItem('myhq_ch2_submitted', 'true');
   localStorage.setItem('myhq_ch2_complete', 'true');
   showSubmittedState();
-
-  // Write completion to Firestore and unlock AM chapters
-  var fbUser = window.firebaseAuth.currentUser;
   if (fbUser) {
     window.firebaseDB.collection('users').doc(fbUser.uid).update({
       'progress.ch2.completed': true,
