@@ -2843,13 +2843,16 @@ function submitAssessment(e) {
   localStorage.setItem('myhq_ch2_unlocked', 'true');
   showSubmittedState();
 
-  // Write completion to Firestore
+  // Write completion to Firestore and unlock ch2 (Who We Are)
   var fbUser = window.firebaseAuth.currentUser;
   if (fbUser) {
     window.firebaseDB.collection('users').doc(fbUser.uid).update({
       'progress.ch1.completed': true,
       'progress.ch1.completedAt': firebase.firestore.FieldValue.serverTimestamp()
     });
+    window.firebaseDB.collection('users').doc(fbUser.uid).set({
+      unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion('ch2') }
+    }, { merge: true });
   }
 
   // Apps Script doesn't return CORS headers on POST, so use no-cors.

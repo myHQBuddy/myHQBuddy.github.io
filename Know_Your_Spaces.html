@@ -791,6 +791,10 @@ async function submitAssessment(e) {
         { amch2_submitted: true, amch2_submitted_at: new Date().toISOString() },
         { merge: true }
       );
+      db.collection('users').doc(auth.currentUser.uid).update({
+        'progress.amch2.completed': true,
+        'progress.amch2.completedAt': firebase.firestore.FieldValue.serverTimestamp()
+      });
     }
 
     markAssessmentDone();
