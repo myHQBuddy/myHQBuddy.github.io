@@ -2268,17 +2268,23 @@ function updateCounter() {
 
 function scaleSlides() {
   const REF_W = 1440;
+  const REF_H = 768;
   const wrap = document.getElementById('slides');
   if (!wrap) return;
   const topbarH = 52;
   const vw = document.documentElement.clientWidth;
   const vh = document.documentElement.clientHeight - topbarH;
-  const scale = vw / REF_W;
-  const scaledH = Math.round(vh / scale);
+  const scaleW = vw / REF_W;
+  const scaleH = vh / REF_H;
+  const scale = Math.min(scaleW, scaleH);
+  const scaledW = REF_W * scale;
+  const scaledH = REF_H * scale;
+  const offsetX = Math.round((vw - scaledW) / 2);
+  const offsetY = Math.round((vh - scaledH) / 2);
   wrap.style.width = REF_W + 'px';
-  wrap.style.height = scaledH + 'px';
-  wrap.style.left = '0px';
-  wrap.style.top = topbarH + 'px';
+  wrap.style.height = REF_H + 'px';
+  wrap.style.left = offsetX + 'px';
+  wrap.style.top = (topbarH + offsetY) + 'px';
   wrap.style.right = 'auto';
   wrap.style.bottom = 'auto';
   wrap.style.transform = `scale(${scale})`;
