@@ -2374,8 +2374,9 @@ function scaleSlides() {
   if (!wrap) return;
   const topbar = document.querySelector('.topbar');
   const topbarH = topbar ? topbar.offsetHeight : 52;
-  const vw = document.documentElement.clientWidth;
-  const vh = document.documentElement.clientHeight - topbarH;
+  const vp = window.visualViewport;
+  const vw = vp ? vp.width  : document.documentElement.clientWidth;
+  const vh = (vp ? vp.height : document.documentElement.clientHeight) - topbarH;
   const scale = Math.min(vw / REF_W, vh / REF_H);
   const scaledW = REF_W * scale;
   const scaledH = REF_H * scale;
@@ -2391,6 +2392,7 @@ function scaleSlides() {
   wrap.style.transformOrigin = 'top left';
 }
 window.addEventListener('resize', scaleSlides);
+if (window.visualViewport) window.visualViewport.addEventListener('resize', scaleSlides);
 
 function goTo(index) {
   if (animating || index === current || index < 0 || index >= TOTAL) return;
