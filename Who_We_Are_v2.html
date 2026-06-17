@@ -76,7 +76,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 .key-hint { position: fixed; bottom: 18px; right: 48px; font-size: 11px; font-weight: 500; color: var(--muted); display: flex; align-items: center; gap: 6px; transition: opacity 0.5s; z-index: 100; }
 .key-hint.hidden { opacity: 0; pointer-events: none; }
 
-.slides { position: fixed; top: clamp(44px,3.6vw,52px); left: 0; right: 0; bottom: 0; overflow: hidden; transform-origin: top left; }
+.slides { position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden; transform-origin: top left; }
 .screen { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); transform: translateY(20px); overflow: hidden; }
 .screen.active { opacity: 1; pointer-events: all; transform: translateY(0); }
 .screen.exit-up { opacity: 0; transform: translateY(-20px); }
@@ -295,7 +295,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 .s7-partner-grid--cw { grid-template-columns: 1fr 1fr; }
 .s7-partner-grid--right { grid-template-rows: 1fr 1fr; }
 .s7-enterprises-grid { display: grid; grid-template-columns: repeat(3,1fr); row-gap: 1px; align-items: center; justify-items: center; flex: 1; align-content: flex-start; }
-.s7-enterprises-grid .s7-logo-img { height: clamp(26px,3.5vw,42px); max-width: 120px; }
+.s7-enterprises-grid .s7-logo-img { height: 34px; max-width: 120px; }
 .s7-gccs-row { display: flex; align-items: center; flex-wrap: wrap; flex: 1; align-content: center; justify-content: space-around; width: 100%; }
 .s7-gccs-row .s7-logo-img { height: 34px; max-width: 140px; }
 /* Full chapter (read-mode) logo sizes */
@@ -304,30 +304,30 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 #read-mode .s7-logo-img--xl { height: clamp(48px,6vw,72px); max-width: 220px; }
 #read-mode .s7-enterprises-grid .s7-logo-img { height: clamp(36px,5vw,56px); max-width: 160px; }
 #read-mode .s7-gccs-row .s7-logo-img { height: clamp(42px,5.5vw,64px); max-width: 200px; }
-.s7-logo-badge { font-size: clamp(9px,0.95vw,11px); font-weight: 700; color: var(--ink); letter-spacing: -0.01em; border: 1px solid var(--hairline); border-radius: 4px; padding: 3px 8px; white-space: nowrap; }
+.s7-logo-badge { font-size: 11px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; border: 1px solid var(--hairline); border-radius: 4px; padding: 3px 8px; white-space: nowrap; }
 
 /* ── SCREEN 8: AMBITION ── */
-.screen-ambition { background: var(--white); display: flex; flex-direction: column; padding: clamp(16px,2.2vw,36px) clamp(28px,5vw,64px) clamp(16px,2vw,28px); gap: clamp(6px,0.8vw,12px); overflow: hidden; }
-.s5-headline { font-size: clamp(16px,1.9vw,28px); font-weight: 800; letter-spacing: -0.02em; color: var(--ink); line-height: 1.25; flex-shrink: 0; }
+.screen-ambition { background: var(--white); display: flex; flex-direction: column; padding: 28px 56px 24px; gap: 10px; overflow: hidden; }
+.s5-headline { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); line-height: 1.25; flex-shrink: 0; }
 .s5-headline span { color: var(--blue); }
-.s5-subtext { font-size: clamp(12px,1.2vw,18px); color: var(--body); line-height: 1.55; flex-shrink: 0; }
+.s5-subtext { font-size: 16px; color: var(--body); line-height: 1.55; flex-shrink: 0; }
 .s5-subtext strong { color: var(--ink); font-weight: 800; }
 .s5-subtext em { font-style: italic; color: var(--blue); font-weight: 600; }
-.s5-body { display: grid; grid-template-columns: 1fr clamp(140px,16vw,220px); gap: clamp(12px,2vw,24px); align-items: center; flex: 1; min-height: 0; overflow: visible; }
+.s5-body { display: grid; grid-template-columns: 1fr 200px; gap: 20px; align-items: center; flex: 1; min-height: 0; overflow: visible; }
 .s5-growth { overflow: visible; }
 .ambition-chart { width: 100%; position: relative; font-family: Manrope,system-ui,sans-serif; overflow: visible; }
 .ambition-bar-row { display: flex; align-items: flex-end; width: 100%; gap: 0.8%; overflow: visible; }
 .ambition-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; }
-.ambition-val { width: 100%; text-align: center; font-size: clamp(7px,0.85vw,12px); line-height: 1.2; margin-bottom: 0.2vw; white-space: nowrap; }
+.ambition-val { width: 100%; text-align: center; font-size: 11px; line-height: 1.2; margin-bottom: 2px; white-space: nowrap; }
 .ambition-bar { width: 100%; border-radius: 3px 3px 0 0; box-sizing: border-box; }
-.ambition-label-row { display: flex; width: 100%; gap: 0.8%; margin-top: 0.3vw; }
-.ambition-label { flex: 1; text-align: center; font-size: clamp(7px,0.85vw,12px); }
+.ambition-label-row { display: flex; width: 100%; gap: 0.8%; margin-top: 4px; }
+.ambition-label { flex: 1; text-align: center; font-size: 11px; }
 .ambition-canvas { position: absolute; top: 0; left: 0; width: 100%; pointer-events: none; }
-.s5-driven { border: 1.5px solid var(--hairline); border-radius: var(--radius); padding: clamp(10px,1.4vw,18px) clamp(10px,1.2vw,16px); display: flex; flex-direction: column; gap: clamp(8px,1.1vw,14px); }
-.s5-driven-title { font-size: clamp(11px,1.1vw,14px); font-weight: 800; color: var(--ink); }
+.s5-driven { border: 1.5px solid var(--hairline); border-radius: var(--radius); padding: 16px 14px; display: flex; flex-direction: column; gap: 12px; }
+.s5-driven-title { font-size: 13px; font-weight: 800; color: var(--ink); }
 .s5-driven-item { display: flex; align-items: center; gap: 12px; }
 .s5-driven-chevron { width: 0; height: 0; border-top: 7px solid transparent; border-bottom: 7px solid transparent; border-left: 12px solid var(--blue); flex-shrink: 0; }
-.s5-driven-text { font-size: clamp(10px,1.1vw,13px); font-weight: 600; color: var(--body); line-height: 1.4; }
+.s5-driven-text { font-size: 12px; font-weight: 600; color: var(--body); line-height: 1.4; }
 
 /* ── READ MODE ── */
 #read-mode { margin-top: 52px; }
@@ -433,11 +433,11 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 .ss-grid-header { display: grid; grid-template-columns: 140px 1fr 40px 1fr; align-items: center; margin: 28px 0 8px; padding: 0 0 8px; border-bottom: 1px solid var(--hairline); }
 .ss-grid-row    { display: grid; grid-template-columns: 140px 1fr 40px 1fr; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--hairline); position: relative; }
 .ss-divider-line { position: absolute; left: calc(140px + ((100% - 140px - 40px) / 2) + 20px - 1px); top: 0; bottom: 0; width: 2px; border-left: 2px dashed rgba(30,34,170,0.2); z-index: 0; }
-.ss-avatar { width: clamp(44px,5vw,64px); height: clamp(44px,5vw,64px); border-radius: 50%; border: 3px solid var(--blue); overflow: hidden; flex-shrink: 0; }
-.ss-dot    { width: clamp(14px,1.5vw,20px); height: clamp(14px,1.5vw,20px); border-radius: 50%; background: var(--blue); border: 3px solid #fff; box-shadow: 0 0 0 2px var(--blue); flex-shrink: 0; }
+.ss-avatar { width: 60px; height: 60px; border-radius: 50%; border: 3px solid var(--blue); overflow: hidden; flex-shrink: 0; }
+.ss-dot    { width: 18px; height: 18px; border-radius: 50%; background: var(--blue); border: 3px solid #fff; box-shadow: 0 0 0 2px var(--blue); flex-shrink: 0; }
 
 /* ── ORG CHART FUNCTION GRID ── */
-.oc-fn-grid { display: grid; grid-template-columns: 1fr 1fr; row-gap: clamp(12px,2.5vw,45px); column-gap: clamp(12px,2.5vw,45px); width: 100%; max-width: 520px; margin-top: 40px; }
+.oc-fn-grid { display: grid; grid-template-columns: 1fr 1fr; row-gap: 36px; column-gap: 36px; width: 100%; max-width: 520px; margin-top: 40px; }
 
 /* ── RESPONSIVE BREAKPOINTS ── */
 
@@ -463,8 +463,8 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
   .s4-cards { grid-template-columns: repeat(2, 1fr); }
 
   /* Slide 5 team — scale down to fit fixed-height viewport */
-  .screen-team { overflow-y: auto; padding: clamp(8px,1.2vw,16px) clamp(16px,3vw,40px) 56px; gap: 8px; }
-  .s5t-title { font-size: clamp(1.1rem,2.2vw,1.8rem); }
+  .screen-team { overflow-y: auto; padding: 14px 36px 56px; gap: 8px; }
+  .s5t-title { font-size: 1.6rem; }
   .s5t-two-panel { height: 380px; gap: 8px; }
   .s5t-panel--left  { padding: 12px 14px; }
   .s5t-panel--right { padding: 12px 14px; }
@@ -668,7 +668,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
   <!-- SCREEN 3: PHASE 3 TIMELINE -->
   <div class="screen screen-origin">
     <div class="s2-eyebrow-dark" data-editable="ch2-sl3-eyebrow">Phase 3 · 2021 – Present</div>
-    <h2 class="s2-headline" style="font-size:clamp(1.4rem,2.8vw,2.2rem);" data-editable="ch2-sl3-headline">Not just rebuilt, <span style="color:var(--blue)">reimagined</span> from the ground up. Fuelled by 250+ people who believed in one mission.</h2>
+    <h2 class="s2-headline" style="font-size:2rem;" data-editable="ch2-sl3-headline">Not just rebuilt, <span style="color:var(--blue)">reimagined</span> from the ground up. Fuelled by 250+ people who believed in one mission.</h2>
     <div style="margin: 0 auto 8px;">
       <span class="s0-vision-text" style="font-size:20px;white-space:nowrap;" data-editable="ch2-sl3-vision">"Enabling individuals &amp; corporates to work from <strong>any-where</strong> &amp; in <strong>any-way</strong>"</span>
     </div>
@@ -753,66 +753,66 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 
       <!-- LEFT: LEADERSHIP TEAM -->
       <div class="s5t-panel s5t-panel--left">
-        <div style="font-size:clamp(12px,1.4vw,16px);font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--blue);margin-bottom:clamp(10px,1.5vw,18px);">Leadership Team</div>
+        <div style="font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--blue);margin-bottom:14px;">Leadership Team</div>
         <div class="s5t-people-grid" style="flex:1;gap:22px;align-content:start;">
 
           <!-- Utkarsh -->
           <div class="s5t-person" style="gap:14px;align-items:center;">
-            <div class="s5t-photo" style="width:clamp(56px,6.5vw,82px);height:clamp(56px,6.5vw,82px);flex-shrink:0;"><img loading="lazy" src="ch2_book_images/utkarsh.png" alt="Utkarsh" onerror="this.style.display='none';this.parentElement.innerHTML='UK';"></div>
+            <div class="s5t-photo" style="width:72px;height:72px;flex-shrink:0;"><img loading="lazy" src="ch2_book_images/utkarsh.png" alt="Utkarsh" onerror="this.style.display='none';this.parentElement.innerHTML='UK';"></div>
             <div>
-              <div class="s5t-person-name" style="font-size:clamp(14px,1.7vw,20px);">Utkarsh Kawatra</div>
-              <div class="s5t-person-role" style="font-size:clamp(10px,1.1vw,13px);">CEO</div>
-              <div class="s5t-person-prev" style="font-size:clamp(10px,1.2vw,14px);">Ex: Helion VC, Opera Solutions<br>IIT Delhi · Cofounder, BloodConnect</div>
+              <div class="s5t-person-name" style="font-size:18px;">Utkarsh Kawatra</div>
+              <div class="s5t-person-role" style="font-size:12px;">CEO</div>
+              <div class="s5t-person-prev" style="font-size:13px;">Ex: Helion VC, Opera Solutions<br>IIT Delhi · Cofounder, BloodConnect</div>
             </div>
           </div>
 
           <!-- Vinayak -->
           <div class="s5t-person" style="gap:14px;align-items:center;">
-            <div class="s5t-photo" style="width:clamp(56px,6.5vw,82px);height:clamp(56px,6.5vw,82px);flex-shrink:0;"><img loading="lazy" src="ch2_book_images/vinayak.jpeg" alt="Vinayak" onerror="this.style.display='none';this.parentElement.innerHTML='VA';"></div>
+            <div class="s5t-photo" style="width:72px;height:72px;flex-shrink:0;"><img loading="lazy" src="ch2_book_images/vinayak.jpeg" alt="Vinayak" onerror="this.style.display='none';this.parentElement.innerHTML='VA';"></div>
             <div>
-              <div class="s5t-person-name" style="font-size:clamp(14px,1.7vw,20px);">Vinayak Agrawal</div>
-              <div class="s5t-person-role" style="font-size:clamp(10px,1.1vw,13px);">CTO</div>
-              <div class="s5t-person-prev" style="font-size:clamp(10px,1.2vw,14px);">Ex: Goldman Sachs<br>IIT Delhi · 2X Patent Holder</div>
+              <div class="s5t-person-name" style="font-size:18px;">Vinayak Agrawal</div>
+              <div class="s5t-person-role" style="font-size:12px;">CTO</div>
+              <div class="s5t-person-prev" style="font-size:13px;">Ex: Goldman Sachs<br>IIT Delhi · 2X Patent Holder</div>
             </div>
           </div>
 
           <!-- Manoj -->
           <div class="s5t-person" style="gap:14px;align-items:center;">
-            <div class="s5t-photo" style="width:clamp(56px,6.5vw,82px);height:clamp(56px,6.5vw,82px);flex-shrink:0;"><img loading="lazy" src="ch2_book_images/manoj.jpeg" alt="Manoj" onerror="this.style.display='none';this.parentElement.innerHTML='MY';"></div>
+            <div class="s5t-photo" style="width:72px;height:72px;flex-shrink:0;"><img loading="lazy" src="ch2_book_images/manoj.jpeg" alt="Manoj" onerror="this.style.display='none';this.parentElement.innerHTML='MY';"></div>
             <div>
-              <div class="s5t-person-name" style="font-size:clamp(14px,1.7vw,20px);">Manoj Yadav</div>
-              <div class="s5t-person-role" style="font-size:clamp(10px,1.1vw,13px);">Vertical Head</div>
-              <div class="s5t-person-prev" style="font-size:clamp(10px,1.2vw,14px);">Ex: Founder – SchoolLog<br>IIT Delhi</div>
+              <div class="s5t-person-name" style="font-size:18px;">Manoj Yadav</div>
+              <div class="s5t-person-role" style="font-size:12px;">Vertical Head</div>
+              <div class="s5t-person-prev" style="font-size:13px;">Ex: Founder – SchoolLog<br>IIT Delhi</div>
             </div>
           </div>
 
           <!-- Judhajit -->
           <div class="s5t-person" style="gap:14px;align-items:center;">
-            <div class="s5t-photo" style="width:clamp(56px,6.5vw,82px);height:clamp(56px,6.5vw,82px);flex-shrink:0;"><img loading="lazy" src="ch2_book_images/judhajit.jpeg" alt="Judhajit" onerror="this.style.display='none';this.parentElement.innerHTML='JB';"></div>
+            <div class="s5t-photo" style="width:72px;height:72px;flex-shrink:0;"><img loading="lazy" src="ch2_book_images/judhajit.jpeg" alt="Judhajit" onerror="this.style.display='none';this.parentElement.innerHTML='JB';"></div>
             <div>
-              <div class="s5t-person-name" style="font-size:clamp(14px,1.7vw,20px);">Judhajit Bal</div>
-              <div class="s5t-person-role" style="font-size:clamp(10px,1.1vw,13px);">Vertical Head</div>
-              <div class="s5t-person-prev" style="font-size:clamp(10px,1.2vw,14px);">Ex: Founder – Maidaan, Coca-Cola<br>MDI Gurgaon</div>
+              <div class="s5t-person-name" style="font-size:18px;">Judhajit Bal</div>
+              <div class="s5t-person-role" style="font-size:12px;">Vertical Head</div>
+              <div class="s5t-person-prev" style="font-size:13px;">Ex: Founder – Maidaan, Coca-Cola<br>MDI Gurgaon</div>
             </div>
           </div>
 
           <!-- Nitin -->
           <div class="s5t-person" style="gap:14px;align-items:center;">
-            <div class="s5t-photo" style="width:clamp(56px,6.5vw,82px);height:clamp(56px,6.5vw,82px);flex-shrink:0;"><img loading="lazy" src="ch2_book_images/nitin.jpeg" alt="Nitin" onerror="this.style.display='none';this.parentElement.innerHTML='NA';"></div>
+            <div class="s5t-photo" style="width:72px;height:72px;flex-shrink:0;"><img loading="lazy" src="ch2_book_images/nitin.jpeg" alt="Nitin" onerror="this.style.display='none';this.parentElement.innerHTML='NA';"></div>
             <div>
-              <div class="s5t-person-name" style="font-size:clamp(14px,1.7vw,20px);">Nitin Agrawal</div>
-              <div class="s5t-person-role" style="font-size:clamp(10px,1.1vw,13px);">Vertical Head</div>
-              <div class="s5t-person-prev" style="font-size:clamp(10px,1.2vw,14px);">Ex: Founder – Paavn, YoloBus<br>IIT Delhi</div>
+              <div class="s5t-person-name" style="font-size:18px;">Nitin Agrawal</div>
+              <div class="s5t-person-role" style="font-size:12px;">Vertical Head</div>
+              <div class="s5t-person-prev" style="font-size:13px;">Ex: Founder – Paavn, YoloBus<br>IIT Delhi</div>
             </div>
           </div>
 
           <!-- Malvika -->
           <div class="s5t-person" style="gap:14px;align-items:center;">
-            <div class="s5t-photo" style="width:clamp(56px,6.5vw,82px);height:clamp(56px,6.5vw,82px);flex-shrink:0;"><img loading="lazy" src="ch2_book_images/malvika.jpeg" alt="Malvika" onerror="this.style.display='none';this.parentElement.innerHTML='MS';"></div>
+            <div class="s5t-photo" style="width:72px;height:72px;flex-shrink:0;"><img loading="lazy" src="ch2_book_images/malvika.jpeg" alt="Malvika" onerror="this.style.display='none';this.parentElement.innerHTML='MS';"></div>
             <div>
-              <div class="s5t-person-name" style="font-size:clamp(14px,1.7vw,20px);">Malvika Sankrityayan</div>
-              <div class="s5t-person-role" style="font-size:clamp(10px,1.1vw,13px);">Marketing Head</div>
-              <div class="s5t-person-prev" style="font-size:clamp(10px,1.2vw,14px);">Ex: Accredian, S&amp;P Global<br>NMIMS Mumbai</div>
+              <div class="s5t-person-name" style="font-size:18px;">Malvika Sankrityayan</div>
+              <div class="s5t-person-role" style="font-size:12px;">Marketing Head</div>
+              <div class="s5t-person-prev" style="font-size:13px;">Ex: Accredian, S&amp;P Global<br>NMIMS Mumbai</div>
             </div>
           </div>
 
@@ -821,19 +821,19 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 
       <!-- RIGHT: THEIR BACKGROUND -->
       <div class="s5t-panel s5t-panel--right">
-        <div style="font-size:clamp(12px,1.4vw,16px);font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--blue);margin-bottom:clamp(12px,1.6vw,20px);">Their Background</div>
+        <div style="font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--blue);margin-bottom:16px;">Their Background</div>
 
         <!-- All 9 logos in a unified 3x3 grid filling the box -->
         <div class="s5t-bg-grid">
-          <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 1.png" alt="Goldman Sachs" style="width:100%;height:auto;max-height:clamp(36px,5vw,58px);object-fit:contain;"></div>
-          <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 2.png" alt="Helion" style="width:100%;height:auto;max-height:clamp(36px,5vw,58px);object-fit:contain;"></div>
-          <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 3.png" alt="Coca-Cola" style="width:100%;height:auto;max-height:clamp(24px,3.5vw,38px);object-fit:contain;"></div>
-          <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 4.jpg" alt="Microsoft Research" style="width:100%;height:auto;max-height:clamp(24px,3.5vw,38px);object-fit:contain;"></div>
-          <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 5.png" alt="Adobe" style="width:100%;height:auto;max-height:clamp(24px,3.5vw,38px);object-fit:contain;"></div>
-          <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 6.png" alt="S&P Global" style="width:100%;height:auto;max-height:clamp(24px,3.5vw,38px);object-fit:contain;"></div>
-          <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 7.png" alt="IIT Delhi" style="width:100%;height:auto;max-height:clamp(30px,4.3vw,48px);object-fit:contain;"></div>
-          <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 8.jpg" alt="MDI Gurgaon" style="width:100%;height:auto;max-height:clamp(30px,4.3vw,48px);object-fit:contain;"></div>
-          <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 9.png" alt="IIM Calcutta" style="width:100%;height:auto;max-height:clamp(30px,4.3vw,48px);object-fit:contain;"></div>
+          <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 1.png" alt="Goldman Sachs" style="width:100%;height:auto;max-height:52px;object-fit:contain;"></div>
+          <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 2.png" alt="Helion" style="width:100%;height:auto;max-height:52px;object-fit:contain;"></div>
+          <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 3.png" alt="Coca-Cola" style="width:100%;height:auto;max-height:36px;object-fit:contain;"></div>
+          <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 4.jpg" alt="Microsoft Research" style="width:100%;height:auto;max-height:36px;object-fit:contain;"></div>
+          <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 5.png" alt="Adobe" style="width:100%;height:auto;max-height:36px;object-fit:contain;"></div>
+          <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 6.png" alt="S&P Global" style="width:100%;height:auto;max-height:36px;object-fit:contain;"></div>
+          <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 7.png" alt="IIT Delhi" style="width:100%;height:auto;max-height:44px;object-fit:contain;"></div>
+          <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 8.jpg" alt="MDI Gurgaon" style="width:100%;height:auto;max-height:44px;object-fit:contain;"></div>
+          <div style="display:flex;align-items:center;justify-content:center;"><img loading="lazy" src="ch2_book_images/Photos_Training/Picture 9.png" alt="IIM Calcutta" style="width:100%;height:auto;max-height:44px;object-fit:contain;"></div>
         </div>
 
       </div>
@@ -935,7 +935,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
     .org-chart { width:100%; max-width:100%; display:flex; flex-direction:column; align-items:center; font-family:var(--sans); }
 
     /* root */
-    .oc-root { background:var(--blue); color:#fff; font-size:clamp(13px,1.6vw,18px); font-weight:800; padding:clamp(6px,0.8vw,10px) clamp(16px,2.5vw,32px); border-radius:8px; letter-spacing:-0.01em; }
+    .oc-root { background:var(--blue); color:#fff; font-size:17px; font-weight:800; padding:9px 28px; border-radius:8px; letter-spacing:-0.01em; }
 
     /* stems */
     .oc-stem { width:1px; background:rgba(30,34,170,0.3); height:18px; }
@@ -949,7 +949,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
     .oc-col { flex:1; display:flex; flex-direction:column; align-items:center; padding:0 12px; }
 
     /* section headers */
-    .oc-section { font-size:clamp(11px,1.3vw,15px); font-weight:700; padding:clamp(6px,0.7vw,9px) clamp(12px,1.6vw,20px); border-radius:6px; text-align:center; letter-spacing:0.03em; }
+    .oc-section { font-size:14px; font-weight:700; padding:8px 18px; border-radius:6px; text-align:center; letter-spacing:0.03em; }
     .oc-section--biz { border:1.5px solid var(--blue); color:var(--blue); }
     .oc-section--fn  { border:1.5px solid rgba(30,34,170,0.5); color:var(--blue); }
 
@@ -964,7 +964,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
     .oc-vbox { display:flex; gap:10px; align-items:stretch; border:1.5px dashed rgba(30,34,170,0.45); border-radius:10px; padding:10px 12px; width:95%; }
     .oc-vnode { white-space:nowrap; }
     /* vertical nodes (AM / OnDemand / VO) */
-    .oc-vnode { border:1.5px solid var(--blue); color:var(--blue); font-size:clamp(11px,1.2vw,14px); font-weight:600; padding:clamp(7px,0.8vw,10px) clamp(8px,0.9vw,12px); border-radius:8px; text-align:center; flex:1; display:flex; align-items:center; justify-content:center; min-height:52px; }
+    .oc-vnode { border:1.5px solid var(--blue); color:var(--blue); font-size:13px; font-weight:600; padding:9px 11px; border-radius:8px; text-align:center; flex:1; display:flex; align-items:center; justify-content:center; min-height:52px; }
 
     /* fn-hierarchy: mirrors oc-hierarchy */
     .oc-fn-connected { display:flex; flex-direction:column; align-items:flex-start; }
@@ -991,13 +991,13 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
     .oc-l-curve { position:absolute; left:0; top:0; height:50%; width:22px; border-left:2px solid rgba(30,34,170,0.3); border-bottom:1.5px solid rgba(30,34,170,0.3); border-bottom-left-radius:7px; background:transparent; display:block; }
     /* fn variant — positioned at vertical line center */
     .oc-l-curve--fn { left:calc(50% - 2px); }
-    .oc-hnode { font-size:clamp(11px,1.2vw,14px); font-weight:700; padding:clamp(8px,1vw,12px) clamp(12px,1.5vw,18px); border-radius:20px; white-space:nowrap; }
+    .oc-hnode { font-size:13px; font-weight:700; padding:10px 16px; border-radius:20px; white-space:nowrap; }
     .oc-hnode { text-align:center; }
-    .oc-hnode--1 { background:var(--blue); color:#fff; width:clamp(180px,22vw,280px); }
-    .oc-hnode--2 { background:rgba(30,34,170,0.7); color:#fff; width:clamp(154px,19vw,240px); }
-    .oc-hnode--3 { background:rgba(30,34,170,0.45); color:#fff; width:clamp(135px,16.5vw,210px); }
-    .oc-hnode--4 { background:rgba(30,34,170,0.25); color:var(--blue); width:clamp(115px,14vw,180px); }
-    .oc-hnode--5 { background:rgba(30,34,170,0.1); color:var(--blue); width:clamp(96px,12vw,150px); }
+    .oc-hnode--1 { background:var(--blue); color:#fff; width:260px; }
+    .oc-hnode--2 { background:rgba(30,34,170,0.7); color:#fff; width:225px; }
+    .oc-hnode--3 { background:rgba(30,34,170,0.45); color:#fff; width:195px; }
+    .oc-hnode--4 { background:rgba(30,34,170,0.25); color:var(--blue); width:168px; }
+    .oc-hnode--5 { background:rgba(30,34,170,0.1); color:var(--blue); width:140px; }
     .oc-fn-desc { font-size:13px; color:var(--muted); line-height:1.4; max-width:220px; padding-left:12px; }
     </style>
     <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
@@ -2081,7 +2081,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
         <p class="section-body">We have grown <strong>35X in the last 3 years</strong> — from ₹20 Cr in FY22 to ₹1,200 Cr in FY26. The plan is to grow <strong>10X more in the next 5 years</strong>, reaching ₹5,000 Cr in transactions by FY30. This isn't a stretch target — it's a structured plan built on three growth drivers.</p></div>
 
         <div class="book-ambition-chart">
-          <div style="display:grid;grid-template-columns:1fr clamp(140px,18vw,220px);gap:clamp(16px,2.5vw,28px);align-items:start;">
+          <div style="display:grid;grid-template-columns:1fr 200px;gap:24px;align-items:start;">
             <div>
               <div class="ambition-chart" id="ambitionChartRead"></div>
             </div>
