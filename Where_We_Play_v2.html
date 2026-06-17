@@ -2268,24 +2268,21 @@ function updateCounter() {
 
 function scaleSlides() {
   const REF_W = 1440;
-  const REF_H = 900;
   const wrap = document.getElementById('slides');
   if (!wrap) return;
   const topbarH = 52;
   const vw = document.documentElement.clientWidth;
   const vh = document.documentElement.clientHeight - topbarH;
-  const scale = Math.min(vw / REF_W, vh / REF_H);
-  const scaledW = REF_W * scale;
-  const scaledH = REF_H * scale;
-  const offsetX = Math.round((vw - scaledW) / 2);
-  const offsetY = Math.round((vh - scaledH) / 2);
+  const scale = vw / REF_W;
+  const scaledH = Math.round(vh / scale);
   wrap.style.width = REF_W + 'px';
-  wrap.style.height = REF_H + 'px';
-  wrap.style.left = offsetX + 'px';
-  wrap.style.top = (topbarH + offsetY) + 'px';
+  wrap.style.height = scaledH + 'px';
+  wrap.style.left = '0px';
+  wrap.style.top = topbarH + 'px';
   wrap.style.right = 'auto';
   wrap.style.bottom = 'auto';
   wrap.style.transform = `scale(${scale})`;
+  wrap.style.transformOrigin = 'top left';
 }
 window.addEventListener('resize', scaleSlides);
 
@@ -2865,6 +2862,29 @@ function submitAssessment(e) {
     errEl.style.display = '';
     btn.disabled = false;
     btn.textContent = 'Submit Answers';
+  });
+
+  // Save answers as a Google Doc in Drive (fire-and-forget)
+  const questions = [
+    document.getElementById('ch1-assess-q1') ? document.getElementById('ch1-assess-q1').textContent : document.querySelector('[data-editable="ch1-assess-q1"]') ? document.querySelector('[data-editable="ch1-assess-q1"]').textContent : 'Q1',
+    document.getElementById('ch1-assess-q2') ? document.getElementById('ch1-assess-q2').textContent : document.querySelector('[data-editable="ch1-assess-q2"]') ? document.querySelector('[data-editable="ch1-assess-q2"]').textContent : 'Q2',
+    document.getElementById('ch1-assess-q3') ? document.getElementById('ch1-assess-q3').textContent : document.querySelector('[data-editable="ch1-assess-q3"]') ? document.querySelector('[data-editable="ch1-assess-q3"]').textContent : 'Q3',
+    document.getElementById('ch1-assess-q4') ? document.getElementById('ch1-assess-q4').textContent : document.querySelector('[data-editable="ch1-assess-q4"]') ? document.querySelector('[data-editable="ch1-assess-q4"]').textContent : 'Q4',
+    document.getElementById('ch1-assess-q5') ? document.getElementById('ch1-assess-q5').textContent : document.querySelector('[data-editable="ch1-assess-q5"]') ? document.querySelector('[data-editable="ch1-assess-q5"]').textContent : 'Q5',
+  ];
+  fetch(SHEET_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({
+      action: 'saveAnswersDoc',
+      folderPath: 'Org Chapters/Where We Play',
+      chapterName: 'Where We Play',
+      name, email,
+      timestamp: new Date().toISOString(),
+      questions,
+      answers: Object.values(answers)
+    })
   });
   return false;
 }
