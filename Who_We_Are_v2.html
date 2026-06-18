@@ -37,7 +37,7 @@
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
-body { font-family: var(--sans); background: var(--white); color: var(--ink); overflow: hidden; font-size: 16px; line-height: 1.6; }
+body { font-family: var(--sans); background: var(--white); color: var(--ink); overflow: auto; font-size: 16px; line-height: 1.6; }
 
 /* ── TOP BAR ── */
 .topbar {
@@ -76,7 +76,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 .key-hint { position: absolute; bottom: 18px; right: 48px; font-size: 11px; font-weight: 500; color: var(--muted); display: flex; align-items: center; gap: 6px; transition: opacity 0.5s; z-index: 100; }
 .key-hint.hidden { opacity: 0; pointer-events: none; }
 
-.slides { position: fixed; overflow: hidden; transform-origin: top left; }
+.slides { position: absolute; transform-origin: top left; }
 .screen { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); transform: translateY(20px); overflow: hidden; }
 .screen.active { opacity: 1; pointer-events: all; transform: translateY(0); }
 .screen.exit-up { opacity: 0; transform: translateY(-20px); }
@@ -2367,6 +2367,9 @@ function updateCounter() {
   if (chap) chap.style.display = current === 0 ? '' : 'none';
 }
 
+// Baseline device-pixel-ratio captured at first paint (100% zoom reference).
+const BASE_DPR = window.devicePixelRatio || 1;
+
 function scaleSlides() {
   const REF_W = 1440;
   const REF_H = 900;
@@ -2376,11 +2379,23 @@ function scaleSlides() {
   const topbarH = topbar ? topbar.offsetHeight : 52;
   const vw = document.documentElement.clientWidth;
   const vh = document.documentElement.clientHeight - topbarH;
-  const scale = Math.min(vw / REF_W, vh / REF_H);
+
+  // Browser zoom factor: when the user zooms in (Cmd +), devicePixelRatio
+  // rises above the baseline. clientWidth shrinks at the same time, so the
+  // raw fit-scale would shrink the slide (content "zooms out"). Multiplying
+  // the fit-scale by the zoom factor makes the slide grow with the browser
+  // zoom — exactly like the natively-zoomed topbar.
+  const zoom = (window.devicePixelRatio || 1) / BASE_DPR;
+  const fit = Math.min(vw / REF_W, vh / REF_H);
+  const scale = fit * zoom;
+
   const scaledW = REF_W * scale;
   const scaledH = REF_H * scale;
-  const offsetX = Math.round((vw - scaledW) / 2);
-  const offsetY = Math.round((vh - scaledH) / 2);
+  // Center while the scaled slide still fits; once it grows past the viewport
+  // (zoomed in), clamp to 0 so the top-left stays anchored and the overflow
+  // extends down/right where the body can scroll to it.
+  const offsetX = Math.max(0, Math.round((vw - scaledW) / 2));
+  const offsetY = Math.max(0, Math.round((vh - scaledH) / 2));
   wrap.style.width = REF_W + 'px';
   wrap.style.height = REF_H + 'px';
   wrap.style.left = offsetX + 'px';
@@ -2389,10 +2404,13 @@ function scaleSlides() {
   wrap.style.bottom = 'auto';
   wrap.style.transform = `scale(${scale})`;
   wrap.style.transformOrigin = 'top left';
+  // Grow the document so the body can scroll to overflowing (zoomed-in) slide.
+  document.body.style.minHeight = (topbarH + offsetY + scaledH) + 'px';
+  document.body.style.minWidth = (offsetX + scaledW) + 'px';
 }
 window.addEventListener('resize', scaleSlides);
 
-// Re-scale when browser zoom changes (devicePixelRatio changes on zoom)
+// Re-scale when browser zoom changes (devicePixelRatio changes on zoom).
 (function watchZoom() {
   const mq = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
   mq.addEventListener('change', function() { scaleSlides(); watchZoom(); });
