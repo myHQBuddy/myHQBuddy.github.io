@@ -1338,10 +1338,10 @@ async function loadChapter(chId, btn) {
     updatePillStatus(chId, false, null);
   }
 
-  currentEditTab = 'slide';
+  currentEditTab = def.slideFields.length > 0 ? 'slide' : def.contentFields.length > 0 ? 'content' : 'assess';
   ['slide','content','assess'].forEach(t => {
     const el = document.getElementById('subtab-' + t);
-    if (el) el.classList.toggle('active', t === 'slide');
+    if (el) el.classList.toggle('active', t === currentEditTab);
   });
   renderEditFields();
 

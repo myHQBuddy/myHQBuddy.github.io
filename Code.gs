@@ -230,6 +230,12 @@ function doPost(e) {
       return jsonRes({ success: true, fileName: fileName, fileUrl: file.getUrl() });
     }
 
+    // ── ANSWERS DOC route ──────────────────────────────────────
+    if (data.action === 'saveAnswersDoc') {
+      saveAnswersDoc(data);
+      return ContentService.createTextOutput('OK');
+    }
+
     // ── TEXT RESPONSE route (existing logic below) ─────────────
     var ss = SpreadsheetApp.getActiveSpreadsheet();
 
@@ -375,6 +381,49 @@ function logUpload(chapterLabel, userName, fileType, fileName, fileUrl) {
     nowIST(),
     fileUrl
   ]);
+}
+
+function saveAnswersDoc(data) {
+  var root = DriveApp.getFolderById('1rtaqTqSJlRJ7HmOrlObgjKxmmomHO_8b');
+
+  var parts = String(data.folderPath).split('/');
+  var folder = root;
+  for (var p = 0; p < parts.length; p++) {
+    folder = getOrCreateDriveFolder(folder, parts[p].trim());
+  }
+
+  var firstName = sanitizeUploadName(data.name || 'Unknown');
+  var docTitle  = firstName + '_' + data.chapterName + '_Answers';
+
+  // Trash any previous submission with the same name
+  var existing = folder.getFilesByName(docTitle);
+  while (existing.hasNext()) existing.next().setTrashed(true);
+
+  var doc  = DocumentApp.create(docTitle);
+  var body = doc.getBody();
+
+  body.appendParagraph(data.chapterName + ' — Assessment Answers')
+      .setHeading(DocumentApp.ParagraphHeading.HEADING1);
+  body.appendParagraph('Name: '      + (data.name      || '—'));
+  body.appendParagraph('Email: '     + (data.email     || '—'));
+  body.appendParagraph('Submitted: ' + (data.timestamp || '—'));
+  body.appendParagraph('');
+
+  var questions = data.questions || [];
+  var answers   = data.answers   || [];
+  for (var q = 0; q < questions.length; q++) {
+    body.appendParagraph('Q' + (q + 1) + ': ' + (questions[q] || ''))
+        .setHeading(DocumentApp.ParagraphHeading.HEADING2);
+    body.appendParagraph(answers[q] || '(no answer)');
+    body.appendParagraph('');
+  }
+
+  doc.saveAndClose();
+
+  // Move from My Drive root into the target folder
+  var file = DriveApp.getFileById(doc.getId());
+  folder.addFile(file);
+  DriveApp.getRootFolder().removeFile(file);
 }
 
 function jsonRes(obj) {
