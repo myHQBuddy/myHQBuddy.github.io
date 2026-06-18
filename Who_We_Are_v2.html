@@ -264,7 +264,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 
 /* ── SCREEN 7: SCALE & CLIENTS ── */
 /* All px values are fixed relative to 1440×900 canvas — scaleSlides() handles viewport scaling */
-.screen-scale { background: var(--white); overflow: hidden; display: flex; flex-direction: column; padding: 18px 36px 24px; height: 100%; box-sizing: border-box; }
+.screen-scale { background: var(--white); overflow: hidden; display: flex; flex-direction: column; padding: 18px 36px 24px; gap: 12px; height: 100%; box-sizing: border-box; }
 .s7-title { font-size: 20px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); flex-shrink: 0; margin-bottom: 4px; }
 .s7-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; width: 100%; flex-shrink: 0; }
 .s7-stat { border: 1px solid var(--hairline); border-radius: var(--radius); background: #f7f8ff; display: flex; align-items: flex-start; gap: 8px; padding: 10px; }
@@ -1005,7 +1005,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 
   <!-- SCREEN 7: SCALE, CLIENTELE & PARTNERS -->
   <div class="screen screen-scale" id="screen-scale">
-    <div id="s7-canvas" style="display:flex;flex-direction:column;flex:1;min-height:0;gap:12px;">
+    <div id="s7-canvas">
     <div class="s7-title" data-editable="ch2-sl7-title">India's #1 online platform — and growing 15% MoM.</div>
 
     <div class="s7-stats">
@@ -1079,7 +1079,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
           <!-- Start-Ups + New Age Brands -->
           <div class="s7-sub-panel" style="flex:3;">
             <div class="s7-sp-label">Start-Ups + New Age Brands</div>
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);row-gap:1px;align-items:center;justify-items:center;flex:1;align-content:flex-start;">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);row-gap:1px;align-items:center;justify-items:center;flex:1;align-content:space-around;">
               <img loading="lazy" src="logos_clientele_supply/zomato.png" alt="Zomato" class="s7-logo-img s7-logo-img--lg">
               <img loading="lazy" src="logos_clientele_supply/flipkart.png" alt="Flipkart" class="s7-logo-img s7-logo-img--lg">
               <img loading="lazy" src="logos_clientele_supply/keka.png" alt="Keka" class="s7-logo-img s7-logo-img--lg">
@@ -1098,7 +1098,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
           <!-- Enterprises -->
           <div class="s7-sub-panel" style="flex:3;">
             <div class="s7-sp-label">Enterprises</div>
-            <div class="s7-enterprises-grid" style="grid-template-columns:repeat(4,1fr);">
+            <div class="s7-enterprises-grid" style="grid-template-columns:repeat(4,1fr);align-content:space-around;">
               <img loading="lazy" src="logos_clientele_supply/marriot.png" alt="Marriott" class="s7-logo-img">
               <img loading="lazy" src="logos_clientele_supply/axis.png" alt="Axis Bank" class="s7-logo-img" style="max-width:160px;">
               <img loading="lazy" src="logos_clientele_supply/tatacliq.png" alt="Tata CliQ" class="s7-logo-img">
@@ -1141,7 +1141,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
           <!-- Managed Office Brands -->
           <div class="s7-sub-panel" style="flex:2.5;">
             <div class="s7-sp-label">Managed Office Brands</div>
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);row-gap:1px;align-items:center;justify-items:center;flex:1;align-content:flex-start;">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);row-gap:1px;align-items:center;justify-items:center;flex:1;align-content:space-around;">
               <img loading="lazy" src="logos_clientele_supply/smartworks.png" alt="Smartworks" class="s7-logo-img s7-logo-img--lg">
               <img loading="lazy" src="logos_clientele_supply/indi.png" alt="IndiQube" class="s7-logo-img s7-logo-img--lg">
               <img loading="lazy" src="logos_clientele_supply/tablespac.png" alt="Table Space" class="s7-logo-img s7-logo-img--lg">
@@ -1156,7 +1156,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
           <!-- Coworking Brands -->
           <div class="s7-sub-panel" style="flex:4;">
             <div class="s7-sp-label">Coworking Brands</div>
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);row-gap:1px;align-items:center;justify-items:center;flex:1;align-content:flex-start;">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);row-gap:1px;align-items:center;justify-items:center;flex:1;align-content:space-around;">
               <img loading="lazy" src="logos_clientele_supply/wework.png" alt="WeWork" class="s7-logo-img s7-logo-img--lg">
               <img loading="lazy" src="logos_clientele_supply/awfis.png" alt="Awfis" class="s7-logo-img s7-logo-img--lg">
               <img loading="lazy" src="logos_clientele_supply/innox8.png" alt="Innov8" class="s7-logo-img s7-logo-img--lg">
