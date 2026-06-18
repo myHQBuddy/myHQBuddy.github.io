@@ -2392,6 +2392,12 @@ function scaleSlides() {
 }
 window.addEventListener('resize', scaleSlides);
 
+// Re-scale when browser zoom changes (devicePixelRatio changes on zoom)
+(function watchZoom() {
+  const mq = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+  mq.addEventListener('change', function() { scaleSlides(); watchZoom(); });
+})();
+
 function goTo(index) {
   if (animating || index === current || index < 0 || index >= TOTAL) return;
   animating = true;
