@@ -223,9 +223,9 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 .s5t-card--founder .s5t-re { color: rgba(255,255,255,0.8); }
 
 /* ── NEW TEAM LAYOUT (matching image) ── */
-.s5t-two-panel { display: flex; align-items: stretch; gap: 16px; width: 100%; height: 420px; }
+.s5t-two-panel { display: flex; align-items: stretch; gap: 16px; width: 100%; flex: 1; min-height: 0; }
 .s5t-panel { border: 1.5px solid var(--blue); border-radius: 12px; padding: 0; background: var(--white); overflow: hidden; display: inline-flex; }
-.s5t-panel img { display: block; width: 100%; height: auto; max-height: 75vh; object-fit: contain; }
+.s5t-panel img { display: block; width: 100%; height: auto; max-height: 100%; object-fit: contain; }
 .s5t-panel-label { font-size: 12px; font-weight: 700; font-style: italic; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; }
 .s5t-people-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .s5t-person { display: flex; align-items: flex-start; gap: 12px; }
@@ -465,7 +465,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
   /* Slide 5 team — scale down to fit fixed-height viewport */
   .screen-team { overflow-y: auto; padding: 14px 36px 56px; gap: 8px; }
   .s5t-title { font-size: 1.6rem; }
-  .s5t-two-panel { height: 380px; gap: 8px; }
+  .s5t-two-panel { gap: 8px; }
   .s5t-panel--left  { padding: 12px 14px; }
   .s5t-panel--right { padding: 12px 14px; }
   .s5t-people-grid  { gap: 8px !important; }
@@ -503,7 +503,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
   .s5t-grid     { grid-template-columns: 1fr; }
   .s5t-founders { grid-template-columns: 1fr; }
   .s5t-pnl      { grid-template-columns: 1fr; }
-  .s5t-two-panel   { height: 340px; }
+  .s5t-two-panel   { flex: 1; }
   .s5t-photo       { width: 28px !important; height: 28px !important; }
   .s5t-person-name { font-size: 11px !important; }
   .s5t-person-prev { display: none; }
