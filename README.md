@@ -122,11 +122,13 @@ The chain, all driven by `arrayUnion` writes to `unlockedChapters.beginner`:
 
 ## Chapter submission flow
 
+When a user submits a chapter, **Google Apps Script (`Code.gs`) handles all permanent storage** — it writes the answers into a formatted **Google Doc** in Drive, logs a row in the response Sheet, and (for AM chapters) saves uploaded files to Drive. The chapter page itself only writes completion/unlock state to Firestore. The browser fires these requests with `mode:'no-cors'` and `Content-Type:'text/plain'` to avoid a CORS preflight, so it never reads the Apps Script response — the writes are fire-and-forget.
+
 On **Submit** in any chapter (`submitAssessment` / equivalent):
 
 1. Validate all questions answered (and minimum word counts where applicable).
 2. Read name/email from **`firebaseAuth.currentUser`** (`displayName` / `email`), falling back to `localStorage`. *Do not rely on localStorage alone — it is never set for fresh Firebase sessions and produces blank answer docs.*
-3. Write completion + unlock to Firestore:
+3. **Firestore (access/progress only)** — mark the chapter complete and unlock the next:
    ```js
    db.collection('users').doc(uid).update({
      'progress.ch2.completed': true,
@@ -136,15 +138,23 @@ On **Submit** in any chapter (`submitAssessment` / equivalent):
      unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion('amch1','amch2') }
    }, { merge: true });
    ```
-4. POST answers to the Apps Script URL (`mode:'no-cors'`, `Content-Type:'text/plain'` to avoid CORS preflight):
+4. **Apps Script → Google Doc (the primary record of answers)** — POST `action:'saveAnswersDoc'` with the answers, the chapter's `folderPath`, and the question text:
+   ```json
+   { "action":"saveAnswersDoc", "folderPath":"Org Chapters/Who We Are",
+     "chapterName":"Who We Are", "name":"…", "email":"…", "timestamp":"…",
+     "questions":["Q1 text", "Q2 text"], "answers":["…","…"] }
+   ```
+   `saveAnswersDoc` creates a Google Doc titled **`<FirstName>_<ChapterName>_Answers`** containing an H1 title, the Name / Email / Submitted lines, and each question as an H2 with the answer below. It is placed in the Drive folder named by `folderPath` (auto-created). **Any existing doc with the same title is trashed first**, so re-submitting replaces the previous doc rather than duplicating it.
+5. **Apps Script → response Sheet (tabular log)** — POST the answers as `q1…q10`:
    ```json
    { "chapter":"Chapter 2", "chapterName":"Who We Are", "status":"Completed",
      "name":"…", "email":"…", "timestamp":"…", "q1":"…", "q2":"…" }
    ```
-   Apps Script `doPost` appends a row to the `Who We Are Responses` sheet (auto-created) and updates the `User Progress` sheet.
-5. POST a second `action:'saveAnswersDoc'` request so Apps Script writes a formatted Google Doc of the Q&A into the chapter's Drive folder.
+   `doPost` appends a row to the `[chapterName] Responses` sheet (auto-created) and updates the `User Progress` sheet (status + IST timestamp columns are created on demand).
 
-AM chapters (Know Your City / Know Your Spaces) additionally upload presentation/audio/tracker files to Drive via `action:'uploadFile'` with a per-task `folderPath`.
+AM chapters (Know Your City / Know Your Spaces) additionally upload presentation / audio / tracker **files** to Drive via `action:'uploadFile'` (base64 body, per-task `folderPath` + `fileSuffix`). Each file is saved as `<UserName>_<fileSuffix>.<ext>`, dedup-replaced by name, and logged.
+
+> Drive layout: the chapter folder (e.g. `Org Chapters/Who We Are`, `01 - Know Your City/…`) lives under the root folder `1rtaqTqSJlRJ7HmOrlObgjKxmmomHO_8b` and holds both the per-user answer Docs and any uploaded files.
 
 ---
 
