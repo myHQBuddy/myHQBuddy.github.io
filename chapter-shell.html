@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║  myHQ BUDDY — CHAPTER SHELL TEMPLATE                                    ║
+  ║                                                                        ║
+  ║  This is a STRUCTURAL SCAFFOLD. Fill the slots marked {{LIKE_THIS}}     ║
+  ║  and the regions marked  <!-- POC SLOT: ... -->  with your content.     ║
+  ║                                                                        ║
+  ║  Read poc-guide.md FIRST. It explains every slot, the slide archetype   ║
+  ║  catalog (bottom of this file), and gives you an LLM prompt to fill     ║
+  ║  this shell.                                                            ║
+  ║                                                                        ║
+  ║  HARD RULES (do not break these):                                       ║
+  ║   1. NEVER edit the scaleSlides() function or the .slides / body CSS.   ║
+  ║      They handle responsiveness + browser zoom. Touching them breaks    ║
+  ║      the slide on other screens.                                        ║
+  ║   2. All sizing INSIDE a slide must use fixed px (no vw / vh / clamp).  ║
+  ║      The 1440×900 canvas is scaled as a whole — vw resolves wrong.      ║
+  ║   3. Keep every data-editable="..." attribute. The admin content editor ║
+  ║      uses those keys. You may change the TEXT, not the key.             ║
+  ║   4. Do NOT touch the Firebase auth gate or the submission code unless  ║
+  ║      the guide tells you to (only CHAPTER_ID, title, folder path,       ║
+  ║      and question/assessment config are yours to set).                  ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+-->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- POC SLOT: set the browser tab title — "Chapter N: {{CHAPTER_TITLE}} | myHQ" -->
+<title>Chapter {{CHAPTER_NUMBER}}: {{CHAPTER_TITLE}} | myHQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" as="style">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" as="style">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<!-- Firebase v9 compat — DO NOT CHANGE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<style>
+/* ══════════════════════════════════════════════════════════════════════
+   DESIGN TOKENS — shared across all chapters. Do not rename. You may add
+   new tokens, but keep these so your chapter matches the rest of the course.
+   ══════════════════════════════════════════════════════════════════════ */
+:root {
+  --blue:       #1E22AA;
+  --blue-dark:  #161a8b;
+  --green:      #BEE5C2;
+  --coral:      #FF7351;
+  --amber:      #FFB848;
+  --ink:        #0B0F2C;
+  --body:       #4A4D63;
+  --muted:      #94909C;
+  --white:      #FFFFFF;
+  --hairline:   rgba(11,15,44,0.10);
+  --sans:       'Manrope', system-ui, sans-serif;
+  --radius:     8px;
+  --ease:       cubic-bezier(0.22,1,0.36,1);
+  --transition: 0.25s var(--ease);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
+/* ⚠ RESPONSIVENESS — do not change `overflow`. Required for zoom scrolling. */
+body { font-family: var(--sans); background: var(--white); color: var(--ink); overflow: auto; font-size: 16px; line-height: 1.6; }
+
+/* ── TOP BAR ── (shared, leave structure as-is) */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: 52px; z-index: 100;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--hairline);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-logo { font-size: 15px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.topbar-chapter { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.topbar-center { font-size: 18px; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; position: absolute; left: 50%; transform: translateX(-50%); }
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+.screen-counter { font-size: 11px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.read-btn {
+  font-size: 11px; font-weight: 700; color: var(--white); background: var(--blue);
+  padding: 6px 14px; border-radius: var(--radius); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: var(--transition); cursor: pointer; border: none; font-family: var(--sans);
+}
+.read-btn:hover { background: var(--blue-dark); }
+.hub-btn {
+  font-size: 14px; color: var(--blue); background: transparent;
+  width: 32px; height: 32px; border-radius: var(--radius);
+  border: 1px solid rgba(30,34,170,0.3);
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: var(--transition); text-decoration: none;
+}
+.hub-btn:hover { background: rgba(30,34,170,0.06); border-color: var(--blue); }
+
+/* ══════════════════════════════════════════════════════════════════════
+   ⚠⚠⚠  SLIDE ENGINE CSS — DO NOT EDIT  ⚠⚠⚠
+   These three rules + scaleSlides() in <script> are the responsiveness
+   contract. They scale the fixed 1440×900 canvas to any screen and make
+   browser zoom magnify-and-scroll. Editing them breaks the slide layout.
+   ══════════════════════════════════════════════════════════════════════ */
+.dot-nav { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 100; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hairline); border: 1.5px solid rgba(11,15,44,0.2); cursor: pointer; transition: var(--transition); }
+.dot.active { background: var(--blue); border-color: var(--blue); transform: scale(1.3); }
+.key-hint { position: absolute; bottom: 18px; right: 48px; font-size: 11px; font-weight: 500; color: var(--muted); display: flex; align-items: center; gap: 6px; transition: opacity 0.5s; z-index: 100; }
+.key-hint.hidden { opacity: 0; pointer-events: none; }
+.slides { position: absolute; transform-origin: top left; }
+.screen { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); transform: translateY(20px); overflow: hidden; }
+.screen.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+.screen.exit-up { opacity: 0; transform: translateY(-20px); }
+/* ── end DO NOT EDIT ── */
+
+.screen-next-btn {
+  position: absolute; bottom: 40px; right: 56px;
+  background: transparent; color: var(--muted); border: 1px solid var(--hairline);
+  font-size: 11px; font-weight: 700; font-family: var(--sans);
+  padding: 7px 14px; border-radius: var(--radius); cursor: pointer;
+  display: flex; align-items: center; gap: 6px; transition: var(--transition);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.screen-next-btn:hover { color: var(--blue); border-color: rgba(30,34,170,0.3); }
+
+/* ══════════════════════════════════════════════════════════════════════
+   ARCHETYPE STYLES — reusable slide layouts. Each block below styles one
+   archetype from the catalog at the bottom of this file. Keep the ones you
+   use; you can delete unused ones. All values are fixed px (canvas units).
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Generic slide scaffolding */
+.slide-pad { height: 100%; display: flex; flex-direction: column; padding: 56px 80px; gap: 28px; }
+.slide-center { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 80px; }
+.eyebrow { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); }
+.slide-headline { font-size: 44px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1.12; }
+.slide-headline span { color: var(--blue); }
+.slide-sub { font-size: 18px; color: var(--body); line-height: 1.6; max-width: 820px; }
+
+/* A) COVER */
+.cover-inner { display: grid; grid-template-columns: 1fr 1fr; height: 100%; align-items: center; padding: 0 80px; gap: 64px; }
+.cover-eyebrow { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+.cover-eyebrow::before { content: ''; width: 9px; height: 9px; background: var(--blue); border-radius: 50%; display: block; }
+.cover-headline { font-size: 60px; font-weight: 800; line-height: 1.08; letter-spacing: -0.04em; color: var(--ink); margin-bottom: 24px; }
+.cover-headline em { font-style: normal; color: var(--blue); }
+.cover-sub { font-size: 18px; color: var(--body); line-height: 1.7; margin-bottom: 32px; }
+.cover-media { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: var(--radius); overflow: hidden; box-shadow: 0 16px 48px rgba(11,15,44,0.18); background: var(--ink); }
+.cover-media img { width: 100%; height: 100%; object-fit: cover; }
+
+/* B) BIG STAT */
+.bigstat-num { font-size: 160px; font-weight: 800; color: var(--ink); letter-spacing: -0.04em; line-height: 1; }
+.bigstat-num span { color: var(--blue); }
+.bigstat-caption { font-size: 26px; font-weight: 700; color: var(--body); max-width: 60ch; }
+.bigstat-facts { display: grid; grid-template-columns: repeat(4, auto); gap: 0; border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; max-width: 1000px; margin-top: 20px; }
+.bigstat-fact { padding: 20px 28px; border-right: 1px solid var(--hairline); text-align: left; }
+.bigstat-fact:last-child { border-right: none; }
+.bigstat-fact-num { font-size: 26px; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; margin-bottom: 4px; }
+.bigstat-fact-lbl { font-size: 13px; color: var(--muted); line-height: 1.4; }
+
+/* C) TIMELINE */
+.timeline { display: flex; align-items: stretch; gap: 0; width: 100%; max-width: 1180px; align-self: center; }
+.tl-node { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
+.tl-node:not(:last-child)::after { content: ''; position: absolute; top: 22px; left: calc(50% + 26px); right: calc(-50% + 26px); height: 1px; background: var(--hairline); }
+.tl-dot { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--blue); background: rgba(30,34,170,0.06); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 13px; font-weight: 800; color: var(--blue); z-index: 1; }
+.tl-year { font-size: 14px; font-weight: 800; color: var(--blue); margin-bottom: 4px; }
+.tl-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+.tl-sub { font-size: 12px; color: var(--body); line-height: 1.5; padding: 0 12px; }
+
+/* D) TWO COLUMN */
+.twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; flex: 1; min-height: 0; }
+.twocol-panel { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 28px 32px; background: #FAFBFF; display: flex; flex-direction: column; gap: 12px; }
+.twocol-panel h3 { font-size: 22px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.twocol-panel p { font-size: 15px; color: var(--body); line-height: 1.65; }
+.twocol-panel ul { padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+.twocol-panel li { font-size: 15px; color: var(--body); line-height: 1.5; }
+
+/* E) CARD GRID */
+.cardgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; flex: 1; min-height: 0; }
+.card { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 24px; background: var(--white); display: flex; flex-direction: column; gap: 10px; }
+.card-icon { width: 52px; height: 52px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 24px; background: rgba(30,34,170,0.08); color: var(--blue); }
+.card h3 { font-size: 18px; font-weight: 800; color: var(--ink); }
+.card p { font-size: 14px; color: var(--body); line-height: 1.6; }
+
+/* F) QUOTE / CALLOUT */
+.quote-wrap { max-width: 900px; align-self: center; text-align: center; display: flex; flex-direction: column; gap: 24px; }
+.quote-mark { font-size: 64px; color: var(--blue); line-height: 0.5; }
+.quote-text { font-size: 34px; font-weight: 700; color: var(--ink); line-height: 1.3; letter-spacing: -0.02em; }
+.quote-attr { font-size: 16px; font-weight: 600; color: var(--muted); }
+
+/* ══════════════════════════════════════════════════════════════════════
+   READ MODE STYLES (optional — recommended). If you drop read mode,
+   delete the #read-mode block in the body too.
+   ══════════════════════════════════════════════════════════════════════ */
+#read-mode.hidden { display: none; }
+.r-layout { display: grid; grid-template-columns: 240px 1fr; max-width: 1200px; margin: 0 auto; gap: 48px; padding: 48px 32px 120px; }
+.r-sidebar { position: sticky; top: 80px; align-self: start; display: flex; flex-direction: column; gap: 4px; }
+.r-toc-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); margin-bottom: 12px; }
+.toc-link { font-size: 13px; color: var(--body); text-decoration: none; padding: 8px 12px; border-radius: var(--radius); border-left: 2px solid transparent; transition: var(--transition); }
+.toc-link:hover { background: #FAFBFF; color: var(--blue); }
+.toc-link.active { color: var(--blue); font-weight: 700; border-left-color: var(--blue); background: rgba(30,34,170,0.05); }
+.r-content { min-width: 0; }
+.section { margin-bottom: 56px; }
+.section-num { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 6px; }
+.section-title { font-size: 29px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1.15; margin-bottom: 16px; }
+.section-outcome { font-size: 13px; color: var(--body); background: #FAFBFF; border: 1px solid var(--hairline); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 16px; }
+.section-outcome span:first-child { font-weight: 700; color: var(--blue); }
+.section-body { font-size: 16px; color: var(--body); line-height: 1.8; margin-bottom: 14px; }
+.takeaway { font-size: 16px; font-weight: 600; color: var(--ink); background: rgba(190,229,194,0.25); border-left: 3px solid var(--green); padding: 16px 20px; border-radius: var(--radius); margin-top: 20px; }
+
+/* ── ASSESSMENT (open-text variant; shared) ── */
+.aq-tracker { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.aq-tracker-bar { flex: 1; height: 4px; background: var(--hairline); border-radius: 99px; overflow: hidden; }
+.aq-tracker-fill { height: 100%; width: 0; background: var(--blue); transition: width 0.3s var(--ease); }
+.aq-tracker-label { font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.aq-question { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 16px; transition: var(--transition); }
+.aq-question.is-filled { border-color: var(--green); background: rgba(190,229,194,0.08); }
+.aq-q-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.aq-q-num { font-size: 12px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.08em; }
+.aq-q-status { font-size: 12px; font-weight: 600; color: var(--muted); }
+.aq-q-status.done { color: #2e7d32; }
+.aq-q-text { font-size: 16px; font-weight: 600; color: var(--ink); line-height: 1.5; margin-bottom: 12px; }
+.aq-textarea { width: 100%; font-family: var(--sans); font-size: 15px; color: var(--ink); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 12px 14px; resize: vertical; line-height: 1.6; }
+.aq-textarea:focus { outline: none; border-color: var(--blue); }
+/* MCQ variant */
+.aq-options { display: flex; flex-direction: column; gap: 8px; }
+.aq-option { display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--ink); padding: 10px 14px; border: 1px solid var(--hairline); border-radius: var(--radius); cursor: pointer; transition: var(--transition); }
+.aq-option:hover { border-color: var(--blue); background: #FAFBFF; }
+.aq-option input { accent-color: var(--blue); }
+/* File-upload variant */
+.aq-upload { display: flex; flex-direction: column; gap: 8px; }
+.aq-upload input[type=file] { font-family: var(--sans); font-size: 14px; }
+.aq-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 24px; gap: 16px; }
+.aq-footer-note { font-size: 13px; color: var(--muted); }
+.aq-submit-btn { font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--white); background: var(--blue); border: none; border-radius: var(--radius); padding: 12px 28px; cursor: pointer; transition: var(--transition); }
+.aq-submit-btn:disabled { background: var(--hairline); color: var(--muted); cursor: not-allowed; }
+.aq-submit-btn:not(:disabled):hover { background: var(--blue-dark); }
+.aq-error { font-size: 13px; color: var(--coral); margin-top: 12px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     TOP BAR — set the chapter label + cover headline. Keep the structure.
+     ══════════════════════════════════════════════════════════════════════ -->
+<header class="topbar" id="topbar">
+  <div class="topbar-left">
+    <span class="topbar-logo">myHQ</span>
+    <span class="topbar-chapter" id="chapterLabel">{{CHAPTER_LABEL}}</span> <!-- POC SLOT: e.g. "Chapter 3" -->
+  </div>
+  <div class="topbar-center" data-editable="{{ID}}-title">{{CHAPTER_TITLE}}</div> <!-- POC SLOT: chapter title shown center-top -->
+  <div class="topbar-right">
+    <a class="hub-btn" href="hub.html" title="Back to Hub"><i class="fa-solid fa-house"></i></a>
+    <span class="screen-counter" id="screenCounter">1 / 1</span>
+    <button class="read-btn" id="btnRead" onclick="setMode('read')">
+      <i class="fa-solid fa-book-open"></i>&nbsp;Read Full Chapter
+    </button>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     SLIDE MODE
+     Add one <div class="screen ..."> per slide. The default scaffold below is
+     Cover + 5 content slides + Assessment. Replace each content slide body by
+     copying an archetype from the CATALOG at the bottom of this file.
+     IMPORTANT: keep `screen` on every slide div; the engine counts them.
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="slide-mode">
+  <div class="slides" id="slides">
+
+  <!-- ─────────── SCREEN 0 · COVER (archetype A) ─────────── -->
+  <div class="screen">
+    <div class="cover-inner">
+      <div>
+        <div class="cover-eyebrow" data-editable="{{ID}}-cover-eyebrow">{{COVER_EYEBROW}}</div> <!-- POC SLOT: e.g. "Chapter 3 · Onboarding" -->
+        <h1 class="cover-headline" data-editable="{{ID}}-cover-headline">{{COVER_HEADLINE}}</h1> <!-- POC SLOT: punchy 1-line hook. Use <em>…</em> to color a phrase blue. -->
+        <p class="cover-sub" data-editable="{{ID}}-cover-sub">{{COVER_SUB}}</p> <!-- POC SLOT: one supporting sentence -->
+      </div>
+      <div>
+        <!-- POC SLOT: cover image OR keep as plain panel. Image goes in chapter_images/ -->
+        <div class="cover-media">
+          <img src="chapter_images/{{ID}}-cover.jpg" alt="{{COVER_IMG_ALT}}" onerror="this.style.display='none'">
+        </div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- ─────────── SCREEN 1 · CONTENT (pick an archetype) ─────────── -->
+  <!-- POC SLOT: replace this slide body with one archetype from the catalog. -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="{{ID}}-sl1-eyebrow">{{SLIDE1_EYEBROW}}</div>
+      <h2 class="slide-headline" data-editable="{{ID}}-sl1-headline">{{SLIDE1_HEADLINE}}</h2>
+      <p class="slide-sub" data-editable="{{ID}}-sl1-body">{{SLIDE1_BODY}}</p>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- ─────────── SCREEN 2 · CONTENT ─────────── -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="{{ID}}-sl2-eyebrow">{{SLIDE2_EYEBROW}}</div>
+      <h2 class="slide-headline" data-editable="{{ID}}-sl2-headline">{{SLIDE2_HEADLINE}}</h2>
+      <p class="slide-sub" data-editable="{{ID}}-sl2-body">{{SLIDE2_BODY}}</p>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- ─────────── SCREEN 3 · CONTENT ─────────── -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="{{ID}}-sl3-eyebrow">{{SLIDE3_EYEBROW}}</div>
+      <h2 class="slide-headline" data-editable="{{ID}}-sl3-headline">{{SLIDE3_HEADLINE}}</h2>
+      <p class="slide-sub" data-editable="{{ID}}-sl3-body">{{SLIDE3_BODY}}</p>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- ─────────── SCREEN 4 · CONTENT ─────────── -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="{{ID}}-sl4-eyebrow">{{SLIDE4_EYEBROW}}</div>
+      <h2 class="slide-headline" data-editable="{{ID}}-sl4-headline">{{SLIDE4_HEADLINE}}</h2>
+      <p class="slide-sub" data-editable="{{ID}}-sl4-body">{{SLIDE4_BODY}}</p>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- ─────────── SCREEN 5 · CONTENT ─────────── -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="{{ID}}-sl5-eyebrow">{{SLIDE5_EYEBROW}}</div>
+      <h2 class="slide-headline" data-editable="{{ID}}-sl5-headline">{{SLIDE5_HEADLINE}}</h2>
+      <p class="slide-sub" data-editable="{{ID}}-sl5-body">{{SLIDE5_BODY}}</p>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- ─────────── SCREEN 6 · ASSESSMENT INTRO (slide) ─────────── -->
+  <!-- This slide nudges the learner into read mode to take the assessment.
+       (The actual assessment form lives in read mode, below.) -->
+  <div class="screen">
+    <div class="slide-center">
+      <div class="eyebrow">Assessment</div>
+      <h2 class="slide-headline" style="margin:16px 0 24px;">{{ASSESSMENT_PROMPT_HEADLINE}}</h2> <!-- POC SLOT: e.g. "Ready to test what you learned?" -->
+      <button class="read-btn" onclick="setMode('read'); setTimeout(function(){var a=document.getElementById('r-assess'); if(a) a.scrollIntoView();}, 100);">
+        <i class="fa-solid fa-pen-to-square"></i>&nbsp;Go to Assessment
+      </button>
+    </div>
+  </div>
+
+  </div><!-- /.slides -->
+
+  <!-- DOT NAV + KEY HINT — leave as-is (built by JS) -->
+  <div class="dot-nav" id="dotNav"></div>
+  <div class="key-hint" id="keyHint"><i class="fa-solid fa-arrows-left-right"></i> Use arrow keys</div>
+</div><!-- /#slide-mode -->
+
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     READ MODE (optional, recommended). Mirror your slides as scrollable
+     sections. Each section needs a matching TOC link (same id). If you drop
+     read mode entirely, delete this whole #read-mode block AND the read
+     button in the topbar.
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="read-mode" class="hidden" style="margin-top:52px;">
+  <div class="r-layout">
+
+    <!-- SIDEBAR TOC — one link per section (href + data-s must match section id) -->
+    <aside class="r-sidebar">
+      <div class="r-toc-label">{{CHAPTER_LABEL}}</div>
+      <a href="#r-intro"   class="toc-link" data-s="r-intro">Introduction</a>
+      <a href="#r-s01"     class="toc-link" data-s="r-s01">01 · {{READ_S01_NAV}}</a>
+      <a href="#r-s02"     class="toc-link" data-s="r-s02">02 · {{READ_S02_NAV}}</a>
+      <a href="#r-s03"     class="toc-link" data-s="r-s03">03 · {{READ_S03_NAV}}</a>
+      <a href="#r-assess"  class="toc-link" data-s="r-assess">Assessment</a>
+      <!-- POC SLOT: add/remove TOC links to match your sections -->
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="r-content">
+
+      <!-- INTRO -->
+      <section class="section" id="r-intro">
+        <div data-editable="{{ID}}-intro-body" style="padding:28px 32px;border:1px solid var(--hairline);border-radius:var(--radius);background:#FAFBFF;">
+          <p class="section-body" style="margin-bottom:0;">{{READ_INTRO_BODY}}</p> <!-- POC SLOT: 2-3 sentence chapter intro -->
+        </div>
+      </section>
+
+      <!-- 01 -->
+      <section class="section" id="r-s01">
+        <div class="section-outcome"><span>Learning Outcome:</span> <span data-editable="{{ID}}-s01-outcome">{{READ_S01_OUTCOME}}</span></div>
+        <div class="section-num">01</div>
+        <h2 class="section-title" data-editable="{{ID}}-s01-title">{{READ_S01_TITLE}}</h2>
+        <div data-editable="{{ID}}-s01-body">
+          <p class="section-body">{{READ_S01_BODY}}</p> <!-- POC SLOT: full prose for this section -->
+        </div>
+        <div class="takeaway" data-editable="{{ID}}-s01-takeaway">{{READ_S01_TAKEAWAY}}</div> <!-- POC SLOT: one-line takeaway (optional) -->
+      </section>
+
+      <!-- 02 -->
+      <section class="section" id="r-s02">
+        <div class="section-outcome"><span>Learning Outcome:</span> <span data-editable="{{ID}}-s02-outcome">{{READ_S02_OUTCOME}}</span></div>
+        <div class="section-num">02</div>
+        <h2 class="section-title" data-editable="{{ID}}-s02-title">{{READ_S02_TITLE}}</h2>
+        <div data-editable="{{ID}}-s02-body">
+          <p class="section-body">{{READ_S02_BODY}}</p>
+        </div>
+        <div class="takeaway" data-editable="{{ID}}-s02-takeaway">{{READ_S02_TAKEAWAY}}</div>
+      </section>
+
+      <!-- 03 -->
+      <section class="section" id="r-s03">
+        <div class="section-outcome"><span>Learning Outcome:</span> <span data-editable="{{ID}}-s03-outcome">{{READ_S03_OUTCOME}}</span></div>
+        <div class="section-num">03</div>
+        <h2 class="section-title" data-editable="{{ID}}-s03-title">{{READ_S03_TITLE}}</h2>
+        <div data-editable="{{ID}}-s03-body">
+          <p class="section-body">{{READ_S03_BODY}}</p>
+        </div>
+        <div class="takeaway" data-editable="{{ID}}-s03-takeaway">{{READ_S03_TAKEAWAY}}</div>
+      </section>
+      <!-- POC SLOT: duplicate a <section> block for each additional read section -->
+
+      <!-- ═══ CHAPTER ASSESSMENT ═══
+           Default = OPEN-TEXT, 3 questions. To change the count, edit the
+           questions here AND set TOTAL_QUESTIONS in <script>. For MCQ / file
+           upload / no-assessment, see the ASSESSMENT VARIANTS in the catalog. -->
+      <section class="section" id="r-assess" style="margin-top:64px;padding-top:48px;border-top:2px solid var(--hairline);">
+        <div class="section-num">Assessment</div>
+        <h2 class="section-title">{{ASSESSMENT_TITLE}}</h2> <!-- POC SLOT: e.g. "Chapter Questions" -->
+        <p class="section-body" style="margin-bottom:32px;">{{ASSESSMENT_INTRO}}</p> <!-- POC SLOT: instructions to the learner -->
+
+        <div class="aq-tracker" id="aqTracker">
+          <div class="aq-tracker-bar"><div class="aq-tracker-fill" id="aqTrackerFill"></div></div>
+          <span class="aq-tracker-label" id="aqTrackerLabel">0 / 3 answered</span>
+        </div>
+
+        <form class="aq-form" id="aqForm" onsubmit="return submitAssessment(event);">
+
+          <div class="aq-question" id="aq1">
+            <div class="aq-q-header"><span class="aq-q-num">Q1</span><span class="aq-q-status" id="aq1-status"></span></div>
+            <p class="aq-q-text" data-editable="{{ID}}-assess-q1">{{ASSESSMENT_Q1}}</p>
+            <textarea class="aq-textarea" id="aq1-ans" name="q1" placeholder="Write your answer here…" rows="6" oninput="onAnsInput(1)"></textarea>
+          </div>
+
+          <div class="aq-question" id="aq2">
+            <div class="aq-q-header"><span class="aq-q-num">Q2</span><span class="aq-q-status" id="aq2-status"></span></div>
+            <p class="aq-q-text" data-editable="{{ID}}-assess-q2">{{ASSESSMENT_Q2}}</p>
+            <textarea class="aq-textarea" id="aq2-ans" name="q2" placeholder="Write your answer here…" rows="6" oninput="onAnsInput(2)"></textarea>
+          </div>
+
+          <div class="aq-question" id="aq3">
+            <div class="aq-q-header"><span class="aq-q-num">Q3</span><span class="aq-q-status" id="aq3-status"></span></div>
+            <p class="aq-q-text" data-editable="{{ID}}-assess-q3">{{ASSESSMENT_Q3}}</p>
+            <textarea class="aq-textarea" id="aq3-ans" name="q3" placeholder="Write your answer here…" rows="6" oninput="onAnsInput(3)"></textarea>
+          </div>
+
+          <div class="aq-footer" id="aqFooter">
+            <span class="aq-footer-note" id="aqFooterNote">Answer all questions to submit.</span>
+            <button class="aq-submit-btn" type="submit" id="aqSubmitBtn" disabled>Submit Answers</button>
+          </div>
+          <div class="aq-error" id="aqError" style="display:none;"></div>
+        </form>
+      </section>
+
+    </main>
+  </div>
+</div><!-- /#read-mode -->
+
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════
+   ⚠ CONFIG — the ONLY part of the script POCs set. Fill these 4 things.
+   ══════════════════════════════════════════════════════════════════════ */
+var CHAPTER_ID   = '{{ID}}';                 // POC SLOT: chapter id, e.g. 'amch3'. Must match admin + hub.
+var NEXT_CHAPTER = '{{NEXT_ID}}';            // POC SLOT: id to unlock on completion, e.g. 'amch4'. '' if none.
+var CHAPTER_NAME = '{{CHAPTER_TITLE}}';      // POC SLOT: human title, used for the answer Doc / Sheet.
+var DRIVE_FOLDER = '{{DRIVE_FOLDER_PATH}}';  // POC SLOT: Drive path for answers, e.g. 'AM Chapters/Know Your X'.
+
+/* Shared Apps Script endpoint — do not change. */
+var SHEET_URL = 'https://script.google.com/macros/s/AKfycbwX0Z5vx6DSwdwZwK26pKZL3V3U9XwEyWgPa9Ek_cFEH1_tpULnWNcn7RlgE-wT8M9M/exec';
+
+/* ── FIREBASE AUTH GATE + CONTENT LOADER — do not edit ── */
+(function() {
+  window.firebaseAuth.onAuthStateChanged(function(user) {
+    if (!user) { window.location.href = 'landing.html'; return; }
+    var db = window.firebaseDB;
+    db.collection('users').doc(user.uid).get().then(function(snap) {
+      var data = snap.exists ? snap.data() : {};
+      var unlocked = (data.unlockedChapters && data.unlockedChapters.beginner) || [];
+      if (unlocked.indexOf(CHAPTER_ID) === -1) {
+        document.getElementById('slide-mode').style.display = 'none';
+        var rm = document.getElementById('read-mode'); if (rm) rm.style.display = 'none';
+        var lock = document.createElement('div');
+        lock.style.cssText = 'position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;font-family:Manrope,sans-serif;z-index:9999;';
+        lock.innerHTML = '<div style="font-size:2.5rem;">🔒</div><div style="font-size:1.2rem;font-weight:800;color:#1E22AA;">This chapter is locked.</div><div style="font-size:14px;color:#7B7FE8;max-width:340px;text-align:center;">Ask your admin to unlock it.</div><a href="hub.html" style="margin-top:8px;font-size:13px;font-weight:700;color:#1E22AA;text-decoration:underline;">← Back to Hub</a>';
+        document.body.appendChild(lock);
+        return;
+      }
+      // Apply admin-edited content over the data-editable defaults.
+      db.collection('content').doc(CHAPTER_ID).get().then(function(cSnap) {
+        if (!cSnap.exists) return;
+        var cData = cSnap.data();
+        document.querySelectorAll('[data-editable]').forEach(function(el) {
+          var key = el.getAttribute('data-editable');
+          if (cData[key] !== undefined) el.innerHTML = cData[key];
+        });
+      });
+    });
+  });
+})();
+
+/* ── MODE TOGGLE — do not edit ── */
+var currentMode = 'slide';
+function setMode(mode) {
+  currentMode = mode;
+  var isSlide = mode === 'slide';
+  document.getElementById('slide-mode').style.display = isSlide ? '' : 'none';
+  var readEl = document.getElementById('read-mode');
+  if (readEl) readEl.classList.toggle('hidden', isSlide);
+  document.body.style.overflow = isSlide ? 'hidden' : 'auto';
+  document.getElementById('screenCounter').style.display = isSlide ? '' : 'none';
+  document.getElementById('dotNav').style.display = isSlide ? '' : 'none';
+  var keyHintEl = document.getElementById('keyHint'); if (keyHintEl) keyHintEl.style.display = isSlide ? '' : 'none';
+  var chapterLabelEl = document.getElementById('chapterLabel'); if (chapterLabelEl) chapterLabelEl.style.display = isSlide ? '' : 'none';
+  var btn = document.getElementById('btnRead');
+  if (isSlide) {
+    btn.innerHTML = '<i class="fa-solid fa-book-open"></i>&nbsp;Read Full Chapter';
+    btn.onclick = function() { setMode('read'); };
+  } else {
+    btn.innerHTML = '<i class="fa-solid fa-display"></i>&nbsp;Back to Slides';
+    btn.onclick = function() { setMode('slide'); };
+    window.scrollTo(0, 0);
+  }
+}
+
+/* ── SLIDE ENGINE — do not edit. TOTAL is auto-counted from .screen divs. ── */
+var TOTAL = document.querySelectorAll('#slides .screen').length;
+var current = 0;
+var animating = false;
+
+function buildDots() {
+  var nav = document.getElementById('dotNav');
+  nav.innerHTML = '';
+  for (var i = 0; i < TOTAL; i++) {
+    var d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    (function(idx){ d.onclick = function(){ goTo(idx); }; })(i);
+    nav.appendChild(d);
+  }
+}
+function updateCounter() {
+  document.getElementById('screenCounter').textContent = (current + 1) + ' / ' + TOTAL;
+  var chap = document.getElementById('chapterLabel');
+  if (chap) chap.style.display = current === 0 ? '' : 'none';
+}
+
+/* ⚠⚠⚠ scaleSlides() — RESPONSIVENESS + BROWSER ZOOM. DO NOT EDIT. ⚠⚠⚠ */
+var BASE_DPR = window.devicePixelRatio || 1;
+function scaleSlides() {
+  var REF_W = 1440, REF_H = 900;
+  var wrap = document.getElementById('slides');
+  if (!wrap) return;
+  var topbar = document.querySelector('.topbar');
+  var topbarH = topbar ? topbar.offsetHeight : 52;
+  var vw = document.documentElement.clientWidth;
+  var vh = document.documentElement.clientHeight - topbarH;
+  var zoom = (window.devicePixelRatio || 1) / BASE_DPR;
+  var fit = Math.min(vw / REF_W, vh / REF_H);
+  var scale = fit * zoom;
+  var scaledW = REF_W * scale, scaledH = REF_H * scale;
+  var offsetX = Math.max(0, Math.round((vw - scaledW) / 2));
+  var offsetY = Math.max(0, Math.round((vh - scaledH) / 2));
+  wrap.style.width = REF_W + 'px';
+  wrap.style.height = REF_H + 'px';
+  wrap.style.left = offsetX + 'px';
+  wrap.style.top = (topbarH + offsetY) + 'px';
+  wrap.style.right = 'auto';
+  wrap.style.bottom = 'auto';
+  wrap.style.transform = 'scale(' + scale + ')';
+  wrap.style.transformOrigin = 'top left';
+  document.body.style.minHeight = (topbarH + offsetY + scaledH) + 'px';
+  document.body.style.minWidth = (offsetX + scaledW) + 'px';
+}
+window.addEventListener('resize', scaleSlides);
+(function watchZoom() {
+  var mq = window.matchMedia('(resolution: ' + window.devicePixelRatio + 'dppx)');
+  mq.addEventListener('change', function() { scaleSlides(); watchZoom(); });
+})();
+/* ⚠ end scaleSlides ⚠ */
+
+function goTo(index) {
+  if (animating || index === current || index < 0 || index >= TOTAL) return;
+  animating = true;
+  var screens = document.querySelectorAll('.screen');
+  var dots = document.querySelectorAll('.dot');
+  var prev = current;
+  current = index;
+  screens[prev].classList.add('exit-up');
+  screens[prev].classList.remove('active');
+  setTimeout(function(){ screens[prev].classList.remove('exit-up'); }, 500);
+  screens[current].classList.add('active');
+  dots[prev].classList.remove('active');
+  dots[current].classList.add('active');
+  updateCounter();
+  var keyHint = document.getElementById('keyHint'); if (keyHint) keyHint.classList.add('hidden');
+  setTimeout(function(){ animating = false; }, 520);
+}
+function next() { goTo(current + 1); }
+function prev() { goTo(current - 1); }
+
+document.addEventListener('keydown', function(e) {
+  if (currentMode !== 'slide') return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prev();
+});
+
+/* ── TOC SCROLL SPY — do not edit ── */
+var tocLinks = document.querySelectorAll('.toc-link');
+var readSections = document.querySelectorAll('.section[id]');
+var tocObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      tocLinks.forEach(function(l){ l.classList.remove('active'); });
+      var a = document.querySelector('.toc-link[data-s="' + entry.target.id + '"]');
+      if (a) a.classList.add('active');
+    }
+  });
+}, { rootMargin: '-15% 0px -75% 0px', threshold: 0 });
+readSections.forEach(function(s){ tocObserver.observe(s); });
+
+/* ── INIT — do not edit ── */
+window.addEventListener('DOMContentLoaded', function() {
+  scaleSlides();
+  buildDots();
+  var first = document.querySelectorAll('.screen')[0];
+  if (first) first.classList.add('active');
+  updateCounter();
+});
+
+/* ══════════════════════════════════════════════════════════════════════
+   ASSESSMENT — OPEN-TEXT variant (default).
+   Set TOTAL_QUESTIONS to your question count. For MCQ / file upload /
+   no-assessment, swap this block per the catalog instructions.
+   ══════════════════════════════════════════════════════════════════════ */
+var TOTAL_QUESTIONS = 3;   // POC SLOT: number of questions in the form above
+var MIN_WORDS = 5;
+
+function wordCount(str) { return str.trim().split(/\s+/).filter(function(w){ return w.length > 0; }).length; }
+
+function onAnsInput(n) {
+  var val = document.getElementById('aq' + n + '-ans').value;
+  var wc = wordCount(val);
+  var q = document.getElementById('aq' + n);
+  var status = document.getElementById('aq' + n + '-status');
+  if (wc >= MIN_WORDS) { q.classList.add('is-filled'); status.textContent = '✓ ' + wc + ' words'; status.classList.add('done'); }
+  else { q.classList.remove('is-filled'); status.textContent = wc > 0 ? wc + ' / ' + MIN_WORDS + ' words min' : ''; status.classList.remove('done'); }
+  updateTracker();
+  saveDraft();
+}
+function saveDraft() {
+  var draft = {};
+  for (var i = 1; i <= TOTAL_QUESTIONS; i++) draft['q' + i] = document.getElementById('aq' + i + '-ans').value;
+  localStorage.setItem('myhq_' + CHAPTER_ID + '_answers', JSON.stringify(draft));
+}
+function updateTracker() {
+  var count = 0;
+  for (var i = 1; i <= TOTAL_QUESTIONS; i++) {
+    if (wordCount(document.getElementById('aq' + i + '-ans').value) >= MIN_WORDS) count++;
+  }
+  document.getElementById('aqTrackerFill').style.width = (count / TOTAL_QUESTIONS * 100) + '%';
+  document.getElementById('aqTrackerLabel').textContent = count + ' / ' + TOTAL_QUESTIONS + ' answered';
+  var btn = document.getElementById('aqSubmitBtn');
+  var note = document.getElementById('aqFooterNote');
+  if (count === TOTAL_QUESTIONS) { btn.disabled = false; note.textContent = 'All questions answered. Ready to submit.'; }
+  else { btn.disabled = true; note.textContent = 'Answer all ' + TOTAL_QUESTIONS + ' questions (min ' + MIN_WORDS + ' words each) to submit.'; }
+}
+
+function submitAssessment(e) {
+  e.preventDefault();
+  var btn = document.getElementById('aqSubmitBtn');
+  var errEl = document.getElementById('aqError');
+  errEl.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'Submitting…';
+
+  var fbUser = window.firebaseAuth.currentUser;
+  var name  = (fbUser && fbUser.displayName) || localStorage.getItem('myhq_name') || '—';
+  var email = (fbUser && fbUser.email) || localStorage.getItem('myhq_email') || '—';
+
+  var answers = {};
+  for (var i = 1; i <= TOTAL_QUESTIONS; i++) answers['q' + i] = document.getElementById('aq' + i + '-ans').value.trim();
+
+  // 1) Mark complete + unlock next chapter in Firestore.
+  if (fbUser) {
+    var prog = {}; prog['progress.' + CHAPTER_ID + '.completed'] = true;
+    prog['progress.' + CHAPTER_ID + '.completedAt'] = firebase.firestore.FieldValue.serverTimestamp();
+    window.firebaseDB.collection('users').doc(fbUser.uid).update(prog);
+    if (NEXT_CHAPTER) {
+      window.firebaseDB.collection('users').doc(fbUser.uid).set({
+        unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion(NEXT_CHAPTER) }
+      }, { merge: true });
+    }
+  }
+
+  // 2) Append answers row to the response Sheet.
+  fetch(SHEET_URL, {
+    method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(Object.assign({ chapterName: CHAPTER_NAME, status: 'Completed', name: name, email: email, timestamp: new Date().toISOString() }, answers))
+  }).catch(function(err) {
+    errEl.textContent = 'Submission failed: ' + err.message + '. Please try again.';
+    errEl.style.display = ''; btn.disabled = false; btn.textContent = 'Submit Answers';
+  });
+
+  // 3) Save a formatted Google Doc of the Q&A in Drive.
+  var questions = [];
+  for (var j = 1; j <= TOTAL_QUESTIONS; j++) {
+    var qel = document.querySelector('[data-editable="' + CHAPTER_ID + '-assess-q' + j + '"]');
+    questions.push(qel ? qel.textContent : 'Q' + j);
+  }
+  fetch(SHEET_URL, {
+    method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ action: 'saveAnswersDoc', folderPath: DRIVE_FOLDER, chapterName: CHAPTER_NAME, name: name, email: email, timestamp: new Date().toISOString(), questions: questions, answers: Object.keys(answers).map(function(k){ return answers[k]; }) })
+  });
+
+  showSubmittedState();
+  return false;
+}
+
+function showSubmittedState() {
+  for (var i = 1; i <= TOTAL_QUESTIONS; i++) {
+    var ta = document.getElementById('aq' + i + '-ans');
+    if (ta) { ta.readOnly = true; ta.style.background = '#F7F8FF'; }
+    var status = document.getElementById('aq' + i + '-status');
+    if (status) { status.textContent = '✓ Submitted'; status.classList.add('done'); }
+  }
+  var tracker = document.getElementById('aqTracker'); if (tracker) tracker.style.display = 'none';
+  var footer = document.getElementById('aqFooter');
+  if (footer) footer.innerHTML = '<a href="hub.html" style="display:inline-flex;align-items:center;gap:10px;background:var(--blue);color:#fff;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:14px 28px;">Back to Hub →</a>';
+}
+</script>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     ███  SLIDE ARCHETYPE CATALOG  ███
+     Copy a block from here into a NEW  <div class="screen"> … </div>  inside
+     #slides above. Replace {{SLOTS}}. Remember: fixed px only, keep
+     data-editable keys unique (use your chapter id + slide number).
+     These are commented out so they don't render. The slide engine counts
+     ONLY uncommented .screen divs.
+     ══════════════════════════════════════════════════════════════════════
+
+  ── A) COVER ──────────────────────────────────────────────────────────
+  <div class="screen">
+    <div class="cover-inner">
+      <div>
+        <div class="cover-eyebrow" data-editable="ID-cover-eyebrow">EYEBROW</div>
+        <h1 class="cover-headline" data-editable="ID-cover-headline">Big <em>hook</em> line.</h1>
+        <p class="cover-sub" data-editable="ID-cover-sub">Supporting sentence.</p>
+      </div>
+      <div><div class="cover-media"><img src="chapter_images/ID-cover.jpg" alt="" onerror="this.style.display='none'"></div></div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  ── B) BIG STAT ───────────────────────────────────────────────────────
+  <div class="screen">
+    <div class="slide-center">
+      <div class="eyebrow" data-editable="ID-slN-eyebrow">EYEBROW</div>
+      <div class="bigstat-num" data-editable="ID-slN-num" style="margin:16px 0;">$1<span>T</span></div>
+      <div class="bigstat-caption" data-editable="ID-slN-caption">What the number means.</div>
+      <div class="bigstat-facts">
+        <div class="bigstat-fact"><div class="bigstat-fact-num" data-editable="ID-slN-f1n">7%</div><div class="bigstat-fact-lbl" data-editable="ID-slN-f1l">Fact one</div></div>
+        <div class="bigstat-fact"><div class="bigstat-fact-num" data-editable="ID-slN-f2n">13%</div><div class="bigstat-fact-lbl" data-editable="ID-slN-f2l">Fact two</div></div>
+        <div class="bigstat-fact"><div class="bigstat-fact-num" data-editable="ID-slN-f3n">3rd</div><div class="bigstat-fact-lbl" data-editable="ID-slN-f3l">Fact three</div></div>
+        <div class="bigstat-fact"><div class="bigstat-fact-num" data-editable="ID-slN-f4n">70M</div><div class="bigstat-fact-lbl" data-editable="ID-slN-f4l">Fact four</div></div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  ── C) TIMELINE (up to 5 nodes) ───────────────────────────────────────
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ID-slN-eyebrow">EYEBROW</div>
+      <h2 class="slide-headline" data-editable="ID-slN-headline">A <span>journey</span> over time.</h2>
+      <div class="timeline">
+        <div class="tl-node"><div class="tl-dot">01</div><div class="tl-year" data-editable="ID-slN-t1y">2015</div><div class="tl-title" data-editable="ID-slN-t1t">Title</div><div class="tl-sub" data-editable="ID-slN-t1s">Detail.</div></div>
+        <div class="tl-node"><div class="tl-dot">02</div><div class="tl-year" data-editable="ID-slN-t2y">2016</div><div class="tl-title" data-editable="ID-slN-t2t">Title</div><div class="tl-sub" data-editable="ID-slN-t2s">Detail.</div></div>
+        <div class="tl-node"><div class="tl-dot">03</div><div class="tl-year" data-editable="ID-slN-t3y">2017</div><div class="tl-title" data-editable="ID-slN-t3t">Title</div><div class="tl-sub" data-editable="ID-slN-t3s">Detail.</div></div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  ── D) TWO COLUMN ─────────────────────────────────────────────────────
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ID-slN-eyebrow">EYEBROW</div>
+      <h2 class="slide-headline" data-editable="ID-slN-headline">Two <span>sides</span>.</h2>
+      <div class="twocol">
+        <div class="twocol-panel"><h3 data-editable="ID-slN-c1t">Left title</h3><p data-editable="ID-slN-c1b">Left body.</p></div>
+        <div class="twocol-panel"><h3 data-editable="ID-slN-c2t">Right title</h3><p data-editable="ID-slN-c2b">Right body.</p></div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  ── E) CARD GRID (3 cards; duplicate .card for more) ───────────────────
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ID-slN-eyebrow">EYEBROW</div>
+      <h2 class="slide-headline" data-editable="ID-slN-headline">Key <span>pillars</span>.</h2>
+      <div class="cardgrid">
+        <div class="card"><div class="card-icon"><i class="fa-solid fa-bolt"></i></div><h3 data-editable="ID-slN-c1t">Card 1</h3><p data-editable="ID-slN-c1b">Body.</p></div>
+        <div class="card"><div class="card-icon"><i class="fa-solid fa-layer-group"></i></div><h3 data-editable="ID-slN-c2t">Card 2</h3><p data-editable="ID-slN-c2b">Body.</p></div>
+        <div class="card"><div class="card-icon"><i class="fa-solid fa-chart-line"></i></div><h3 data-editable="ID-slN-c3t">Card 3</h3><p data-editable="ID-slN-c3b">Body.</p></div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  ── F) QUOTE / CALLOUT ────────────────────────────────────────────────
+  <div class="screen">
+    <div class="slide-center">
+      <div class="quote-wrap">
+        <div class="quote-mark">"</div>
+        <div class="quote-text" data-editable="ID-slN-quote">The line that lands.</div>
+        <div class="quote-attr" data-editable="ID-slN-attr">— Attribution</div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  ════════════════════════════════════════════════════════════════════════
+   ███  ASSESSMENT VARIANTS  ███
+   The shell ships OPEN-TEXT by default (form in read mode). To use another
+   type, replace the form inside #r-assess and follow the JS note.
+  ════════════════════════════════════════════════════════════════════════
+
+  ── MCQ VARIANT (replaces a .aq-question; one correct shown via radios) ──
+  Front-end only collects the choice; it submits like text (the chosen
+  option string becomes the answer). Keep onsubmit="return submitAssessment(event)".
+  Replace each .aq-question's <textarea> with:
+    <div class="aq-options">
+      <label class="aq-option"><input type="radio" name="q1" value="A" onchange="onAnsInput(1)"> Option A</label>
+      <label class="aq-option"><input type="radio" name="q1" value="B" onchange="onAnsInput(1)"> Option B</label>
+      <label class="aq-option"><input type="radio" name="q1" value="C" onchange="onAnsInput(1)"> Option C</label>
+    </div>
+  …and in <script>, change onAnsInput/wordCount logic to count a question as
+  answered when a radio for that name is :checked (the LLM prompt in
+  poc-guide.md handles this rewrite for you).
+
+  ── FILE UPLOAD VARIANT (AM-chapter style) ─────────────────────────────
+  Replace the textarea with:
+    <div class="aq-upload">
+      <input type="file" id="aq1-file" accept=".pdf,.pptx,.png,.jpg" onchange="onFilePick(1)">
+    </div>
+  Upload uses the Apps Script  action:'uploadFile'  route (base64 body,
+  folderPath + fileSuffix). This is more involved — ask the admin to wire
+  it, or have your LLM follow the uploadFile contract in poc-guide.md.
+
+  ── NO ASSESSMENT ──────────────────────────────────────────────────────
+  Delete the entire #r-assess <section>, remove its TOC link, and in the
+  cover/last slide drop the "Go to Assessment" button. On a read-only
+  chapter you may also remove the slide-mode assessment-intro screen.
+  Completion can still be marked by calling the Firestore write on a
+  "Mark as complete" button — ask the admin if you need that.
+
+  ════════════════════════════════════════════════════════════════════════ -->
+</body>
+</html>
