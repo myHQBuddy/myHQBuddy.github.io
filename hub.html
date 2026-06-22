@@ -266,6 +266,31 @@ body {
 }
 .course-card.completed .card-prog-fill { background: var(--mint); }
 
+/* Admin portal row */
+.admin-portal-row {
+  display: flex; align-items: center; justify-content: space-between;
+  border: 1px solid var(--border);
+  background: var(--white);
+  padding: 18px 28px;
+  cursor: pointer;
+  transition: background 0.18s var(--ease);
+}
+.admin-portal-row:hover { background: var(--blue-wash); }
+.admin-portal-row .admin-icon {
+  font-size: 14px; color: var(--blue); margin-right: 12px;
+}
+.admin-portal-label {
+  font-size: 13px; font-weight: 800;
+  color: var(--blue); letter-spacing: -0.01em;
+}
+.admin-portal-hint {
+  font-family: var(--mono);
+  font-size: 9px; font-weight: 600;
+  letter-spacing: 0.13em; text-transform: uppercase;
+  color: var(--blue-soft); margin-top: 4px;
+}
+.admin-portal-row .admin-arrow { font-size: 14px; color: var(--blue); }
+
 /* CTA */
 .card-cta-wrap { padding: 0; }
 .card-cta {
@@ -362,12 +387,15 @@ body {
 
 <!-- ADMIN PORTAL ROW (shown only if isAdmin or masterAdmin) -->
 <div class="courses-wrap" id="admin-portal-wrap" style="display:none;padding-bottom:0;">
-  <div style="border:1px solid rgba(30,34,170,0.15);border-left:4px solid #1A1E9E;background:#f0f2ff;display:flex;align-items:center;justify-content:space-between;padding:18px 24px;cursor:pointer;" onclick="window.location.href='admin.html'">
-    <div>
-      <div style="font-size:13px;font-weight:800;color:#1A1E9E;letter-spacing:-0.01em;">⚙️ Admin Portal</div>
-      <div style="font-size:10px;font-weight:600;color:#7B7FE8;letter-spacing:0.08em;text-transform:uppercase;margin-top:3px;font-family:'JetBrains Mono',monospace;">Manage users &amp; content</div>
+  <div class="admin-portal-row" onclick="window.location.href='admin.html'">
+    <div style="display:flex;align-items:center;">
+      <i class="fa-solid fa-gear admin-icon"></i>
+      <div>
+        <div class="admin-portal-label">Admin Portal</div>
+        <div class="admin-portal-hint">Manage users &amp; content</div>
+      </div>
     </div>
-    <span style="font-size:18px;color:#1A1E9E;">→</span>
+    <i class="fa-solid fa-arrow-right admin-arrow"></i>
   </div>
 </div>
 
