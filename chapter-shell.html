@@ -195,13 +195,13 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
    delete the #read-mode block in the body too.
    ══════════════════════════════════════════════════════════════════════ */
 #read-mode.hidden { display: none; }
-.r-layout { display: grid; grid-template-columns: 240px 1fr; max-width: 1200px; margin: 0 auto; gap: 48px; padding: 48px 32px 120px; }
-.r-sidebar { position: sticky; top: 80px; align-self: start; display: flex; flex-direction: column; gap: 4px; }
+.r-layout { display: flex; max-width: 100%; margin: 0; padding: 0 48px 80px 0; align-items: flex-start; }
+.r-sidebar { width: 240px; flex-shrink: 0; position: sticky; top: 52px; padding: 32px 24px 0 24px; max-height: calc(100vh - 52px); overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
 .r-toc-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); margin-bottom: 12px; }
 .toc-link { font-size: 13px; color: var(--body); text-decoration: none; padding: 8px 12px; border-radius: var(--radius); border-left: 2px solid transparent; transition: var(--transition); }
 .toc-link:hover { background: #FAFBFF; color: var(--blue); }
 .toc-link.active { color: var(--blue); font-weight: 700; border-left-color: var(--blue); background: rgba(30,34,170,0.05); }
-.r-content { min-width: 0; }
+.r-content { flex: 1; min-width: 0; padding: 40px 0 0 48px; }
 .section { margin-bottom: 56px; }
 .section-num { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 6px; }
 .section-title { font-size: 29px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1.15; margin-bottom: 16px; }
@@ -475,16 +475,19 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 /* ══════════════════════════════════════════════════════════════════════
    ⚠ CONFIG — the ONLY part of the script POCs set. Fill these 4 things.
    ══════════════════════════════════════════════════════════════════════ */
-var CHAPTER_ID   = '{{ID}}';                 // POC SLOT: chapter id, e.g. 'amch3'. Must match admin + hub.
-var NEXT_CHAPTER = '{{NEXT_ID}}';            // POC SLOT: id to unlock on completion, e.g. 'amch4'. '' if none.
+var CHAPTER_ID   = '{{ID}}';                 // POC SLOT: chapter id — pattern: amch3 / voch1 / orgch3 / ch2. See poc-guide.md.
+var NEXT_CHAPTER = '{{NEXT_ID}}';            // POC SLOT: id to unlock on completion (e.g. 'amch4'). '' if none.
 var CHAPTER_NAME = '{{CHAPTER_TITLE}}';      // POC SLOT: human title, used for the answer Doc / Sheet.
-var DRIVE_FOLDER = '{{DRIVE_FOLDER_PATH}}';  // POC SLOT: Drive path for answers, e.g. 'AM Chapters/Know Your X'.
+var DRIVE_FOLDER = '{{DRIVE_FOLDER_PATH}}';  // POC SLOT: path string (NOT a link) e.g. 'AM Chapters/Know Your X' or 'VO Chapters/Name'. Folder auto-created.
 
 /* Shared Apps Script endpoint — do not change. */
 var SHEET_URL = 'https://script.google.com/macros/s/AKfycbwX0Z5vx6DSwdwZwK26pKZL3V3U9XwEyWgPa9Ek_cFEH1_tpULnWNcn7RlgE-wT8M9M/exec';
 
 /* ── FIREBASE AUTH GATE + CONTENT LOADER — do not edit ── */
+/* DEV PREVIEW: on localhost, skip auth + lock so POCs can preview locally. */
+var DEV_PREVIEW = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 (function() {
+  if (DEV_PREVIEW) return; // skip gate on local server
   window.firebaseAuth.onAuthStateChanged(function(user) {
     if (!user) { window.location.href = 'landing.html'; return; }
     var db = window.firebaseDB;
@@ -521,7 +524,7 @@ function setMode(mode) {
   document.getElementById('slide-mode').style.display = isSlide ? '' : 'none';
   var readEl = document.getElementById('read-mode');
   if (readEl) readEl.classList.toggle('hidden', isSlide);
-  document.body.style.overflow = isSlide ? 'hidden' : 'auto';
+  document.body.style.overflow = 'auto';
   document.getElementById('screenCounter').style.display = isSlide ? '' : 'none';
   document.getElementById('dotNav').style.display = isSlide ? '' : 'none';
   var keyHintEl = document.getElementById('keyHint'); if (keyHintEl) keyHintEl.style.display = isSlide ? '' : 'none';
@@ -537,8 +540,8 @@ function setMode(mode) {
   }
 }
 
-/* ── SLIDE ENGINE — do not edit. TOTAL is auto-counted from .screen divs. ── */
-var TOTAL = document.querySelectorAll('#slides .screen').length;
+/* ── SLIDE ENGINE — do not edit. TOTAL is set in DOMContentLoaded below. ── */
+var TOTAL = 0;
 var current = 0;
 var animating = false;
 
@@ -634,6 +637,7 @@ readSections.forEach(function(s){ tocObserver.observe(s); });
 
 /* ── INIT — do not edit ── */
 window.addEventListener('DOMContentLoaded', function() {
+  TOTAL = document.querySelectorAll('#slides .screen').length;
   scaleSlides();
   buildDots();
   var first = document.querySelectorAll('.screen')[0];
