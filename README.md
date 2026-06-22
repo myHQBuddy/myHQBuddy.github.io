@@ -34,7 +34,7 @@ Firestore is the source of truth for **access control and content**. Apps Script
 | `Where_We_Play_v2.html` | **ch1** — Where We Play: India's commercial real estate market. |
 | `Who_We_Are_v2.html` | **ch2** — Who We Are: myHQ's story, team & ambition. |
 | `Know_Your_City.html` | **amch1** — Know Your City: geography, micromarkets, local expertise (AM track). |
-| `Know_Your_Spaces.html` | **amch2** — Know Your Spaces: operators, inventory, brand analysis (self-read AM chapter). |
+| `Know_Your_Spaces.html` | **amch2** — Coworking and Flex: operators, inventory, brand analysis (self-read AM chapter). |
 | `admin.html` | Admin dashboard — lock/unlock chapters per user, edit chapter content, view all users. |
 
 > Note: `chapter-2.html`, `Coworking & Flex.html`, `index.html` are legacy/standalone and not part of the live flow.
@@ -112,11 +112,11 @@ The chain, all driven by `arrayUnion` writes to `unlockedChapters.beginner`:
 2. **Submit Where We Play (ch1)** → `progress.ch1.completed = true` **and** `ch2` unlocked.
 3. **Submit Who We Are (ch2)** → `progress.ch2.completed = true` **and** `amch1` + `amch2` unlocked.
 4. **Submit Know Your City (amch1)** → `progress.amch1.completed = true`.
-5. **Submit Know Your Spaces (amch2)** → `progress.amch2.completed = true`.
+5. **Submit Coworking and Flex (amch2)** → `progress.amch2.completed = true`.
 
 `hub.html` also has a safety net: if both org chapters (`ch1` + `ch2`) are completed but the AM chapters aren't yet in `unlockedChapters`, it writes them via `arrayUnion` on load. Each chapter page independently gates access — if its `CHAPTER_ID` isn't in `unlockedChapters.beginner`, it renders a 🔒 lock screen instead of the content.
 
-> Know Your Spaces (amch2) is a self-read chapter not presented to new joinees, so auto-unlocking it alongside amch1 is intentional.
+> Coworking and Flex (amch2) is a self-read chapter not presented to new joinees, so auto-unlocking it alongside amch1 is intentional.
 
 ---
 
@@ -152,7 +152,7 @@ On **Submit** in any chapter (`submitAssessment` / equivalent):
    ```
    `doPost` appends a row to the `[chapterName] Responses` sheet (auto-created) and updates the `User Progress` sheet (status + IST timestamp columns are created on demand).
 
-AM chapters (Know Your City / Know Your Spaces) additionally upload presentation / audio / tracker **files** to Drive via `action:'uploadFile'` (base64 body, per-task `folderPath` + `fileSuffix`). Each file is saved as `<UserName>_<fileSuffix>.<ext>`, dedup-replaced by name, and logged.
+AM chapters (Know Your City / Coworking and Flex) additionally upload presentation / audio / tracker **files** to Drive via `action:'uploadFile'` (base64 body, per-task `folderPath` + `fileSuffix`). Each file is saved as `<UserName>_<fileSuffix>.<ext>`, dedup-replaced by name, and logged.
 
 > Drive layout: the chapter folder (e.g. `Org Chapters/Who We Are`, `01 - Know Your City/…`) lives under the root folder `1rtaqTqSJlRJ7HmOrlObgjKxmmomHO_8b` and holds both the per-user answer Docs and any uploaded files.
 
@@ -213,7 +213,7 @@ Slide-deck chapters render on a fixed **1440×900** canvas (`#slides`) scaled to
 - Achieved by capturing `BASE_DPR = devicePixelRatio` at load, then `scale = fit × (devicePixelRatio / BASE_DPR)`, clamping offsets to ≥ 0, growing `document.body` min-height/width so overflow is scrollable, and re-running on `matchMedia('(resolution: …dppx)')` change.
 - CSS: `body { overflow: auto }`, `.slides { position: absolute; transform-origin: top left }`. All in-canvas sizing uses fixed `px` (no `vw`/`clamp()`), since `vw` inside `transform: scale()` resolves against the real viewport, not the canvas.
 
-Apply this exact `scaleSlides()` pattern to every new slide-deck chapter. (Know Your Spaces is a scrolling self-read chapter and has no `.slides` canvas.)
+Apply this exact `scaleSlides()` pattern to every new slide-deck chapter. (Coworking and Flex is a scrolling self-read chapter and has no `.slides` canvas.)
 
 ---
 

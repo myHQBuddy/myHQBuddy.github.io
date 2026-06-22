@@ -266,6 +266,31 @@ body {
 }
 .course-card.completed .card-prog-fill { background: var(--mint); }
 
+/* Admin portal row */
+.admin-portal-row {
+  display: flex; align-items: center; justify-content: space-between;
+  border: 1px solid var(--border);
+  background: var(--white);
+  padding: 18px 28px;
+  cursor: pointer;
+  transition: background 0.18s var(--ease);
+}
+.admin-portal-row:hover { background: var(--blue-wash); }
+.admin-portal-row .admin-icon {
+  font-size: 14px; color: var(--blue); margin-right: 12px;
+}
+.admin-portal-label {
+  font-size: 13px; font-weight: 800;
+  color: var(--blue); letter-spacing: -0.01em;
+}
+.admin-portal-hint {
+  font-family: var(--mono);
+  font-size: 9px; font-weight: 600;
+  letter-spacing: 0.13em; text-transform: uppercase;
+  color: var(--blue-soft); margin-top: 4px;
+}
+.admin-portal-row .admin-arrow { font-size: 14px; color: var(--blue); }
+
 /* CTA */
 .card-cta-wrap { padding: 0; }
 .card-cta {
@@ -362,12 +387,15 @@ body {
 
 <!-- ADMIN PORTAL ROW (shown only if isAdmin or masterAdmin) -->
 <div class="courses-wrap" id="admin-portal-wrap" style="display:none;padding-bottom:0;">
-  <div style="border:1px solid rgba(30,34,170,0.15);border-left:4px solid #1A1E9E;background:#f0f2ff;display:flex;align-items:center;justify-content:space-between;padding:18px 24px;cursor:pointer;" onclick="window.location.href='admin.html'">
-    <div>
-      <div style="font-size:13px;font-weight:800;color:#1A1E9E;letter-spacing:-0.01em;">⚙️ Admin Portal</div>
-      <div style="font-size:10px;font-weight:600;color:#7B7FE8;letter-spacing:0.08em;text-transform:uppercase;margin-top:3px;font-family:'JetBrains Mono',monospace;">Manage users &amp; content</div>
+  <div class="admin-portal-row" onclick="window.location.href='admin.html'">
+    <div style="display:flex;align-items:center;">
+      <i class="fa-solid fa-gear admin-icon"></i>
+      <div>
+        <div class="admin-portal-label">Admin Portal</div>
+        <div class="admin-portal-hint">Manage users &amp; content</div>
+      </div>
     </div>
-    <span style="font-size:18px;color:#1A1E9E;">→</span>
+    <i class="fa-solid fa-arrow-right admin-arrow"></i>
   </div>
 </div>
 
@@ -413,6 +441,36 @@ body {
       </div>
     </div>
 
+    <!-- CHAPTER 3 (placeholder) -->
+    <div class="course-card locked has-backdrop" id="card-ch3">
+      <div class="card-top-bar"></div>
+      <div class="card-backdrop" style="background-image:url('ch3_book_images/what_we_do_backdrop.png'); background-size:cover; background-position:center;">
+        <div class="card-head">
+          <div class="card-num">Chapter 03</div>
+          <div class="card-title">What We Do</div>
+          <div class="badge badge-locked" id="status-ch3">Coming soon</div>
+        </div>
+      </div>
+      <div class="card-cta-wrap" id="footer-ch3">
+        <button class="card-cta cta-locked" disabled>Coming soon</button>
+      </div>
+    </div>
+
+    <!-- CHAPTER 4 (placeholder) -->
+    <div class="course-card locked" id="card-ch4">
+      <div class="card-top-bar"></div>
+      <div class="card-backdrop">
+        <div class="card-head">
+          <div class="card-num">Chapter 04</div>
+          <div class="card-title">What We Stand For</div>
+          <div class="badge badge-locked" id="status-ch4">Coming soon</div>
+        </div>
+      </div>
+      <div class="card-cta-wrap" id="footer-ch4">
+        <button class="card-cta cta-locked" disabled>Coming soon</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -446,7 +504,7 @@ body {
       <div class="card-backdrop" style="background-image:url('coworking_bg.avif')">
         <div class="card-head">
           <div class="card-num">AM · Chapter 02</div>
-          <div class="card-title" id="title-amch2">Know Your Spaces</div>
+          <div class="card-title" id="title-amch2">Coworking and Flex</div>
           <div class="badge badge-locked" id="status-amch2">Locked</div>
         </div>
       </div>
