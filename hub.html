@@ -460,17 +460,21 @@ body {
     </div>
 
     <!-- AM CHAPTER 3 -->
-    <div class="course-card locked">
+    <div class="course-card locked has-backdrop" id="card-amch3">
       <div class="card-top-bar"></div>
-      <div class="card-inner">
+      <div class="card-backdrop" style="background-image:url('logo_landing_hub/who_we_are_BG.png'); background-size:cover; background-position:center;">
         <div class="card-head">
           <div class="card-num">AM · Chapter 03</div>
-          <div class="card-title" style="color:var(--blue-pale);">Chapter 3</div>
-          <div class="badge badge-locked">Coming Soon</div>
+          <div class="card-title" id="title-amch3">First Impression</div>
+          <div class="badge badge-locked" id="status-amch3">Locked</div>
         </div>
       </div>
-      <div class="card-cta-wrap">
+      <div class="card-cta-wrap" id="footer-amch3">
         <button class="card-cta cta-locked" disabled>Locked</button>
+      </div>
+      <div class="unlock-section" id="unlock-section-amch3" style="display:none;">
+        <div class="unlock-label">Chapter is locked</div>
+        <div class="unlock-hint">Complete AM Chapter 2 and get it approved to unlock this chapter.</div>
       </div>
     </div>
 
@@ -749,6 +753,38 @@ auth.onAuthStateChanged(function(user) {
       }
     } else {
       if (amch2UnlockSec) amch2UnlockSec.style.display = '';
+    }
+
+    var amch3Card      = document.getElementById('card-amch3');
+    var amch3Status    = document.getElementById('status-amch3');
+    var amch3Footer     = document.getElementById('footer-amch3');
+    var amch3UnlockSec = document.getElementById('unlock-section-amch3');
+    var amch3Title     = document.getElementById('title-amch3');
+
+    var adminUnlockedAmch3 = unlocked.indexOf('amch3') !== -1;
+    var amch3Unlocked      = bothOrgDone || adminUnlockedAmch3;
+    var amch3Completed     = progress.amch3 && progress.amch3.completed;
+
+    if (bothOrgDone && !adminUnlockedAmch3) {
+      db.collection('users').doc(user.uid).set({
+        unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion('amch3') }
+      }, { merge: true });
+    }
+
+    if (amch3Unlocked) {
+      amch3Card.classList.remove('locked'); amch3Card.classList.add('unlocked');
+      if (amch3Title) amch3Title.style.color = '';
+      if (amch3UnlockSec) amch3UnlockSec.style.display = 'none';
+      if (amch3Completed) {
+        amch3Card.classList.add('completed');
+        amch3Status.textContent = 'Completed'; amch3Status.className = 'badge badge-mint';
+        amch3Footer.innerHTML = '<a class="card-cta cta-done" href="First_Impression.html"><span>Review</span><span class="arrow">→</span></a>';
+      } else {
+        amch3Status.textContent = 'Unlocked'; amch3Status.className = 'badge badge-blue';
+        amch3Footer.innerHTML = '<a class="card-cta cta-primary" href="First_Impression.html"><span>Start</span><span class="arrow">→</span></a>';
+      }
+    } else {
+      if (amch3UnlockSec) amch3UnlockSec.style.display = '';
     }
   });
 });

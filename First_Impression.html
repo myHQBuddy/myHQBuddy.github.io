@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AM Chapter 3: First Impression | myHQ T&D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<style>
+
+/* ── TOKENS ── */
+:root {
+  --blue:       #1E22AA;
+  --blue-dark:  #161a8b;
+  --green:      #BEE5C2;
+  --ink:        #0B0F2C;
+  --body:       #4A4D63;
+  --muted:      #94909C;
+  --white:      #FFFFFF;
+  --hairline:   rgba(11,15,44,0.10);
+  --sans:       'Manrope', system-ui, sans-serif;
+  --radius:     8px;
+  --ease:       cubic-bezier(0.22,1,0.36,1);
+  --transition: 0.25s var(--ease);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--sans);
+  background: var(--white);
+  color: var(--ink);
+  overflow: hidden;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: 52px; z-index: 200;
+  background: rgba(255,255,255,0.97); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--hairline);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 clamp(16px,4vw,48px);
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-logo { font-size: 13px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.topbar-chapter { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.topbar-center { font-size: 18px; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; position: absolute; left: 50%; transform: translateX(-50%); }
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+.screen-counter { font-size: 11px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.read-btn {
+  font-size: 11px; font-weight: 700; color: var(--white); background: var(--blue);
+  padding: 6px 14px; border-radius: var(--radius);
+  border: none; cursor: pointer; font-family: var(--sans);
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: var(--transition);
+}
+.read-btn:hover { background: var(--blue-dark); }
+.hub-btn {
+  font-size: 14px; color: var(--blue); background: transparent;
+  width: 32px; height: 32px; border-radius: var(--radius);
+  border: 1px solid rgba(30,34,170,0.3);
+  display: inline-flex; align-items: center; justify-content: center;
+  text-decoration: none; transition: var(--transition);
+}
+.hub-btn:hover { background: rgba(30,34,170,0.06); border-color: var(--blue); }
+
+/* ── DOT NAV ── */
+.dot-nav {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 8px; z-index: 200;
+}
+.dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--hairline); border: 1.5px solid rgba(11,15,44,0.2);
+  cursor: pointer; transition: var(--transition);
+}
+.dot.active { background: var(--blue); border-color: var(--blue); transform: scale(1.3); }
+
+/* ── KEY HINT ── */
+.key-hint {
+  position: fixed; bottom: 26px; right: clamp(16px,4vw,48px);
+  font-size: 11px; font-weight: 500; color: var(--muted);
+  display: flex; align-items: center; gap: 6px;
+  transition: opacity 0.5s; z-index: 200;
+}
+.key-hint.hidden { opacity: 0; pointer-events: none; }
+
+/* ── SCREEN NEXT BTN ── */
+.screen-next-btn {
+  position: absolute; bottom: 56px; right: clamp(32px,5vw,64px);
+  background: transparent; color: var(--muted); border: 1px solid var(--hairline);
+  font-size: 11px; font-weight: 700; font-family: var(--sans);
+  padding: 8px 16px; border-radius: var(--radius); cursor: pointer;
+  display: flex; align-items: center; gap: 6px; transition: var(--transition);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.screen-next-btn:hover { color: var(--blue); border-color: rgba(30,34,170,0.3); }
+
+/* ── SLIDES WRAPPER ── */
+.slides { position: fixed; top: 52px; left: 0; right: 0; bottom: 0; z-index: 1; }
+.screen {
+  position: absolute; inset: 0;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+  transform: translateY(20px);
+  overflow: hidden;
+}
+.screen.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+.screen.exit-up { opacity: 0; transform: translateY(-20px); }
+.hidden { display: none !important; }
+
+/* ── READ MODE LAYOUT ── */
+.r-layout { display: flex; min-height: 100vh; }
+.r-sidebar {
+  width: 240px; flex-shrink: 0;
+  position: sticky; top: 52px; align-self: flex-start;
+  height: calc(100vh - 52px); overflow-y: auto;
+  padding: 32px 16px 48px; border-right: 1px solid var(--hairline);
+}
+.r-content { flex: 1; min-width: 0; padding: 52px 72px 120px 64px; max-width: 900px; }
+.toc-chapter {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.14em; color: var(--muted); margin-bottom: 16px; padding: 0 10px;
+}
+.toc-link {
+  display: block; padding: 8px 12px; font-size: 12px; font-weight: 600;
+  color: var(--body); text-decoration: none; border-radius: 6px;
+  border-left: 2px solid transparent; margin-bottom: 2px; transition: all 0.15s;
+}
+.toc-link:hover { color: var(--ink); background: rgba(0,0,0,0.04); }
+.toc-link.active { color: var(--blue); font-weight: 700; border-left-color: var(--blue); background: rgba(30,34,170,0.05); }
+.toc-divider { height: 1px; background: var(--hairline); margin: 12px 10px; }
+
+/* ── READ MODE SECTION BASE ── */
+.section { margin-bottom: 80px; }
+.section-num {
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 6px;
+}
+h2.section-title {
+  font-size: clamp(1.5rem,2.2vw,2rem); font-weight: 800;
+  letter-spacing: -0.03em; color: var(--ink); line-height: 1.15; margin-bottom: 20px;
+}
+h3.section-subhead {
+  font-size: 1.05rem; font-weight: 800; color: var(--ink);
+  letter-spacing: -0.02em; margin-top: 40px; margin-bottom: 12px;
+}
+.section-body { font-size: 15px; color: var(--body); line-height: 1.75; margin-bottom: 14px; }
+.section-list { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; padding: 0; }
+.section-list li { font-size: 15px; color: var(--body); line-height: 1.65; padding-left: 18px; position: relative; }
+.section-list li::before { content: ''; position: absolute; left: 0; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: var(--blue); }
+.intro-card {
+  border: 1px solid var(--hairline); border-radius: var(--radius); padding: 28px 32px;
+}
+.r-insight {
+  background: rgba(190,229,194,0.22); border-left: 3px solid #4CAF74;
+  border-radius: 0 6px 6px 0; padding: 14px 20px;
+  font-size: 14px; font-weight: 600; color: var(--ink); margin: 24px 0; line-height: 1.65;
+}
+.r-insight::before { content: '✦  '; color: #4CAF74; }
+
+/* ── ASSESSMENT (READ MODE) ── */
+.assess-section { margin-top: 80px; padding-top: 56px; border-top: 2px solid var(--hairline); }
+.aq-tracker { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+.aq-tracker-bar { flex: 1; height: 4px; background: var(--hairline); border-radius: 99px; overflow: hidden; }
+.aq-tracker-fill { height: 100%; background: var(--blue); border-radius: 99px; width: 0; transition: width 0.4s; }
+.aq-tracker-label { font-size: 11px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.aq-question { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 24px 28px; margin-bottom: 16px; background: #FAFBFF; }
+.aq-q-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.aq-q-num { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: var(--blue); }
+.aq-q-status { font-size: 11px; font-weight: 700; color: #2a7d3f; margin-left: auto; }
+.aq-q-text { font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.5; margin-bottom: 6px; }
+.aq-q-sub { font-size: 13px; color: var(--body); line-height: 1.6; margin-bottom: 16px; }
+.aq-upload-zone {
+  position: relative; border: 1.5px dashed rgba(30,34,170,0.28); border-radius: var(--radius);
+  background: #F8F9FF; padding: 28px 24px; text-align: center; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.aq-upload-zone:hover { border-color: var(--blue); background: rgba(30,34,170,0.04); }
+.aq-upload-zone.has-file { border-color: #2a7d3f; background: rgba(42,125,63,0.05); border-style: solid; }
+.aq-upload-zone i { font-size: 26px; color: rgba(30,34,170,0.28); margin-bottom: 10px; display: block; }
+.aq-upload-label { font-size: 13px; font-weight: 600; color: var(--body); margin-bottom: 4px; }
+.aq-upload-sub { font-size: 11px; color: var(--muted); }
+.aq-file-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.aq-fname { font-size: 12px; font-weight: 600; color: #2a7d3f; margin-top: 8px; display: none; }
+.aq-footer { display: flex; align-items: center; justify-content: flex-end; gap: 16px; margin-top: 24px; }
+.aq-footer-note { font-size: 12px; color: var(--muted); }
+.aq-submit-btn {
+  background: var(--blue); color: #fff; border: none; border-radius: var(--radius);
+  padding: 10px 28px; font-size: 13px; font-weight: 700; font-family: var(--sans);
+  cursor: pointer; transition: background 0.2s;
+}
+.aq-submit-btn:hover:not(:disabled) { background: var(--blue-dark); }
+.aq-submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.aq-submitted { text-align: center; padding: 48px 24px; }
+.aq-submitted-icon { font-size: 36px; margin-bottom: 12px; }
+.aq-submitted-title { font-size: 20px; font-weight: 800; color: var(--ink); margin-bottom: 8px; }
+.aq-submitted-body { font-size: 14px; color: var(--body); line-height: 1.65; }
+
+/* ═══════════════════════════════════════
+   SLIDE 1 — HERO
+═══════════════════════════════════════ */
+.screen-hero {
+  background: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  padding: clamp(32px,5vw,80px) clamp(28px,6vw,120px);
+  text-align: center;
+}
+.hero-tag {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.16em; color: var(--blue);
+  background: rgba(30,34,170,0.07); border-radius: 99px;
+  padding: 5px 16px; display: inline-block; margin-bottom: 28px;
+}
+.hero-title {
+  font-size: clamp(3.5rem,7vw,6.5rem); font-weight: 800; line-height: 1.0;
+  letter-spacing: -0.05em; color: var(--ink); margin-bottom: 20px;
+}
+.hero-title em { font-style: normal; color: var(--blue); }
+.hero-sub {
+  font-size: clamp(14px,1.4vw,17px); color: var(--body);
+  line-height: 1.7; max-width: 52ch; margin-bottom: 36px;
+}
+.hero-meta {
+  display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+}
+.hero-meta-item {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 600; color: var(--muted);
+}
+.hero-meta-item i { color: var(--blue); font-size: 12px; }
+
+/* ═══════════════════════════════════════
+   SLIDE 2 — CALL STRUCTURE
+═══════════════════════════════════════ */
+.screen-structure {
+  background: var(--white);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: clamp(32px,4vw,64px) clamp(28px,6vw,120px);
+}
+.structure-eyebrow {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.14em; color: var(--muted); margin-bottom: 8px;
+}
+.structure-title {
+  font-size: clamp(1.8rem,2.8vw,2.6rem); font-weight: 800;
+  letter-spacing: -0.04em; color: var(--ink); margin-bottom: 12px; text-align: center;
+}
+.structure-sub {
+  font-size: clamp(13px,1.2vw,15px); color: var(--body);
+  line-height: 1.7; text-align: center; max-width: 56ch; margin-bottom: 48px;
+}
+.call-parts {
+  display: flex; align-items: stretch; gap: 0; width: 100%; max-width: 820px;
+}
+.call-part {
+  flex: 1; border: 1px solid var(--hairline); border-radius: var(--radius);
+  padding: clamp(20px,2.5vw,32px) clamp(18px,2vw,28px);
+  background: #FAFBFF; display: flex; flex-direction: column; gap: 10px;
+  transition: var(--transition);
+}
+.call-part:hover { border-color: rgba(30,34,170,0.25); background: #fff; }
+.call-part-num {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--blue);
+}
+.call-part-name {
+  font-size: clamp(1.1rem,1.6vw,1.4rem); font-weight: 800;
+  color: var(--ink); letter-spacing: -0.03em; line-height: 1.1;
+}
+.call-part-time {
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  background: rgba(11,15,44,0.05); border-radius: 99px;
+  padding: 3px 10px; display: inline-block; width: fit-content;
+}
+.call-part-body {
+  font-size: clamp(12px,1.1vw,13px); color: var(--body);
+  line-height: 1.65; margin-top: 4px;
+}
+.call-arrow {
+  display: flex; align-items: center; padding: 0 12px;
+  color: var(--muted); font-size: 16px; flex-shrink: 0;
+}
+.structure-insight {
+  margin-top: 36px; padding: 14px 22px;
+  background: rgba(30,34,170,0.05); border-left: 3px solid var(--blue);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 14px; font-weight: 600; color: var(--ink);
+  line-height: 1.65; max-width: 640px; text-align: left;
+}
+
+/* ═══════════════════════════════════════
+   SLIDE 3 — INTRODUCTION
+═══════════════════════════════════════ */
+.screen-intro {
+  display: grid; grid-template-columns: 1fr 1fr;
+  align-items: stretch; background: var(--white);
+}
+.intro-left {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(32px,5vw,72px) clamp(28px,4vw,56px);
+  border-right: 1px solid var(--hairline);
+}
+.intro-right {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(32px,5vw,72px) clamp(28px,4vw,56px);
+  background: #FAFBFF;
+}
+.intro-eyebrow {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.14em; color: var(--muted); margin-bottom: 8px;
+}
+.intro-heading {
+  font-size: clamp(1.6rem,2.4vw,2.2rem); font-weight: 800;
+  letter-spacing: -0.04em; color: var(--ink); line-height: 1.1; margin-bottom: 24px;
+}
+.script-block { display: flex; flex-direction: column; gap: 14px; }
+.script-line { display: flex; flex-direction: column; gap: 6px; }
+.script-badge {
+  font-size: 9px; font-weight: 800; letter-spacing: 0.14em;
+  text-transform: uppercase; border-radius: 99px;
+  padding: 3px 10px; display: inline-block; width: fit-content;
+}
+.badge-first       { background: rgba(30,34,170,0.12); color: var(--blue); }
+.badge-permission  { background: rgba(255,184,72,0.18); color: #a06000; }
+.badge-credibility { background: rgba(76,175,116,0.15); color: #2a6b3f; }
+.badge-hook        { background: rgba(255,115,81,0.13); color: #b03010; }
+.badge-objective   { background: rgba(11,15,44,0.08); color: var(--muted); }
+.script-text {
+  font-size: clamp(13px,1.2vw,14px); color: var(--ink);
+  line-height: 1.7; font-weight: 500;
+  border-left: 2px solid var(--hairline); padding-left: 12px;
+}
+.script-divider { height: 1px; background: var(--hairline); margin: 4px 0; }
+
+/* legend */
+.badge-legend { display: flex; flex-direction: column; gap: 10px; }
+.legend-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--muted); margin-bottom: 6px;
+}
+.legend-item { display: flex; align-items: center; gap: 10px; }
+.legend-label { font-size: 13px; color: var(--body); font-weight: 600; line-height: 1.4; }
+.legend-sub { font-size: 12px; color: var(--muted); line-height: 1.4; }
+.intro-principle {
+  margin-top: 28px; padding: 14px 18px;
+  background: rgba(30,34,170,0.06); border-radius: var(--radius);
+  border-left: 3px solid var(--blue);
+  font-size: 13px; font-weight: 700; color: var(--ink); line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════
+   SLIDE 4 — BEFORE THE CALL
+═══════════════════════════════════════ */
+.screen-before {
+  background: var(--white);
+  display: grid; grid-template-columns: 40% 60%;
+  align-items: stretch;
+}
+.before-left {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(32px,5vw,72px) clamp(28px,4vw,56px);
+  border-right: 1px solid var(--hairline);
+}
+.before-right {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(32px,5vw,72px) clamp(28px,4vw,56px);
+}
+.before-eyebrow {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.14em; color: var(--muted); margin-bottom: 8px;
+}
+.before-heading {
+  font-size: clamp(1.6rem,2.4vw,2.2rem); font-weight: 800;
+  letter-spacing: -0.04em; color: var(--ink); line-height: 1.1; margin-bottom: 16px;
+}
+.before-body {
+  font-size: clamp(13px,1.2vw,14px); color: var(--body); line-height: 1.75;
+}
+.research-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+.research-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  border: 1px solid var(--hairline); border-radius: var(--radius);
+  padding: 14px 16px; background: #FAFBFF;
+}
+.research-icon {
+  width: 32px; height: 32px; flex-shrink: 0; border-radius: 6px;
+  background: rgba(30,34,170,0.08);
+  display: flex; align-items: center; justify-content: center;
+}
+.research-icon i { font-size: 13px; color: var(--blue); }
+.research-label { font-size: 13px; font-weight: 700; color: var(--ink); line-height: 1.4; padding-top: 6px; }
+.research-source { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.before-contrast {
+  background: rgba(30,34,170,0.04); border-radius: var(--radius);
+  padding: 18px 20px; border: 1px solid rgba(30,34,170,0.1);
+}
+.before-contrast-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--blue); margin-bottom: 12px;
+}
+.before-compare { display: flex; flex-direction: column; gap: 10px; }
+.compare-row { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: flex-start; }
+.compare-icon { font-size: 14px; margin-top: 2px; }
+.compare-text { font-size: 13px; color: var(--body); line-height: 1.6; font-style: italic; }
+.compare-text strong { font-style: normal; font-weight: 700; color: var(--ink); }
+
+/* ═══════════════════════════════════════
+   SLIDE 5 — DISCOVERY
+═══════════════════════════════════════ */
+.screen-discovery {
+  background: var(--white);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: clamp(24px,3vw,48px) clamp(28px,5vw,100px);
+}
+.disc-eyebrow {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.14em; color: var(--muted); margin-bottom: 6px;
+}
+.disc-heading {
+  font-size: clamp(1.5rem,2.2vw,2rem); font-weight: 800;
+  letter-spacing: -0.04em; color: var(--ink); margin-bottom: 24px; text-align: center;
+}
+/* vertical flow */
+.disc-flow {
+  display: flex; flex-direction: column;
+  width: 100%; max-width: 820px; margin-bottom: 18px;
+}
+.disc-flow-item {
+  display: grid; grid-template-columns: 44px 1fr;
+  position: relative;
+}
+.disc-flow-left {
+  display: flex; flex-direction: column; align-items: center; padding-top: 2px;
+}
+.disc-flow-num {
+  width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+  background: var(--blue); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800;
+}
+.disc-flow-line {
+  width: 2px; flex: 1; background: var(--hairline); min-height: 12px; margin-top: 4px;
+}
+.disc-flow-item:last-child .disc-flow-line { display: none; }
+.disc-flow-body {
+  padding: 0 0 16px 4px;
+}
+.disc-flow-head {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+}
+.disc-flow-icon {
+  width: 26px; height: 26px; border-radius: 6px; flex-shrink: 0;
+  background: rgba(30,34,170,0.08);
+  display: flex; align-items: center; justify-content: center;
+}
+.disc-flow-icon i { font-size: 10px; color: var(--blue); }
+.disc-flow-title { font-size: 13px; font-weight: 800; color: var(--ink); }
+.disc-questions { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.disc-q {
+  font-size: clamp(12px,1.05vw,13px); color: var(--body); line-height: 1.5;
+  padding-left: 14px; position: relative;
+}
+.disc-q::before {
+  content: ''; position: absolute; left: 0; top: 7px;
+  width: 4px; height: 4px; border-radius: 50%; background: var(--blue);
+}
+.budget-rule {
+  background: rgba(190,229,194,0.22); border-left: 3px solid #4CAF74;
+  border-radius: 0 var(--radius) var(--radius) 0; padding: 10px 16px;
+  font-size: 12.5px; font-weight: 600; color: var(--ink);
+  line-height: 1.65; max-width: 820px; width: 100%;
+}
+.budget-rule::before { content: '✦  '; color: #4CAF74; }
+
+/* ═══════════════════════════════════════
+   SLIDE 6 — SUMMARY & NEXT STEPS
+═══════════════════════════════════════ */
+.screen-summary {
+  background: var(--white);
+  display: grid; grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+}
+.summary-left {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(32px,5vw,72px) clamp(28px,4vw,56px);
+  border-right: 1px solid var(--hairline);
+}
+.summary-right {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: clamp(32px,5vw,72px) clamp(28px,4vw,56px);
+  background: #FAFBFF;
+}
+.summary-eyebrow {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.14em; color: var(--muted); margin-bottom: 8px;
+}
+.summary-heading {
+  font-size: clamp(1.6rem,2.4vw,2.2rem); font-weight: 800;
+  letter-spacing: -0.04em; color: var(--ink); line-height: 1.1; margin-bottom: 16px;
+}
+.summary-body {
+  font-size: clamp(13px,1.2vw,14px); color: var(--body);
+  line-height: 1.75; margin-bottom: 24px;
+}
+.summary-template {
+  background: rgba(30,34,170,0.04); border: 1px solid rgba(30,34,170,0.15);
+  border-radius: var(--radius); padding: 20px 22px;
+  font-size: clamp(13px,1.2vw,14px); color: var(--ink);
+  line-height: 2.0; font-weight: 500;
+}
+.summary-blank {
+  display: inline-block; background: var(--blue); color: var(--white);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.02em;
+  border-radius: 4px; padding: 1px 8px; margin: 0 3px;
+  vertical-align: middle; white-space: nowrap;
+}
+.next-steps-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--muted); margin-bottom: 14px;
+}
+.next-steps-list { display: flex; flex-direction: column; gap: 12px; }
+.next-step {
+  display: flex; align-items: flex-start; gap: 12px;
+  border: 1px solid var(--hairline); border-radius: var(--radius);
+  padding: 13px 15px; background: var(--white);
+}
+.next-step-num {
+  font-size: 11px; font-weight: 800; color: var(--white); background: var(--blue);
+  width: 20px; height: 20px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+.next-step-text { font-size: 13px; color: var(--body); line-height: 1.6; }
+.next-step-text strong { color: var(--ink); font-weight: 700; }
+.summary-reminder {
+  margin-top: 20px; padding: 12px 16px;
+  background: rgba(190,229,194,0.2); border-radius: var(--radius);
+  border-left: 3px solid #4CAF74;
+  font-size: 13px; font-weight: 700; color: var(--ink);
+}
+.summary-send-note {
+  margin-top: 12px; padding: 10px 14px;
+  background: rgba(30,34,170,0.06); border-radius: var(--radius);
+  font-size: 12.5px; font-weight: 600; color: var(--blue);
+  display: flex; align-items: center; gap: 8px;
+}
+
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-logo">myHQ</span>
+    <span class="topbar-chapter">Ch5 · Sales Pitch</span>
+  </div>
+  <div class="topbar-center">First Impression</div>
+  <div class="topbar-right">
+    <a class="hub-btn" href="../../hub.html" title="Back to Hub"><i class="fa-solid fa-house"></i></a>
+    <span class="screen-counter" id="screenCounter">1 / —</span>
+    <button class="read-btn" id="btnRead" onclick="setMode('read')">
+      <i class="fa-solid fa-book-open"></i>&nbsp;Read Full Chapter
+    </button>
+  </div>
+</header>
+
+<!-- DOT NAV -->
+<nav class="dot-nav" id="dotNav"></nav>
+
+<!-- KEY HINT -->
+<div class="key-hint" id="keyHint">
+  <span>← →</span> navigate &nbsp;·&nbsp; <span>Space</span> next
+</div>
+
+<!-- SLIDE MODE -->
+<div id="slide-mode">
+  <div class="slides" id="slides">
+    <!-- SLIDE 1: HERO -->
+    <div class="screen screen-hero">
+      <h1 class="hero-title">First<br><em>Impression</em></h1>
+      <p class="hero-sub">Open, discover, summary — the three-part intro call framework.</p>
+      <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+
+    <!-- SLIDE 2: CALL STRUCTURE -->
+    <div class="screen screen-structure">
+      <div class="structure-eyebrow">The Framework</div>
+      <h2 class="structure-title">Every Client Call Has Three Parts</h2>
+      <p class="structure-sub">Master this structure and every call becomes predictable. The quality of your discovery determines the quality of your recommendation.</p>
+
+      <div class="call-parts">
+        <div class="call-part">
+          <div class="call-part-num">Part 01</div>
+          <div class="call-part-name">Introduction</div>
+          <div class="call-part-time">30–45 seconds</div>
+          <div class="call-part-body">Open strong. Use the client's name first. Earn the right to ask questions by establishing who you are and why this call matters.</div>
+        </div>
+        <div class="call-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="call-part">
+          <div class="call-part-num">Part 02</div>
+          <div class="call-part-name">Conversation</div>
+          <div class="call-part-time">4–5 minutes</div>
+          <div class="call-part-body">Discover the real requirement. Ask about situation, people, location, configuration, and budget. Listen more than you talk. This is not an interview or question-answer session — it's a conversation.</div>
+        </div>
+        <div class="call-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+        <div class="call-part">
+          <div class="call-part-num">Part 03</div>
+          <div class="call-part-name">Summary</div>
+          <div class="call-part-time">1–2 minutes</div>
+          <div class="call-part-body">Read back what you heard. Confirm the requirement, set clear next steps, and close with a specific follow-up commitment.</div>
+        </div>
+      </div>
+
+      <div class="structure-insight">
+        Most calls are lost in the first 30 seconds or the last 2 minutes. A weak opening loses trust before discovery starts. A missing summary leaves the client without a next step.
+      </div>
+      <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+
+    <!-- SLIDE 3: INTRODUCTION -->
+    <div class="screen screen-intro">
+      <div class="intro-left">
+        <div class="intro-eyebrow">Part 01</div>
+        <h2 class="intro-heading">The Opening Script</h2>
+
+        <div class="script-block">
+
+          <div class="script-line">
+            <span class="script-badge badge-first">First Impression</span>
+            <div class="script-text">"Hi <strong>[Name]</strong>!"</div>
+          </div>
+
+          <div class="script-divider"></div>
+
+          <div class="script-line">
+            <span class="script-badge badge-permission">Permission</span>
+            <div class="script-text">"Good morning — this is <strong>[Your Name]</strong> from myHQ by Anarock. I'm calling regarding your office space requirement — is this a good time to talk for 2–3 minutes?"</div>
+          </div>
+
+          <div class="script-divider"></div>
+
+          <div class="script-line">
+            <span class="script-badge badge-credibility">Credibility</span>
+            <div class="script-text">"Quick background — we help organizations with their office space needs across all geographies. We work with 5000+ workspace partners and have assisted clients like Rebel Foods, Russell Tobin, JioSaavn, Angel One, Philip Morris, and Zomato in finding the right office solutions."</div>
+          </div>
+
+          <div class="script-divider"></div>
+
+          <div class="script-line">
+            <span class="script-badge badge-hook">No-Cost Hook</span>
+            <div class="script-text">"We charge zero brokerage."</div>
+          </div>
+
+          <div class="script-divider"></div>
+
+          <div class="script-line">
+            <span class="script-badge badge-objective">Objective</span>
+            <div class="script-text">"The objective of this call is to help you through this process."</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="intro-right">
+        <div class="legend-title">Why each line works</div>
+        <div class="badge-legend">
+          <div class="legend-item">
+            <span class="script-badge badge-first">First Impression</span>
+            <div>
+              <div class="legend-label">Name first, always</div>
+              <div class="legend-sub">The client hears their own name and feels the call is personal, not a mass dial.</div>
+            </div>
+          </div>
+          <div class="legend-item">
+            <span class="script-badge badge-permission">Permission</span>
+            <div>
+              <div class="legend-label">Ask before launching in</div>
+              <div class="legend-sub">Respects their time and gets a micro-commitment before your pitch starts.</div>
+            </div>
+          </div>
+          <div class="legend-item">
+            <span class="script-badge badge-credibility">Credibility</span>
+            <div>
+              <div class="legend-label">Company + named clients</div>
+              <div class="legend-sub">5000+ partners and recognised brand names build instant credibility before you ask a single question.</div>
+            </div>
+          </div>
+          <div class="legend-item">
+            <span class="script-badge badge-hook">No-Cost Hook</span>
+            <div>
+              <div class="legend-label">Remove the fear of cost</div>
+              <div class="legend-sub">"Zero brokerage" removes the biggest barrier to opening up about requirements.</div>
+            </div>
+          </div>
+          <div class="legend-item">
+            <span class="script-badge badge-objective">Objective</span>
+            <div>
+              <div class="legend-label">Set a shared purpose</div>
+              <div class="legend-sub">Frame the call as helping them, not selling to them. Changes the dynamic immediately.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="intro-principle">
+          Name first. Always.<br>It is the first impression.
+        </div>
+      </div>
+
+      <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+
+    <!-- SLIDE 4: BEFORE THE CALL -->
+    <div class="screen screen-before">
+      <div class="before-left">
+        <div class="before-eyebrow">Part 02 — Preparation</div>
+        <h2 class="before-heading">Research Before You Dial</h2>
+        <p class="before-body">Do this research on the lead form, LinkedIn, or the company website before you make the call. Two minutes of prep changes the entire opening.</p>
+      </div>
+
+      <div class="before-right">
+        <div class="research-list">
+          <div class="research-item">
+            <div class="research-icon"><i class="fa-solid fa-building"></i></div>
+            <div>
+              <div class="research-label">Company Name</div>
+              <div class="research-source">Lead form · LinkedIn</div>
+            </div>
+          </div>
+          <div class="research-item">
+            <div class="research-icon"><i class="fa-solid fa-briefcase"></i></div>
+            <div>
+              <div class="research-label">What the Company Does</div>
+              <div class="research-source">Website · LinkedIn About</div>
+            </div>
+          </div>
+          <div class="research-item">
+            <div class="research-icon"><i class="fa-solid fa-door-open"></i></div>
+            <div>
+              <div class="research-label">Current Office Space</div>
+              <div class="research-source">LinkedIn · Google Maps</div>
+            </div>
+          </div>
+          <div class="research-item">
+            <div class="research-icon"><i class="fa-solid fa-people-group"></i></div>
+            <div>
+              <div class="research-label">Employee Strength &amp; Revenue Estimate</div>
+              <div class="research-source">LinkedIn · Crunchbase · Tracxn</div>
+            </div>
+          </div>
+          <div class="research-item">
+            <div class="research-icon"><i class="fa-solid fa-chess-knight"></i></div>
+            <div>
+              <div class="research-label">Competitor</div>
+              <div class="research-source">Google · Crunchbase</div>
+            </div>
+          </div>
+          <div class="research-item">
+            <div class="research-icon"><i class="fa-solid fa-user-tie"></i></div>
+            <div>
+              <div class="research-label">Profile of Client</div>
+              <div class="research-source">LinkedIn · lead form</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="before-contrast">
+          <div class="before-contrast-title">The difference it makes</div>
+          <div class="before-compare">
+            <div class="compare-row">
+              <div class="compare-icon">❌</div>
+              <div class="compare-text">"I got a lead from your end regarding office space."</div>
+            </div>
+            <div class="compare-row">
+              <div class="compare-icon">✅</div>
+              <div class="compare-text">"Hi Rahul — I understand <strong>Finzo Technologies</strong> is looking for office space in Bangalore. I'm calling to help."</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+
+    <!-- SLIDE 5: DISCOVERY QUESTIONS -->
+    <div class="screen screen-discovery">
+      <div class="disc-eyebrow">Part 02</div>
+      <h2 class="disc-heading">What You Need to Know</h2>
+
+      <div class="disc-flow">
+
+        <div class="disc-flow-item">
+          <div class="disc-flow-left">
+            <div class="disc-flow-num">1</div>
+            <div class="disc-flow-line"></div>
+          </div>
+          <div class="disc-flow-body">
+            <div class="disc-flow-head">
+              <div class="disc-flow-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+              <div class="disc-flow-title">Situation</div>
+            </div>
+            <ul class="disc-questions">
+              <li class="disc-q">Why are they looking for an office?</li>
+              <li class="disc-q">Client nearby / current office bad / expansion / new setup / tenure finished / cost cutting</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="disc-flow-item">
+          <div class="disc-flow-left">
+            <div class="disc-flow-num">2</div>
+            <div class="disc-flow-line"></div>
+          </div>
+          <div class="disc-flow-body">
+            <div class="disc-flow-head">
+              <div class="disc-flow-icon"><i class="fa-solid fa-users"></i></div>
+              <div class="disc-flow-title">End User</div>
+            </div>
+            <ul class="disc-questions">
+              <li class="disc-q">Who will use the office? How will they utilise it?</li>
+              <li class="disc-q">Kind of employees — front-facing or backend?</li>
+              <li class="disc-q">Do clients visit?</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="disc-flow-item">
+          <div class="disc-flow-left">
+            <div class="disc-flow-num">3</div>
+            <div class="disc-flow-line"></div>
+          </div>
+          <div class="disc-flow-body">
+            <div class="disc-flow-head">
+              <div class="disc-flow-icon"><i class="fa-solid fa-location-dot"></i></div>
+              <div class="disc-flow-title">Location</div>
+            </div>
+            <ul class="disc-questions">
+              <li class="disc-q">Where do the employees travel from?</li>
+              <li class="disc-q">Where do the founders travel from?</li>
+              <li class="disc-q">Mode of transportation — metro or personal vehicles?</li>
+              <li class="disc-q">What is the location expectation?</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="disc-flow-item">
+          <div class="disc-flow-left">
+            <div class="disc-flow-num">4</div>
+            <div class="disc-flow-line"></div>
+          </div>
+          <div class="disc-flow-body">
+            <div class="disc-flow-head">
+              <div class="disc-flow-icon"><i class="fa-solid fa-sliders"></i></div>
+              <div class="disc-flow-title">Configuration &amp; Cashflow</div>
+            </div>
+            <ul class="disc-questions">
+              <li class="disc-q">Configuration — seats, cabins, meeting rooms, carpet area?</li>
+              <li class="disc-q">What is the budget expectation? <span style="color:var(--muted);font-weight:400;">(Monthly cashflow — total spend the business can absorb)</span></li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="budget-rule">
+        Budget rule: if the client says ₹8K/seat — show options from ₹7K to ₹12K. Budget = 8–15% of monthly salary cost per employee. Never limit to their stated number alone.
+      </div>
+
+      <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+
+    <!-- SLIDE 6: SUMMARY & NEXT STEPS -->
+    <div class="screen screen-summary">
+      <div class="summary-left">
+        <div class="summary-eyebrow">Part 03</div>
+        <h2 class="summary-heading">Close Every Call with a Summary</h2>
+        <p class="summary-body">Read back what you heard before you end the call. This builds trust, catches misunderstandings, and creates a shared commitment to next steps.</p>
+
+        <div class="summary-template">
+          "Perfect — you're looking for <span class="summary-blank">X seats</span> in
+          <span class="summary-blank">location</span>, with
+          <span class="summary-blank">configuration</span>. Monthly budget around
+          <span class="summary-blank">₹X total / ₹X per seat</span>. Key requirements:
+          <span class="summary-blank">parking / metro / 24×7</span>. Moving in by
+          <span class="summary-blank">date / month</span>."
+        </div>
+        <div class="summary-send-note"><i class="fa-solid fa-paper-plane"></i> Send this summary to the client in writing after the call.</div>
+      </div>
+
+      <div class="summary-right">
+        <div class="next-steps-title">Then commit to the next step</div>
+        <div class="next-steps-list">
+          <div class="next-step">
+            <div class="next-step-num">1</div>
+            <div class="next-step-text"><strong>Share options today.</strong> "I'll identify spaces that match your requirement and share them with you today."</div>
+          </div>
+          <div class="next-step">
+            <div class="next-step-num">2</div>
+            <div class="next-step-text"><strong>Set price expectations.</strong> "Quoted prices typically have 10–15% negotiation room — I'll factor that in."</div>
+          </div>
+          <div class="next-step">
+            <div class="next-step-num">3</div>
+            <div class="next-step-text"><strong>Schedule the visit.</strong> "Once you've reviewed the options, we can organise site visits together."</div>
+          </div>
+        </div>
+
+        <div class="summary-reminder">
+          Use the client's name during the conversation — not just at the start.
+        </div>
+      </div>
+
+      <!-- no next btn on last slide -->
+    </div>
+  </div>
+</div>
+
+<!-- READ MODE -->
+<div id="read-mode" class="hidden" style="margin-top:52px;">
+  <div class="r-layout">
+    <aside class="r-sidebar">
+      <a class="toc-link" href="#s-intro">Introduction</a>
+      <div class="toc-divider"></div>
+      <a class="toc-link" href="#s01">01 · The 3-Part Call</a>
+      <a class="toc-link" href="#s02">02 · Introduction</a>
+      <a class="toc-link" href="#s03">03 · Before the Call</a>
+      <a class="toc-link" href="#s04">04 · What You Need to Know</a>
+      <a class="toc-link" href="#s05">05 · Summary &amp; Next Steps</a>
+      <div class="toc-divider"></div>
+      <a class="toc-link" href="#s-assess">Assessment</a>
+    </aside>
+    <main class="r-content" id="readContent">
+
+      <!-- INTRO -->
+      <section class="section" id="s-intro">
+        <div class="intro-card">
+          <p class="section-body">Every client interaction is a discovery opportunity. This chapter gives you a repeatable, structured framework for conducting the initial office space enquiry call — from the first word to the confirmed next step.</p>
+          <p class="section-body">The three-part structure works for any city, any client type, and any enquiry size. Master it and you will never walk away from a call without understanding what the client actually needs.</p>
+        </div>
+      </section>
+
+      <!-- 01 THE 3-PART CALL -->
+      <section class="section" id="s01">
+        <div class="section-num">01</div>
+        <h2 class="section-title">The 3-Part Call</h2>
+        <p class="section-body">A successful client call has three phases. Each phase has a distinct purpose and a time budget. Together they take 10–15 minutes.</p>
+
+        <h3 class="section-subhead">Introduction — 30–45 seconds</h3>
+        <p class="section-body">Open strong. Use the client's name first. Establish who you are, earn the right to ask questions, and set a shared purpose for the call. This is where trust is either built or lost before discovery begins.</p>
+
+        <h3 class="section-subhead">Conversation — 4–5 minutes</h3>
+        <p class="section-body">Discover the real requirement by asking across four themes: Situation, People, Location, and Requirements. Listen more than you talk. This is not an interview or question-answer session — it's a conversation. The details you uncover here determine the quality of your recommendation.</p>
+
+        <h3 class="section-subhead">Summary — 1–2 minutes</h3>
+        <p class="section-body">Read back what you heard. Confirm seat count, location, configuration, budget, and timeline. Commit to a specific next step before ending the call. Never hang up without a clear follow-up.</p>
+
+        <div class="r-insight">Most calls are lost in the first 30 seconds or the last 2 minutes. A weak opening loses trust before discovery starts. A missing summary leaves the client without a next step.</div>
+      </section>
+
+      <!-- 02 INTRODUCTION -->
+      <section class="section" id="s02">
+        <div class="section-num">02</div>
+        <h2 class="section-title">Introduction</h2>
+        <p class="section-body">The recommended opening script. Every line has a purpose. Do not skip any part of it — each element earns something specific from the client.</p>
+
+        <h3 class="section-subhead">The Script</h3>
+        <p class="section-body"><strong>"Hi [Name]!"</strong> — Name first, always. It signals that this is a personal call, not a mass dial. It is the first impression.</p>
+        <p class="section-body"><strong>"Good morning — this is [Your Name] from myHQ by Anarock. I'm calling regarding your office space requirement — is this a good time to talk for 2–3 minutes?"</strong> — Identify yourself, state the reason immediately, and ask permission before launching. A client who says "yes" is already more engaged than one who wasn't asked.</p>
+        <p class="section-body"><strong>"Quick background — we help organizations with their office space needs across all geographies. We work with 5000+ workspace partners and have assisted clients like Rebel Foods, Russell Tobin, JioSaavn, Angel One, Philip Morris, and Zomato in finding the right office solutions."</strong> — Name-drop at scale. These are brands the client recognises. This earns instant credibility before a single question is asked.</p>
+        <p class="section-body"><strong>"We charge zero brokerage."</strong> — The biggest barrier to opening up is fear of cost. Remove it in one sentence.</p>
+        <p class="section-body"><strong>"The objective of this call is to help you through this process."</strong> — Frame the call as helping them, not selling to them. This resets the dynamic entirely.</p>
+
+        <div class="r-insight">Name first. Always. It is the first impression.</div>
+      </section>
+
+      <!-- 03 BEFORE THE CALL -->
+      <section class="section" id="s03">
+        <div class="section-num">03</div>
+        <h2 class="section-title">Before the Call</h2>
+        <p class="section-body">Two minutes of research before you dial changes your entire opening. Do this on the lead form, LinkedIn, or the company website.</p>
+
+        <h3 class="section-subhead">Pre-Call Checklist</h3>
+        <p class="section-body"><strong>Company name</strong> — Lead form or CRM. Don't mispronounce or misread it.</p>
+        <p class="section-body"><strong>What the company does</strong> — Website or LinkedIn. One sentence is enough: "they're a fintech startup," "they're a logistics firm."</p>
+        <p class="section-body"><strong>Current office space</strong> — Google Maps or LinkedIn. Knowing their current setup tells you the scale of the move and any pain points.</p>
+        <p class="section-body"><strong>Employee strength &amp; revenue estimate</strong> — LinkedIn employee count, Crunchbase, or Tracxn. Sets expectations on seat requirement and budget range before you ask.</p>
+        <p class="section-body"><strong>Competitor</strong> — A quick Google or Crunchbase search. Shows you understand their market and builds instant credibility.</p>
+        <p class="section-body"><strong>Profile of client</strong> — LinkedIn profile of the person you're calling. Their role, seniority, and background shapes how you pitch.</p>
+
+        <div class="r-insight">"I understand Finzo Technologies is looking for space in Bangalore for your tech team" opens trust. "I got a lead from your end" closes it.</div>
+      </section>
+
+      <!-- 04 WHAT YOU NEED TO KNOW -->
+      <section class="section" id="s04">
+        <div class="section-num">04</div>
+        <h2 class="section-title">What You Need to Know</h2>
+
+        <h3 class="section-subhead">Situation</h3>
+        <ul class="section-list">
+          <li>Why are they looking for an office?</li>
+          <li>Client nearby / current office bad / expansion / new setup / tenure finished / cost cutting</li>
+        </ul>
+
+        <h3 class="section-subhead">End User</h3>
+        <ul class="section-list">
+          <li>Who will use the office? How will they utilise it?</li>
+          <li>Kind of employees — front-facing or backend?</li>
+          <li>Do clients visit?</li>
+        </ul>
+
+        <h3 class="section-subhead">Location</h3>
+        <ul class="section-list">
+          <li>Where do the employees travel from?</li>
+          <li>Where do the founders travel from?</li>
+          <li>Mode of transportation — metro or personal vehicles?</li>
+          <li>What is the location expectation?</li>
+        </ul>
+
+        <h3 class="section-subhead">Configuration &amp; Cashflow</h3>
+        <ul class="section-list">
+          <li>Configuration — seats, cabins, meeting rooms, carpet area?</li>
+          <li>What is the budget expectation? <span style="color:var(--muted);">(Monthly cashflow — total spend the business can absorb)</span></li>
+        </ul>
+
+        <div class="r-insight">Budget rule: if the client says ₹8K/seat — show options from ₹7K to ₹12K. Budget = 8–15% of monthly salary cost per employee. Never limit your search to their stated number alone.</div>
+      </section>
+
+      <!-- 05 SUMMARY & NEXT STEPS -->
+      <section class="section" id="s05">
+        <div class="section-num">05</div>
+        <h2 class="section-title">Summary &amp; Next Steps</h2>
+        <p class="section-body">Before you end the call, read back everything you heard. This builds trust, catches misunderstandings early, and creates a mutual commitment to next steps.</p>
+
+        <h3 class="section-subhead">Summary Template</h3>
+        <p class="section-body"><em>"Perfect — you're looking for <strong>[X seats]</strong> in <strong>[location]</strong>, with <strong>[configuration]</strong>. Monthly budget around <strong>₹[X total / ₹X per seat]</strong>. Key requirements: <strong>[parking / metro access / 24×7]</strong>. Moving in by <strong>[date / month]</strong>."</em></p>
+        <div class="summary-send-note"><i class="fa-solid fa-paper-plane"></i> Send this summary to the client in writing after the call.</div>
+
+        <h3 class="section-subhead">Next Steps Script</h3>
+        <p class="section-body"><strong>"As the next step, I'll identify options that match your requirement and share them with you today."</strong></p>
+        <p class="section-body"><strong>"Quoted prices typically have 10–15% negotiation room — I'll factor that in."</strong></p>
+        <p class="section-body"><strong>"Once you've reviewed the options, we can organise site visits together."</strong></p>
+
+        <div class="r-insight">Use the client's name during the conversation — not just at the start. A name used naturally mid-call signals you're engaged, not reading from a script.</div>
+      </section>
+
+      <!-- ASSESSMENT -->
+      <section class="section assess-section" id="s-assess">
+        <div class="section-num">Assessment</div>
+        <h2 class="section-title">Put It Into Practice</h2>
+        <p class="section-body">Two tasks to complete before this chapter is done.</p>
+
+        <div class="aq-tracker">
+          <div class="aq-tracker-bar"><div class="aq-tracker-fill" id="aqTrackerFill"></div></div>
+          <span class="aq-tracker-label" id="aqTrackerLabel">0 / 3 submitted</span>
+        </div>
+
+        <!-- Q1: Mock calls -->
+        <div class="aq-question" id="aq1">
+          <div class="aq-q-header">
+            <span class="aq-q-num">Task 1</span>
+            <span class="aq-q-status" id="aq1-status"></span>
+          </div>
+          <p class="aq-q-text">Have a mock call with 2 people from the list below and upload both recordings.</p>
+          <p class="aq-q-sub">Call any 2: J (+91 98999 43672) · Himanshu (+91 86558 30454) · Yugandhra (+91 92666 07111) · Akram (+91 96661 81312) · Karshit (+91 86558 30461) · Amrith (+91 86557 82708)</p>
+
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px;">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">Recording 1</div>
+              <div class="aq-upload-zone" id="aq1a-zone">
+                <i class="fa-solid fa-microphone"></i>
+                <div class="aq-upload-label">Click to upload recording 1</div>
+                <div class="aq-upload-sub">Accepted: .mp3 · .mp4 · .m4a · .wav · .mov · .webm · .ogg · .aac</div>
+                <input type="file" class="aq-file-input" id="aq1a-file" accept=".mp3,.mp4,.m4a,.wav,.mov,.webm,.ogg,.aac" onchange="onFileSelect('aq1a')">
+              </div>
+              <div class="aq-fname" id="aq1a-fname"></div>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">Recording 2</div>
+              <div class="aq-upload-zone" id="aq1b-zone">
+                <i class="fa-solid fa-microphone"></i>
+                <div class="aq-upload-label">Click to upload recording 2</div>
+                <div class="aq-upload-sub">Accepted: .mp3 · .mp4 · .m4a · .wav · .mov · .webm · .ogg · .aac</div>
+                <input type="file" class="aq-file-input" id="aq1b-file" accept=".mp3,.mp4,.m4a,.wav,.mov,.webm,.ogg,.aac" onchange="onFileSelect('aq1b')">
+              </div>
+              <div class="aq-fname" id="aq1b-fname"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Q2: Case studies -->
+        <div class="aq-question" id="aq2">
+          <div class="aq-q-header">
+            <span class="aq-q-num">Task 2</span>
+            <span class="aq-q-status" id="aq2-status"></span>
+          </div>
+          <p class="aq-q-text">Call old leads and document 2 case studies where you followed this structure.</p>
+          <p class="aq-q-sub">Write up 2 real calls — what you found out at each stage (Situation / End User / Location / Configuration) and what happened next. Upload as a single document.</p>
+
+          <div class="aq-upload-zone" id="aq2-zone">
+            <i class="fa-solid fa-file-lines"></i>
+            <div class="aq-upload-label">Click to upload your case study document</div>
+            <div class="aq-upload-sub">Accepted: .pdf · .doc · .docx · .txt</div>
+            <input type="file" class="aq-file-input" id="aq2-file" accept=".pdf,.doc,.docx,.txt" onchange="onFileSelect('aq2')">
+          </div>
+          <div class="aq-fname" id="aq2-fname"></div>
+        </div>
+
+        <div class="aq-footer">
+          <span class="aq-footer-note" id="aqFooterNote">Upload all 3 files to submit.</span>
+          <button class="aq-submit-btn" type="button" id="aqSubmitBtn" disabled onclick="submitAssessment()">Submit</button>
+        </div>
+
+        <div class="aq-submitted" id="aqSubmitted" style="display:none;">
+          <div class="aq-submitted-icon">✅</div>
+          <div class="aq-submitted-title">Assessment Submitted</div>
+          <p class="aq-submitted-body">Your recordings and case studies have been saved. Your manager will review before unlocking the next chapter.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+/* ── NAV STATE ── */
+let cur = 0;
+let keyHintTimer = null;
+
+function buildDotNav() {
+  const TOTAL = document.querySelectorAll('.screen').length;
+  const nav = document.getElementById('dotNav');
+  nav.innerHTML = '';
+  for (let i = 0; i < TOTAL; i++) {
+    const d = document.createElement('button');
+    d.className = 'dot' + (i === cur ? ' active' : '');
+    d.setAttribute('aria-label', 'Slide ' + (i + 1));
+    d.addEventListener('click', () => goTo(i));
+    nav.appendChild(d);
+  }
+}
+
+function goTo(n) {
+  const screens = document.querySelectorAll('.screen');
+  const TOTAL = screens.length;
+  if (n < 0 || n >= TOTAL) return;
+  if (screens[cur]) {
+    screens[cur].classList.remove('active');
+    screens[cur].classList.add('exit-up');
+    setTimeout(() => screens[cur] && screens[cur].classList.remove('exit-up'), 500);
+  }
+  cur = n;
+  if (screens[cur]) screens[cur].classList.add('active');
+  document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === cur));
+  document.getElementById('screenCounter').textContent = (cur + 1) + ' / ' + TOTAL;
+  resetKeyHint();
+}
+
+function next() { goTo(cur + 1); }
+function prev() { goTo(cur - 1); }
+
+function resetKeyHint() {
+  const kh = document.getElementById('keyHint');
+  if (!kh) return;
+  kh.classList.remove('hidden');
+  clearTimeout(keyHintTimer);
+  keyHintTimer = setTimeout(() => kh.classList.add('hidden'), 3000);
+}
+
+function setMode(m) {
+  const sm = document.getElementById('slide-mode');
+  const rm = document.getElementById('read-mode');
+  const btn = document.getElementById('btnRead');
+  const dn = document.getElementById('dotNav');
+  const kh = document.getElementById('keyHint');
+  if (m === 'read') {
+    sm.classList.add('hidden');
+    rm.classList.remove('hidden');
+    dn.classList.add('hidden');
+    if (kh) kh.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+    btn.innerHTML = '<i class="fa-solid fa-display"></i>&nbsp;Slide Mode';
+    btn.onclick = () => setMode('slides');
+  } else {
+    rm.classList.add('hidden');
+    sm.classList.remove('hidden');
+    dn.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    btn.innerHTML = '<i class="fa-solid fa-book-open"></i>&nbsp;Read Full Chapter';
+    btn.onclick = () => setMode('read');
+    goTo(cur);
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (document.getElementById('slide-mode').classList.contains('hidden')) return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  buildDotNav();
+  const screens = document.querySelectorAll('.screen');
+  if (screens.length) screens[0].classList.add('active');
+  const TOTAL = screens.length;
+  document.getElementById('screenCounter').textContent = '1 / ' + TOTAL;
+  resetKeyHint();
+  initToc();
+});
+
+/* ── TOC SCROLL SPY ── */
+function initToc() {
+  const links = document.querySelectorAll('.r-sidebar .toc-link');
+  const OFFSET = 76;
+  links.forEach(link => {
+    link.addEventListener('click', e => {
+      const href = link.getAttribute('href');
+      if (!href || !href.startsWith('#')) return;
+      e.preventDefault();
+      const target = document.getElementById(href.slice(1));
+      if (!target) return;
+      const top = target.getBoundingClientRect().top + window.scrollY - OFFSET;
+      window.scrollTo({ top, behavior: 'smooth' });
+      links.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+    });
+  });
+  const sectionIds = ['s-intro','s01','s02','s03','s04','s05','s-assess'];
+  const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + entry.target.id));
+      }
+    });
+  }, { rootMargin: '-76px 0px -55% 0px', threshold: 0 });
+  sections.forEach(s => obs.observe(s));
+  if (links.length) links[0].classList.add('active');
+}
+
+/* ── ASSESSMENT ── */
+const LS_KEY = 'myhq_amch3_submitted';
+const fileState = { aq1a: false, aq1b: false, aq2: false };
+
+const UPLOAD_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwX0Z5vx6DSwdwZwK26pKZL3V3U9XwEyWgPa9Ek_cFEH1_tpULnWNcn7RlgE-wT8M9M/exec';
+
+const QUESTION_CONFIG = {
+  aq1a: { folderPath: '03 - First Impression/Mock Call Recordings', fileSuffix: 'Mock_Call_1'    },
+  aq1b: { folderPath: '03 - First Impression/Mock Call Recordings', fileSuffix: 'Mock_Call_2'    },
+  aq2:  { folderPath: '03 - First Impression/Case Studies',         fileSuffix: 'Case_Studies'   }
+};
+
+function getLoggedInFirstName() {
+  const auth = window.firebaseAuth;
+  if (auth && auth.currentUser) {
+    const raw = auth.currentUser.displayName || auth.currentUser.email || '';
+    const name = raw.split(' ')[0].split('@')[0];
+    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+  }
+  return 'User';
+}
+
+// Redirect to login if not authenticated
+if (window.firebaseAuth) {
+  window.firebaseAuth.onAuthStateChanged(function(user) {
+    if (!user) { window.location.href = 'landing.html'; return; }
+    restoreAssessment();
+  });
+}
+
+function getRenamedFile(id, originalFile) {
+  const cfg  = QUESTION_CONFIG[id];
+  const ext  = originalFile.name.split('.').pop();
+  const firstName = getLoggedInFirstName();
+  const newName = firstName + '_' + cfg.fileSuffix + '.' + ext;
+  return { newName, ext, mimeType: originalFile.type || 'application/octet-stream' };
+}
+
+function onFileSelect(id) {
+  const input = document.getElementById(id + '-file');
+  const zone  = document.getElementById(id + '-zone');
+  const fname = document.getElementById(id + '-fname');
+  if (input && input.files && input.files.length > 0) {
+    const f = input.files[0];
+    fileState[id] = true;
+    const { newName } = getRenamedFile(id, f);
+    if (zone)  zone.classList.add('has-file');
+    if (fname) { fname.textContent = '📎 Will be saved as: ' + newName; fname.style.display = 'block'; }
+  } else {
+    fileState[id] = false;
+    if (zone)  zone.classList.remove('has-file');
+    if (fname) fname.style.display = 'none';
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  const count = Object.values(fileState).filter(Boolean).length;
+  const total = 3;
+  const fill  = document.getElementById('aqTrackerFill');
+  const lbl   = document.getElementById('aqTrackerLabel');
+  const btn   = document.getElementById('aqSubmitBtn');
+  const note  = document.getElementById('aqFooterNote');
+  if (fill) fill.style.width = (count / total * 100) + '%';
+  if (lbl)  lbl.textContent  = count + ' / ' + total + ' submitted';
+  if (btn)  btn.disabled = count < total;
+  if (note) note.textContent = count < total ? 'Upload all 3 files to submit.' : 'Ready to submit!';
+  const s1 = document.getElementById('aq1-status');
+  const s2 = document.getElementById('aq2-status');
+  if (s1) s1.textContent = (fileState.aq1a && fileState.aq1b) ? 'Both uploaded ✓' : '';
+  if (s2) s2.textContent = fileState.aq2 ? 'Uploaded ✓' : '';
+}
+
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function submitAssessment() {
+  if (!fileState.aq1a || !fileState.aq1b || !fileState.aq2) return;
+
+  const btn = document.getElementById('aqSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Uploading…';
+
+  const firstName = getLoggedInFirstName();
+
+  try {
+    for (const id of ['aq1a', 'aq1b', 'aq2']) {
+      const input = document.getElementById(id + '-file');
+      const file  = input.files[0];
+      const cfg   = QUESTION_CONFIG[id];
+      const { ext, mimeType } = getRenamedFile(id, file);
+      const base64 = await toBase64(file);
+
+      await fetch(UPLOAD_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify({
+          action:     'uploadFile',
+          folderPath: cfg.folderPath,
+          fileSuffix: cfg.fileSuffix,
+          userName:   firstName,
+          fileData:   base64,
+          mimeType:   mimeType,
+          fileExt:    ext
+        })
+      });
+    }
+
+    localStorage.setItem(LS_KEY, 'true');
+
+    // Persist to Firestore for cross-device progress
+    const auth = window.firebaseAuth;
+    const db   = window.firebaseDB;
+    if (auth && auth.currentUser && db) {
+      db.collection('users').doc(auth.currentUser.uid).set(
+        { amch3_submitted: true, amch3_submitted_at: new Date().toISOString() },
+        { merge: true }
+      );
+      db.collection('users').doc(auth.currentUser.uid).update({
+        'progress.amch3.completed': true,
+        'progress.amch3.completedAt': firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+
+    markAssessmentDone();
+
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = 'Submit';
+    alert('Upload failed: ' + err.message + '. Please try again.');
+  }
+}
+
+function markAssessmentDone() {
+  document.querySelectorAll('.aq-question').forEach(q => q.style.display = 'none');
+  const tracker = document.querySelector('.aq-tracker');
+  const footer  = document.querySelector('.aq-footer');
+  if (tracker) tracker.style.display = 'none';
+  if (footer)  footer.style.display  = 'none';
+  const done = document.getElementById('aqSubmitted');
+  if (done) done.style.display = 'block';
+}
+
+function restoreAssessment() {
+  if (localStorage.getItem(LS_KEY) === 'true') {
+    markAssessmentDone();
+  }
+}
+
+</script>
+</body>
+</html>
