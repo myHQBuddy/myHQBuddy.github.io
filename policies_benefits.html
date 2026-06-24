@@ -88,7 +88,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 .screen-next-btn:hover { color: var(--blue); border-color: rgba(30,34,170,0.3); }
 
 /* Slide scaffolding */
-.slide-pad { height: 100%; display: flex; flex-direction: column; padding: 56px 80px; gap: 28px; }
+.slide-pad { height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 56px 80px; gap: 28px; }
 .slide-center { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 80px; }
 .eyebrow { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); }
 .slide-headline { font-size: 44px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1.12; }
@@ -115,7 +115,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 .img-placeholder span { font-size: 12px; font-weight: 600; max-width: 220px; line-height: 1.4; }
 
 /* Card Grid */
-.cardgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; flex: 1; min-height: 0; align-content: center; align-items: start; }
+.cardgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; min-height: 0; align-content: center; align-items: start; }
 .card { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 32px 28px; background: var(--white); display: flex; flex-direction: column; gap: 16px; }
 .card-icon { width: 64px; height: 64px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 28px; background: rgba(30,34,170,0.08); color: var(--blue); }
 .card h3 { font-size: 21px; font-weight: 800; color: var(--ink); }
@@ -131,7 +131,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 .cardgrid-compact .card p { font-size: 12.5px; line-height: 1.5; }
 
 /* Two Column */
-.twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; flex: 1; min-height: 0; align-content: center; align-items: stretch; }
+.twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; min-height: 0; align-content: center; align-items: stretch; }
 .twocol-panel { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 40px 44px; background: #FAFBFF; display: flex; flex-direction: column; gap: 18px; }
 .twocol-panel h3 { font-size: 26px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
 .twocol-panel p { font-size: 17px; color: var(--body); line-height: 1.75; }
@@ -232,7 +232,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
       </div>
       <div>
         <div class="cover-media">
-          <img src="chapter_images/ch3-cover.jpg" alt="How We Support You" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <img src="ch5_book_images/offsite_team.jpg" alt="How We Support You" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
           <div class="img-placeholder" style="display:none; position:absolute; inset:0; border:none; border-radius:0;">
             <i class="fa-solid fa-image"></i>
             <span>Photo: Team celebrating a benefit or milestone (e.g. offsite, team dinner)</span>
@@ -248,10 +248,6 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
     <div class="slide-pad">
       <div class="eyebrow" data-editable="ch3-sl1-eyebrow">The Philosophy</div>
       <h2 class="slide-headline" data-editable="ch3-sl1-headline">We invest in <span>all three.</span></h2>
-      <div class="img-placeholder" style="height:90px; flex-direction:row; gap:14px; margin-bottom:16px;">
-        <i class="fa-solid fa-image" style="font-size:20px;"></i>
-        <span style="max-width:none;">Photo: Team at an offsite or a family-friendly company event</span>
-      </div>
       <div class="cardgrid">
         <div class="card">
           <div class="card-icon" style="background:rgba(255,184,72,0.15);color:var(--amber);"><i class="fa-solid fa-person"></i></div>
@@ -408,10 +404,6 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
     <div class="slide-pad">
       <div class="eyebrow" data-editable="ch3-sl4-eyebrow">Your HRMS</div>
       <h2 class="slide-headline" data-editable="ch3-sl4-headline">Keka. <span>One place for everything.</span></h2>
-      <div class="img-placeholder" style="height:56px; flex-direction:row; gap:14px; margin-bottom:12px;">
-        <i class="fa-solid fa-image" style="font-size:16px;"></i>
-        <span style="max-width:none; font-size:11px;">Screenshot: Keka app/dashboard home screen</span>
-      </div>
       <div class="cardgrid cardgrid-compact" style="grid-template-columns:repeat(4,1fr);">
         <div class="card">
           <div class="card-icon"><i class="fa-solid fa-calendar-check"></i></div>
@@ -463,10 +455,6 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
     <div class="slide-pad">
       <div class="eyebrow" data-editable="ch3-sl5-eyebrow">Non-Negotiable</div>
       <h2 class="slide-headline" data-editable="ch3-sl5-headline">Two rules. <span>Zero exceptions.</span></h2>
-      <div class="img-placeholder" style="height:90px; flex-direction:row; gap:14px; margin-bottom:16px;">
-        <i class="fa-solid fa-image" style="font-size:20px;"></i>
-        <span style="max-width:none;">Photo: Workplace conduct training session or team briefing</span>
-      </div>
       <div class="cardgrid" style="grid-template-columns:repeat(2,1fr);">
         <div class="card" style="border-color:rgba(255,115,81,0.3);background:rgba(255,115,81,0.03);">
           <div class="card-icon" style="background:rgba(255,115,81,0.12);color:var(--coral);"><i class="fa-solid fa-shield-halved"></i></div>
@@ -722,6 +710,9 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
       <section class="section" id="r-s04">
         <div class="section-num">04</div>
         <h2 class="section-title" data-editable="ch3-s04-title">Keka HRMS</h2>
+        <figure style="margin:0 0 24px; border-radius:var(--radius); overflow:hidden; border:1px solid var(--hairline); background:#FAFBFF;">
+          <img src="ch5_book_images/keka.png" alt="Keka HRMS dashboard" style="display:block; width:100%; height:auto; object-fit:contain;" onerror="this.parentElement.style.display='none';">
+        </figure>
         <div data-editable="ch3-s04-body">
           <p class="section-body" style="margin-bottom:20px;">Keka is myHQ's HRMS — the single platform for everything people-related. You will use it from day one, every day.</p>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:4px;">
