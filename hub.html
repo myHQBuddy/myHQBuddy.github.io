@@ -856,27 +856,27 @@ auth.onAuthStateChanged(function(user) {
     }
 
     // ── Chapter 4/5/6 — What We Do (AM / VO / OD) ──
-    var wwdLinks = {
-      wwdam: 'what_we_do/What_We_Do_AM.html',
-      wwdvo: 'what_we_do/What_We_Do_VO.html',
-      wwdod: 'what_we_do/What_We_Do_OnDemand.html'
-    };
-    var wwdToUnlock = ['wwdam', 'wwdvo', 'wwdod'].filter(function(id) {
-      return unlocked.indexOf(id) === -1;
-    });
+    // Note: domId (card-/status- element ids) differs from the Firestore
+    // chapter key (key) — the chapter files & admin portal use wwd_am etc.
+    var wwdChapters = [
+      { domId: 'wwdam', key: 'wwd_am', href: 'what_we_do/What_We_Do_AM.html' },
+      { domId: 'wwdvo', key: 'wwd_vo', href: 'what_we_do/What_We_Do_VO.html' },
+      { domId: 'wwdod', key: 'wwd_od', href: 'what_we_do/What_We_Do_OnDemand.html' }
+    ];
+    var wwdKeys = wwdChapters.map(function(c) { return c.key; });
+    var wwdToUnlock = wwdKeys.filter(function(key) { return unlocked.indexOf(key) === -1; });
     if (ch3Completed && wwdToUnlock.length) {
       db.collection('users').doc(user.uid).set({
-        unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion('wwdam', 'wwdvo', 'wwdod') }
+        unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion.apply(null, wwdKeys) }
       }, { merge: true });
     }
-    ['wwdam', 'wwdvo', 'wwdod'].forEach(function(id) {
-      var card       = document.getElementById('card-' + id);
-      var status     = document.getElementById('status-' + id);
-      var footer     = document.getElementById('footer-' + id);
-      var unlockSecW = document.getElementById('unlock-section-' + id);
-      var wUnlocked  = ch3Completed || unlocked.indexOf(id) !== -1;
-      var wCompleted = progress[id] && progress[id].completed;
-      var href       = wwdLinks[id];
+    wwdChapters.forEach(function(c) {
+      var card       = document.getElementById('card-' + c.domId);
+      var status     = document.getElementById('status-' + c.domId);
+      var footer     = document.getElementById('footer-' + c.domId);
+      var unlockSecW = document.getElementById('unlock-section-' + c.domId);
+      var wUnlocked  = ch3Completed || unlocked.indexOf(c.key) !== -1;
+      var wCompleted = progress[c.key] && progress[c.key].completed;
 
       if (wUnlocked) {
         card.classList.remove('locked'); card.classList.add('unlocked');
@@ -884,10 +884,10 @@ auth.onAuthStateChanged(function(user) {
         if (wCompleted) {
           card.classList.add('completed');
           status.textContent = 'Completed'; status.className = 'badge badge-mint';
-          footer.innerHTML = '<a class="card-cta cta-done" href="' + href + '"><span>Review</span><span class="arrow">→</span></a>';
+          footer.innerHTML = '<a class="card-cta cta-done" href="' + c.href + '"><span>Review</span><span class="arrow">→</span></a>';
         } else {
           status.textContent = 'Unlocked'; status.className = 'badge badge-blue';
-          footer.innerHTML = '<a class="card-cta cta-primary" href="' + href + '"><span>Start</span><span class="arrow">→</span></a>';
+          footer.innerHTML = '<a class="card-cta cta-primary" href="' + c.href + '"><span>Start</span><span class="arrow">→</span></a>';
         }
       } else {
         if (unlockSecW) unlockSecW.style.display = '';
