@@ -273,17 +273,24 @@ body {
 .course-list-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--blue-soft); margin-bottom: 4px; }
 .course-list-item {
   display: flex; align-items: center; gap: 14px;
-  padding: 14px 18px; border: 1px solid var(--blue-pale);
+  padding: 16px 20px; border: 1px solid #E6E8FF; border-radius: 10px;
   text-decoration: none; cursor: pointer;
-  transition: background 0.15s;
+  transition: border-color 0.18s var(--ease), box-shadow 0.18s var(--ease);
 }
-a.course-list-item { background: #f0f2ff; }
-a.course-list-item:hover { background: #e4e7ff; }
-.course-list-item.locked { opacity: 0.45; cursor: not-allowed; background: transparent; }
+a.course-list-item { background: var(--blue-wash); }
+a.course-list-item:hover { border-color: var(--border-mid); box-shadow: 0 4px 12px rgba(26,30,158,0.07); }
+.course-list-item.locked {
+  background: var(--white);
+  opacity: 0.55;
+  cursor: default;
+}
 .course-list-num { font-size: 10px; font-weight: 700; color: var(--blue-soft); letter-spacing: 0.1em; width: 20px; }
 .course-list-name { flex: 1; font-size: 13px; font-weight: 700; color: var(--blue); }
 .course-list-arrow { font-size: 14px; color: var(--blue); }
-.course-list-lock { font-size: 12px; }
+.course-list-status {
+  font-size: 11px; font-weight: 600; color: var(--blue-soft);
+  letter-spacing: -0.005em;
+}
 .admin-portal-link {
   display: flex; align-items: center; justify-content: space-between;
   border: 1px solid #E6E8FF;
@@ -391,12 +398,12 @@ a.course-list-item:hover { background: #e4e7ff; }
         <div class="course-list-item locked">
           <span class="course-list-num">02</span>
           <span class="course-list-name">Intermediate</span>
-          <span class="course-list-lock">🔒</span>
+          <span class="course-list-status">Unlocks Next</span>
         </div>
         <div class="course-list-item locked">
           <span class="course-list-num">03</span>
           <span class="course-list-name">Advanced</span>
-          <span class="course-list-lock">🔒</span>
+          <span class="course-list-status">Unlocks Later</span>
         </div>
       </div>
       <button class="signout-btn" onclick="doSignOut()">Sign out</button>
