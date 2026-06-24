@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 5: What We Do — Virtual Office | myHQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" as="style">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" as="style">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="../firebase-config.js"></script>
+<style>
+:root {
+  --blue:       #1E22AA;
+  --blue-dark:  #161a8b;
+  --green:      #BEE5C2;
+  --coral:      #FF7351;
+  --amber:      #FFB848;
+  --ink:        #0B0F2C;
+  --body:       #4A4D63;
+  --muted:      #94909C;
+  --white:      #FFFFFF;
+  --hairline:   rgba(11,15,44,0.10);
+  --sans:       'Manrope', system-ui, sans-serif;
+  --radius:     8px;
+  --ease:       cubic-bezier(0.22,1,0.36,1);
+  --transition: 0.25s var(--ease);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--sans); background: var(--white); color: var(--ink); overflow: auto; font-size: 16px; line-height: 1.6; }
+
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: 52px; z-index: 100;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--hairline);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-logo { font-size: 15px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.topbar-chapter { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.topbar-center { font-size: 18px; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; position: absolute; left: 50%; transform: translateX(-50%); }
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+.screen-counter { font-size: 11px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.read-btn {
+  font-size: 11px; font-weight: 700; color: var(--white); background: var(--blue);
+  padding: 6px 14px; border-radius: var(--radius); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: var(--transition); cursor: pointer; border: none; font-family: var(--sans);
+}
+.read-btn:hover { background: var(--blue-dark); }
+.hub-btn {
+  font-size: 14px; color: var(--blue); background: transparent;
+  width: 32px; height: 32px; border-radius: var(--radius);
+  border: 1px solid rgba(30,34,170,0.3);
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: var(--transition); text-decoration: none;
+}
+.hub-btn:hover { background: rgba(30,34,170,0.06); border-color: var(--blue); }
+
+/* ⚠⚠⚠ SLIDE ENGINE CSS — DO NOT EDIT ⚠⚠⚠ */
+.dot-nav { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 100; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hairline); border: 1.5px solid rgba(11,15,44,0.2); cursor: pointer; transition: var(--transition); }
+.dot.active { background: var(--blue); border-color: var(--blue); transform: scale(1.3); }
+.key-hint { position: absolute; bottom: 18px; right: 48px; font-size: 11px; font-weight: 500; color: var(--muted); display: flex; align-items: center; gap: 6px; transition: opacity 0.5s; z-index: 100; }
+.key-hint.hidden { opacity: 0; pointer-events: none; }
+.slides { position: absolute; transform-origin: top left; }
+.screen { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); transform: translateY(20px); overflow: hidden; }
+.screen.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+.screen.exit-up { opacity: 0; transform: translateY(-20px); }
+/* end DO NOT EDIT */
+
+.screen-next-btn {
+  position: absolute; bottom: 40px; right: 56px;
+  background: transparent; color: var(--muted); border: 1px solid var(--hairline);
+  font-size: 11px; font-weight: 700; font-family: var(--sans);
+  padding: 7px 14px; border-radius: var(--radius); cursor: pointer;
+  display: flex; align-items: center; gap: 6px; transition: var(--transition);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.screen-next-btn:hover { color: var(--blue); border-color: rgba(30,34,170,0.3); }
+
+.slide-pad { height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 52px 76px; gap: 30px; }
+.slide-center { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 80px; }
+.eyebrow { font-size: 19px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); }
+.slide-headline { font-size: 57px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1.12; }
+.slide-headline span { color: var(--blue); }
+.slide-sub { font-size: 20px; color: var(--body); line-height: 1.6; max-width: 900px; }
+
+.cover-inner { display: grid; grid-template-columns: 1fr 1fr; height: 100%; align-items: center; padding: 0 80px; gap: 64px; }
+.cover-eyebrow { font-size: 17.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 27px; display: flex; align-items: center; gap: 13px; }
+.cover-eyebrow::before { content: ''; width: 12px; height: 12px; background: var(--blue); border-radius: 50%; display: block; }
+.cover-headline { font-size: 81px; font-weight: 800; line-height: 1.08; letter-spacing: -0.04em; color: var(--ink); margin-bottom: 32px; }
+.cover-headline em { font-style: normal; color: var(--blue); }
+.cover-sub { font-size: 24px; color: var(--body); line-height: 1.7; margin-bottom: 43px; }
+.cover-media { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: var(--radius); overflow: hidden; box-shadow: 0 16px 48px rgba(11,15,44,0.18); background: var(--ink); }
+.cover-media img { width: 100%; height: 100%; object-fit: cover; }
+
+.img-placeholder {
+  border: 2px dashed var(--hairline); border-radius: var(--radius);
+  background: #FAFBFF; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 8px;
+  color: var(--muted); text-align: center; padding: 20px;
+}
+.img-placeholder i { font-size: 28px; color: #B8BBF0; }
+.img-placeholder span { font-size: 12px; font-weight: 600; max-width: 220px; line-height: 1.4; }
+
+.bigstat-num { font-size: 176px; font-weight: 800; color: var(--ink); letter-spacing: -0.04em; line-height: 1; }
+.bigstat-num span { color: var(--blue); }
+.bigstat-caption { font-size: 32px; font-weight: 700; color: var(--body); max-width: 60ch; }
+.bigstat-facts { display: grid; grid-template-columns: repeat(4, auto); gap: 0; border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; max-width: 1180px; margin-top: 27px; }
+.bigstat-fact { padding: 27px 38px; border-right: 1px solid var(--hairline); text-align: left; }
+.bigstat-fact:last-child { border-right: none; }
+.bigstat-fact-num { font-size: 35px; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; margin-bottom: 5px; }
+.bigstat-fact-lbl { font-size: 17.5px; color: var(--muted); line-height: 1.4; }
+
+/* Uniform stat grid */
+.statgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; max-width: 1180px; width: 100%; }
+.statbox { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 26px 22px; background: #FAFBFF; text-align: left; }
+.statbox-num { font-size: 32px; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; margin-bottom: 7px; }
+.statbox-lbl { font-size: 14.5px; color: var(--body); line-height: 1.4; }
+
+/* Timeline */
+.timeline { display: flex; align-items: stretch; gap: 0; width: 100%; max-width: 1280px; align-self: center; }
+.tl-node { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
+.tl-node:not(:last-child)::after { content: ''; position: absolute; top: 30px; left: calc(50% + 35px); right: calc(-50% + 35px); height: 1px; background: var(--hairline); }
+.tl-dot { width: 59px; height: 59px; border-radius: 50%; border: 2px solid var(--blue); background: rgba(30,34,170,0.06); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 17.5px; font-weight: 800; color: var(--blue); z-index: 1; }
+.tl-year { font-size: 19px; font-weight: 800; color: var(--blue); margin-bottom: 5px; }
+.tl-title { font-size: 20px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+.tl-sub { font-size: 16px; color: var(--body); line-height: 1.5; padding: 0 16px; }
+
+.cardgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-content: center; }
+.card { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 30px; background: var(--white); display: flex; flex-direction: column; gap: 11px; }
+.card-icon { width: 68px; height: 68px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 30px; background: rgba(30,34,170,0.08); color: var(--blue); }
+.card h3 { font-size: 23px; font-weight: 800; color: var(--ink); }
+.card p { font-size: 18px; color: var(--body); line-height: 1.6; }
+
+.twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-content: center; align-items: stretch; }
+.twocol-panel { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 38px 43px; background: #FAFBFF; display: flex; flex-direction: column; gap: 16px; }
+.twocol-panel h3 { font-size: 30px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.twocol-panel p { font-size: 20px; color: var(--body); line-height: 1.65; }
+.twocol-panel ul { padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.twocol-panel li { font-size: 20px; color: var(--body); line-height: 1.5; padding-left: 24px; position: relative; }
+.twocol-panel li::before { content: ''; position: absolute; left: 0; top: 11px; width: 7px; height: 7px; border-radius: 50%; background: var(--blue); }
+
+/* Bar chart (VO growth) */
+.barchart { display: flex; align-items: flex-end; gap: 54px; height: 280px; padding: 0 40px; }
+.barchart-group { display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: flex-end; }
+.barchart-bars { display: flex; align-items: flex-end; gap: 11px; height: 100%; }
+.barchart-bar { width: 54px; border-radius: 5px 5px 0 0; position: relative; display: flex; justify-content: center; }
+.barchart-bar .bv { position: absolute; top: -30px; font-size: 17.5px; font-weight: 800; color: var(--ink); white-space: nowrap; }
+.barchart-bar.revenue { background: var(--green); }
+.barchart-bar.gmv { background: var(--blue); }
+.barchart-label { margin-top: 13px; font-size: 17.5px; font-weight: 700; color: var(--body); }
+.barchart-legend { display: flex; gap: 32px; justify-content: center; margin-top: 5px; }
+.barchart-legend-item { display: flex; align-items: center; gap: 11px; font-size: 17.5px; color: var(--body); font-weight: 600; }
+.barchart-legend-swatch { width: 16px; height: 16px; border-radius: 4px; }
+
+/* Logo strip */
+.logo-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 19px; }
+.logo-pill { display: flex; align-items: center; justify-content: center; height: 76px; }
+.logo-pill img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+#read-mode.hidden { display: none; }
+.r-layout { display: flex; max-width: 100%; margin: 0; padding: 0 48px 80px 0; align-items: flex-start; }
+.r-sidebar { width: 240px; flex-shrink: 0; position: sticky; top: 52px; padding: 32px 24px 0 24px; max-height: calc(100vh - 52px); overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.r-toc-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); margin-bottom: 12px; }
+.toc-link { font-size: 13px; color: var(--body); text-decoration: none; padding: 8px 12px; border-radius: var(--radius); border-left: 2px solid transparent; transition: var(--transition); }
+.toc-link:hover { background: #FAFBFF; color: var(--blue); }
+.toc-link.active { color: var(--blue); font-weight: 700; border-left-color: var(--blue); background: rgba(30,34,170,0.05); }
+.r-content { flex: 1; min-width: 0; padding: 40px 0 0 48px; }
+.section { margin-bottom: 56px; }
+.section-num { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 6px; }
+.section-title { font-size: 29px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1.15; margin-bottom: 16px; }
+.section-outcome { font-size: 13px; color: var(--body); background: #FAFBFF; border: 1px solid var(--hairline); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 16px; }
+.section-outcome span:first-child { font-weight: 700; color: var(--blue); }
+.section-body { font-size: 16px; color: var(--body); line-height: 1.8; margin-bottom: 14px; }
+.takeaway { font-size: 16px; font-weight: 600; color: var(--ink); background: rgba(190,229,194,0.25); border-left: 3px solid var(--green); padding: 16px 20px; border-radius: var(--radius); margin-top: 20px; }
+.section-list { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; padding: 0; }
+.section-list li { font-size: 15px; color: var(--body); line-height: 1.65; padding-left: 18px; position: relative; }
+.section-list li::before { content: ''; position: absolute; left: 0; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: var(--blue); }
+.minicard-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 4px; }
+.minicard { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 18px 16px; background: #FAFBFF; }
+.minicard i { font-size: 22px; margin-bottom: 8px; color: var(--blue); display: block; }
+.minicard .mc-t { font-size: 13px; font-weight: 800; color: var(--ink); margin-bottom: 4px; }
+.minicard .mc-b { font-size: 12px; color: var(--body); line-height: 1.5; }
+.r-barchart { display: flex; align-items: flex-end; gap: 48px; height: 220px; padding: 0 20px 0 0; }
+.r-barchart-group { display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
+.r-barchart-bars { display: flex; align-items: flex-end; gap: 8px; height: 100%; }
+.r-barchart-bar { width: 36px; border-radius: 4px 4px 0 0; position: relative; display: flex; justify-content: center; }
+.r-barchart-bar .bv { position: absolute; top: -20px; font-size: 12px; font-weight: 800; color: var(--ink); white-space: nowrap; }
+.r-barchart-bar.revenue { background: var(--green); }
+.r-barchart-bar.gmv { background: var(--blue); }
+.r-barchart-label { margin-top: 8px; font-size: 12px; font-weight: 700; color: var(--body); }
+
+/* Assessment */
+.aq-tracker { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.aq-tracker-bar { flex: 1; height: 4px; background: var(--hairline); border-radius: 99px; overflow: hidden; }
+.aq-tracker-fill { height: 100%; width: 0; background: var(--blue); transition: width 0.3s var(--ease); }
+.aq-tracker-label { font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.aq-question { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 16px; transition: var(--transition); }
+.aq-question.is-filled { border-color: var(--green); background: rgba(190,229,194,0.08); }
+.aq-q-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.aq-q-num { font-size: 12px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.08em; }
+.aq-q-status { font-size: 12px; font-weight: 600; color: var(--muted); }
+.aq-q-status.done { color: #2e7d32; }
+.aq-q-text { font-size: 16px; font-weight: 600; color: var(--ink); line-height: 1.5; margin-bottom: 12px; }
+.aq-textarea { width: 100%; font-family: var(--sans); font-size: 15px; color: var(--ink); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 12px 14px; resize: vertical; line-height: 1.6; }
+.aq-textarea:focus { outline: none; border-color: var(--blue); }
+.aq-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 24px; gap: 16px; }
+.aq-footer-note { font-size: 13px; color: var(--muted); }
+.aq-submit-btn { font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--white); background: var(--blue); border: none; border-radius: var(--radius); padding: 12px 28px; cursor: pointer; transition: var(--transition); }
+.aq-submit-btn:disabled { background: var(--hairline); color: var(--muted); cursor: not-allowed; }
+.aq-submit-btn:not(:disabled):hover { background: var(--blue-dark); }
+.aq-error { font-size: 13px; color: var(--coral); margin-top: 12px; }
+</style>
+</head>
+<body>
+
+<header class="topbar" id="topbar">
+  <div class="topbar-left">
+    <span class="topbar-logo">myHQ</span>
+    <span class="topbar-chapter" id="chapterLabel">Chapter 5</span>
+  </div>
+  <div class="topbar-center" data-editable="ch5-title">What We Do — Virtual Office</div>
+  <div class="topbar-right">
+    <a class="hub-btn" href="../hub.html" title="Back to Hub"><i class="fa-solid fa-house"></i></a>
+    <span class="screen-counter" id="screenCounter">1 / 1</span>
+    <button class="read-btn" id="btnRead" onclick="setMode('read')">
+      <i class="fa-solid fa-book-open"></i>&nbsp;Read Full Chapter
+    </button>
+  </div>
+</header>
+
+<div id="slide-mode">
+  <div class="slides" id="slides">
+
+  <!-- SCREEN 0 · COVER -->
+  <div class="screen">
+    <div class="cover-inner">
+      <div>
+        <div class="cover-eyebrow" data-editable="ch5-cover-eyebrow">Virtual Office</div>
+        <h1 class="cover-headline" data-editable="ch5-cover-headline">A professional address.<br><em>No office needed.</em></h1>
+        <p class="cover-sub" data-editable="ch5-cover-sub">Mailing address, GST registration, company registration — Virtual Office helps businesses launch and scale at a fraction of the cost, with government-compliant documents and mail handling.</p>
+      </div>
+      <div>
+        <div class="cover-media">
+          <img src="chapter_images/ch5-cover.jpg" alt="Virtual Office">
+        </div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 1 · TWO COLUMN — What & Why -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ch5-sl1-eyebrow">The Product</div>
+      <h2 class="slide-headline" data-editable="ch5-sl1-headline">A real address. <span>Zero rent.</span></h2>
+      <p class="slide-sub" data-editable="ch5-sl1-sub">Virtual office gives individuals and companies access to a professional business address without actually renting physical office space.</p>
+      <div class="twocol">
+        <div class="twocol-panel">
+          <h3 data-editable="ch5-sl1-c1t">What You Get</h3>
+          <ul>
+            <li data-editable="ch5-sl1-c1l1">Professional business address</li>
+            <li data-editable="ch5-sl1-c1l2">Government-compliant documents</li>
+            <li data-editable="ch5-sl1-c1l3">Support for GST Registration</li>
+            <li data-editable="ch5-sl1-c1l4">Support for Company Registration</li>
+            <li data-editable="ch5-sl1-c1l5">Mail &amp; package handling services</li>
+          </ul>
+        </div>
+        <div class="twocol-panel">
+          <h3 data-editable="ch5-sl1-c2t">Why Choose myHQ</h3>
+          <ul>
+            <li data-editable="ch5-sl1-c2l1">Hassle free — 100% digital process</li>
+            <li data-editable="ch5-sl1-c2l2">Super fast documentation</li>
+            <li data-editable="ch5-sl1-c2l3">Verified partners and full transparency</li>
+            <li data-editable="ch5-sl1-c2l4">300+ premium addresses across 25+ cities; we cover 20 states</li>
+            <li data-editable="ch5-sl1-c2l5">Money back guarantee</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 2 · TIMELINE — Pre-purchase Journey (4 steps) -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ch5-sl2-eyebrow">VO Product</div>
+      <h2 class="slide-headline" data-editable="ch5-sl2-headline">Pre-purchase journey. <span>4 steps.</span></h2>
+      <div class="timeline">
+        <div class="tl-node">
+          <div class="tl-dot">01</div>
+          <div class="tl-year" data-editable="ch5-sl2-t1y">Discovery</div>
+          <div class="tl-title" data-editable="ch5-sl2-t1t">Find VO Across the Country</div>
+          <div class="tl-sub" data-editable="ch5-sl2-t1s">Filter by criteria: state, location, price, plan.</div>
+        </div>
+        <div class="tl-node">
+          <div class="tl-dot">02</div>
+          <div class="tl-year" data-editable="ch5-sl2-t2y">Compare</div>
+          <div class="tl-title" data-editable="ch5-sl2-t2t">Choose a Workspace</div>
+          <div class="tl-sub" data-editable="ch5-sl2-t2s">Compare and choose a space based on your preferences.</div>
+        </div>
+        <div class="tl-node">
+          <div class="tl-dot">03</div>
+          <div class="tl-year" data-editable="ch5-sl2-t3y">Select Plan</div>
+          <div class="tl-title" data-editable="ch5-sl2-t3t">Select a Plan and Tenure</div>
+          <div class="tl-sub" data-editable="ch5-sl2-t3s">Plans and tenures according to user needs.</div>
+        </div>
+        <div class="tl-node">
+          <div class="tl-dot">04</div>
+          <div class="tl-year" data-editable="ch5-sl2-t4y">Checkout</div>
+          <div class="tl-title" data-editable="ch5-sl2-t4t">Checkout</div>
+          <div class="tl-sub" data-editable="ch5-sl2-t4s">Complete payment and start post-purchase KYC.</div>
+        </div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 3 · TIMELINE — Post-purchase Journey (4 steps) -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ch5-sl3-eyebrow">VO Product</div>
+      <h2 class="slide-headline" data-editable="ch5-sl3-headline">Post-purchase journey. <span>4 steps.</span></h2>
+      <div class="timeline">
+        <div class="tl-node">
+          <div class="tl-dot">01</div>
+          <div class="tl-year" data-editable="ch5-sl3-t1y">Track</div>
+          <div class="tl-title" data-editable="ch5-sl3-t1t">Client Dashboard</div>
+          <div class="tl-sub" data-editable="ch5-sl3-t1s">Keep track of the subscription — complete digital KYC and signature.</div>
+        </div>
+        <div class="tl-node">
+          <div class="tl-dot">02</div>
+          <div class="tl-year" data-editable="ch5-sl3-t2y">Generate</div>
+          <div class="tl-title" data-editable="ch5-sl3-t2t">Supply Dashboard</div>
+          <div class="tl-sub" data-editable="ch5-sl3-t2s">Auto-generation of documents to reduce ops bandwidth, with real-time updates.</div>
+        </div>
+        <div class="tl-node">
+          <div class="tl-dot">03</div>
+          <div class="tl-year" data-editable="ch5-sl3-t3y">Fulfil</div>
+          <div class="tl-title" data-editable="ch5-sl3-t3t">Subscription Fulfillment</div>
+          <div class="tl-sub" data-editable="ch5-sl3-t3s">All documents shared in minimum TAT on the dashboard.</div>
+        </div>
+        <div class="tl-node">
+          <div class="tl-dot">04</div>
+          <div class="tl-year" data-editable="ch5-sl3-t4y">Renew</div>
+          <div class="tl-title" data-editable="ch5-sl3-t4t">Renewal Management</div>
+          <div class="tl-sub" data-editable="ch5-sl3-t4s">Renewal of client subscriptions before they lapse.</div>
+        </div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 4 · CARD GRID — Who uses VO -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ch5-sl4-eyebrow">All Types of Businesses Need VO</div>
+      <h2 class="slide-headline" data-editable="ch5-sl4-headline">Every kind of business. <span>Every city.</span></h2>
+      <div class="cardgrid">
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-rocket"></i></div>
+          <h3 data-editable="ch5-sl4-c1t">Startups</h3>
+          <p data-editable="ch5-sl4-c1b">Launch in a new city with a credible address before committing to physical office space.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-building-columns"></i></div>
+          <h3 data-editable="ch5-sl4-c2t">Corporates</h3>
+          <p data-editable="ch5-sl4-c2b">Establish a regional entity or satellite presence in a new city as they expand — without hiring a local team.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-store"></i></div>
+          <h3 data-editable="ch5-sl4-c3t">E-Commerce &amp; Freelancers</h3>
+          <p data-editable="ch5-sl4-c3b">Platforms require a GST number per operating state. Freelancers keep personal &amp; professional addresses separate.</p>
+        </div>
+      </div>
+      <div class="logo-strip" style="margin-top:8px;">
+        <div class="logo-pill"><img src="chapter_images/vo_logos/flix.jpeg" alt="FLiX"></div>
+        <div class="logo-pill"><img src="chapter_images/vo_logos/hitachi.png" alt="Hitachi"></div>
+        <div class="logo-pill"><img src="chapter_images/vo_logos/yourstory.png" alt="YourStory"></div>
+        <div class="logo-pill"><img src="chapter_images/vo_logos/dolby.jpeg" alt="Dolby"></div>
+        <div class="logo-pill"><img src="chapter_images/vo_logos/mahindra.png" alt="Mahindra"></div>
+        <div class="logo-pill"><img src="chapter_images/vo_logos/dream11.png" alt="Dream11"></div>
+        <div class="logo-pill"><img src="chapter_images/vo_logos/swiggy.png" alt="Swiggy"></div>
+        <div class="logo-pill"><img src="chapter_images/vo_logos/cbre.png" alt="CBRE"></div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 5 · BAR CHART — Growth -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ch5-sl5-eyebrow">Current Scale</div>
+      <h2 class="slide-headline" data-editable="ch5-sl5-headline">Growth (VO). <span>In crores.</span></h2>
+      <div class="barchart">
+        <div class="barchart-group">
+          <div class="barchart-bars">
+            <div class="barchart-bar revenue" style="height:15px;"><span class="bv">3.1</span></div>
+            <div class="barchart-bar gmv" style="height:46px;"><span class="bv">10</span></div>
+          </div>
+          <div class="barchart-label">2023-24</div>
+        </div>
+        <div class="barchart-group">
+          <div class="barchart-bars">
+            <div class="barchart-bar revenue" style="height:35px;"><span class="bv">7.5</span></div>
+            <div class="barchart-bar gmv" style="height:115px;"><span class="bv">25</span></div>
+          </div>
+          <div class="barchart-label">2024-25</div>
+        </div>
+        <div class="barchart-group">
+          <div class="barchart-bars">
+            <div class="barchart-bar revenue" style="height:64px;"><span class="bv">14</span></div>
+            <div class="barchart-bar gmv" style="height:230px;"><span class="bv">50</span></div>
+          </div>
+          <div class="barchart-label">2025-26</div>
+        </div>
+      </div>
+      <div class="barchart-legend">
+        <div class="barchart-legend-item"><span class="barchart-legend-swatch" style="background:var(--green);"></span>Revenue</div>
+        <div class="barchart-legend-item"><span class="barchart-legend-swatch" style="background:var(--blue);"></span>GMV</div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 6 · WEWORK -->
+  <div class="screen">
+    <div class="slide-center" style="background:var(--blue); color:var(--white);">
+      <div class="eyebrow" style="color:rgba(255,255,255,0.7);" data-editable="ch5-sl6-eyebrow">Exclusive Partnership</div>
+      <img src="chapter_images/myhq_wework.png" alt="myHQ + WeWork" style="max-width:480px; width:100%; margin:18px 0;">
+      <h2 class="slide-headline" style="color:var(--white); margin:14px 0 28px;" data-editable="ch5-sl6-headline">We have exclusive rights of <span style="color:#BEE5C2;">WeWork India.</span></h2>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1000px;">
+        <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:18px;font-size:14px;line-height:1.6;" data-editable="ch5-sl6-c1">Exclusive partner for all virtual office &amp; on-demand business</div>
+        <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:18px;font-size:14px;line-height:1.6;" data-editable="ch5-sl6-c2">Managing the entire tech backend for WeWork India to fulfil this business</div>
+        <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:18px;font-size:14px;line-height:1.6;" data-editable="ch5-sl6-c3">All bookings, even the ones on WW India website / app, are managed by us</div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 7 · BIG STAT — Scale -->
+  <div class="screen">
+    <div class="slide-center">
+      <div class="eyebrow" data-editable="ch5-sl7-eyebrow">Current Scale</div>
+      <div class="bigstat-num" data-editable="ch5-sl7-num" style="margin:16px 0;">30<span>K+</span></div>
+      <div class="bigstat-caption" data-editable="ch5-sl7-caption" style="margin-bottom:32px;">companies serviced — virtual offices sold every month</div>
+      <div class="statgrid">
+        <div class="statbox">
+          <div class="statbox-num" data-editable="ch5-sl7-f1n">2.5K</div>
+          <div class="statbox-lbl" data-editable="ch5-sl7-f1l">VOs sold every month</div>
+        </div>
+        <div class="statbox">
+          <div class="statbox-num" data-editable="ch5-sl7-f2n">₹4.2Cr</div>
+          <div class="statbox-lbl" data-editable="ch5-sl7-f2l">Worth of VOs sold / month</div>
+        </div>
+        <div class="statbox">
+          <div class="statbox-num" data-editable="ch5-sl7-f3n">25+ cities</div>
+          <div class="statbox-lbl" data-editable="ch5-sl7-f3l">300+ addresses, 20 states</div>
+        </div>
+        <div class="statbox">
+          <div class="statbox-num" data-editable="ch5-sl7-f4n">100%</div>
+          <div class="statbox-lbl" data-editable="ch5-sl7-f4l">Digital KYC &amp; e-sign</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /.slides -->
+  <div class="dot-nav" id="dotNav"></div>
+  <div class="key-hint" id="keyHint"><i class="fa-solid fa-arrows-left-right"></i> Use arrow keys</div>
+</div>
+
+
+<div id="read-mode" class="hidden" style="margin-top:52px;">
+  <div class="r-layout">
+
+    <aside class="r-sidebar">
+      <div class="r-toc-label">Chapter 5</div>
+      <a href="#r-intro"  class="toc-link" data-s="r-intro">Introduction</a>
+      <a href="#r-s01"    class="toc-link" data-s="r-s01">01 · What is Virtual Office</a>
+      <a href="#r-s02"    class="toc-link" data-s="r-s02">02 · Pre-Purchase Journey</a>
+      <a href="#r-s03"    class="toc-link" data-s="r-s03">03 · Post-Purchase Journey</a>
+      <a href="#r-s04"    class="toc-link" data-s="r-s04">04 · Who Needs It</a>
+      <a href="#r-s05"    class="toc-link" data-s="r-s05">05 · Scale &amp; Growth</a>
+    </aside>
+
+    <main class="r-content">
+
+      <section class="section" id="r-intro">
+        <div data-editable="ch5-intro-body" style="padding:28px 32px;border:1px solid var(--hairline);border-radius:var(--radius);background:#FAFBFF;">
+          <p class="section-body" style="margin-bottom:0;">Virtual Office (VO) is myHQ's address-as-a-service product — covering mailing address, GST registration, and company registration. It gives individuals and companies access to a professional business address without actually renting a physical office, helping businesses launch and scale at a fraction of the cost. The entire process — discovery, plan selection, KYC, renewals — is digital, and it is myHQ's highest-volume product.</p>
+        </div>
+      </section>
+
+      <section class="section" id="r-s01">
+        <div class="section-outcome"><span>Learning Outcome:</span> <span data-editable="ch5-s01-outcome">Understand what Virtual Office is, what it includes, and why myHQ over a competitor.</span></div>
+        <div class="section-num">01</div>
+        <h2 class="section-title" data-editable="ch5-s01-title">What is a Virtual Office?</h2>
+        <div data-editable="ch5-s01-body">
+          <p class="section-body">Virtual office is a service offering that gives individuals and companies access to a professional business address without actually renting a physical office space. We help businesses launch and scale at a fraction of the cost. Clients get government-compliant documents along with mail &amp; package handling services.</p>
+          <p class="section-body">In India, you can't get a GST number, register a company, or even open certain bank accounts without a registered business address in the relevant state. That address requirement used to force businesses to either lease real space they didn't need yet, or use a friend's or relative's address informally (which creates compliance risk down the line). VO solves this directly — it's the address requirement, sold as a service, without the office attached to it.</p>
+          <p class="section-body">A Virtual Office from myHQ can include:</p>
+          <ul class="section-list">
+            <li><strong>Professional business address</strong> — at a branded workspace location, so the business has a credible address on its invoices, website, and registrations rather than a residential one.</li>
+            <li><strong>Support for GST Registration</strong> — register for GST in any state using the address. This is the single most common reason a client buys a VO.</li>
+            <li><strong>Support for Company Registration</strong> — use the address as your registered office for MCA/ROC filings.</li>
+            <li><strong>Mail &amp; package handling</strong> — receive and forward business correspondence, so the client doesn't need anyone physically present at the address.</li>
+          </ul>
+          <p class="section-body"><strong>Why choose myHQ?</strong> Hassle-free, 100% digital process — no branch visits at any stage. Super fast documentation, so a client isn't stuck waiting weeks for a registration that's blocking their business launch. Verified partners and full transparency, which matters because a VO address that fails verification can get a client's GST registration rejected. 300+ premium addresses across 25+ cities, covering 20 states. And a money-back guarantee, which removes the risk for a client buying a service they've likely never bought before.</p>
+        </div>
+        <div class="takeaway" data-editable="ch5-s01-takeaway">VO = real address, real registration, no physical space — 100% digital, with a money-back guarantee. Perfect for businesses that need credibility before they need a desk.</div>
+      </section>
+
+      <section class="section" id="r-s02">
+        <div class="section-outcome"><span>Learning Outcome:</span> <span data-editable="ch5-s02-outcome">Walk through the 4-step pre-purchase journey a client follows to buy a Virtual Office on myHQ.</span></div>
+        <div class="section-num">02</div>
+        <h2 class="section-title" data-editable="ch5-s02-title">Pre-Purchase Journey</h2>
+        <div data-editable="ch5-s02-body">
+          <p class="section-body">Buying a Virtual Office on myHQ is a fully digital, four-step process:</p>
+          <div class="minicard-grid">
+            <div class="minicard">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <div class="mc-t">1. Discovery</div>
+              <div class="mc-b">Find VO across the country based on criteria: state, location, price, plan.</div>
+            </div>
+            <div class="minicard">
+              <i class="fa-solid fa-building"></i>
+              <div class="mc-t">2. Choose a Workspace</div>
+              <div class="mc-b">Compare and choose a space you like based on your preferences.</div>
+            </div>
+            <div class="minicard">
+              <i class="fa-solid fa-list-check"></i>
+              <div class="mc-t">3. Select a Plan &amp; Tenure</div>
+              <div class="mc-b">Plans and tenures according to user needs — GST, registration, address-only.</div>
+            </div>
+            <div class="minicard">
+              <i class="fa-solid fa-credit-card"></i>
+              <div class="mc-t">4. Checkout</div>
+              <div class="mc-b">Complete payment and start post-purchase KYC.</div>
+            </div>
+          </div>
+          <p class="section-body">The state and city selected in Discovery isn't a preference — it's usually fixed by where the client needs to register for GST or incorporate, so this step is really about finding the right address within a constraint, not browsing for the nicest option. The plan selected in step 3 also determines which documents the client will need to provide at KYC, which is why getting the plan right upfront avoids back-and-forth later — a GST-only plan needs different paperwork than a full company registration plan.</p>
+        </div>
+        <div class="takeaway" data-editable="ch5-s02-takeaway">Discovery → Choose → Select Plan → Checkout. Fully digital, no branch visits — the client can complete this end to end on the app or website.</div>
+      </section>
+
+      <section class="section" id="r-s03">
+        <div class="section-outcome"><span>Learning Outcome:</span> <span data-editable="ch5-s03-outcome">Know what happens after a client buys — the dashboards and processes that keep the subscription running.</span></div>
+        <div class="section-num">03</div>
+        <h2 class="section-title" data-editable="ch5-s03-title">Post-Purchase Journey</h2>
+        <div data-editable="ch5-s03-body">
+          <p class="section-body">Once a client purchases, the relationship is managed through four ongoing processes:</p>
+          <div class="minicard-grid">
+            <div class="minicard">
+              <i class="fa-solid fa-gauge"></i>
+              <div class="mc-t">1. Client Dashboard</div>
+              <div class="mc-b">Client dashboard to keep track of the subscription — complete digital KYC and signature.</div>
+            </div>
+            <div class="minicard">
+              <i class="fa-solid fa-server"></i>
+              <div class="mc-t">2. Supply Dashboard</div>
+              <div class="mc-b">Auto-generation of documents to reduce operational bandwidth, plus real-time updates and a data overview of all subscriptions.</div>
+            </div>
+            <div class="minicard">
+              <i class="fa-solid fa-file-circle-check"></i>
+              <div class="mc-t">3. Subscription Fulfillment</div>
+              <div class="mc-b">All documents shared in minimum TAT on the dashboard.</div>
+            </div>
+            <div class="minicard">
+              <i class="fa-solid fa-rotate"></i>
+              <div class="mc-t">4. Renewal Management</div>
+              <div class="mc-b">Renewal of client subscriptions before the plan expires.</div>
+            </div>
+          </div>
+          <p class="section-body">The subscription status moves through stages visible to both the client and the supply partner: <strong>KYC Verification → Agreement Signature → Processing Documents → Active → Expired.</strong></p>
+          <p class="section-body">This matters operationally because VO isn't a one-time sale — it's a subscription that needs to stay valid for as long as the client's GST registration or company registration depends on it. If a client's VO lapses because a renewal was missed, their registered address effectively stops being valid, which can put their GST compliance at risk. That's why the Supply Dashboard auto-generates documents (utility bills, NOCs, agreements) on a recurring basis instead of relying on someone remembering to regenerate them manually, and why Renewal Management exists as its own dedicated step rather than being left to the client to notice.</p>
+        </div>
+        <div class="takeaway" data-editable="ch5-s03-takeaway">VO doesn't end at checkout — the supply dashboard auto-generates documents and the client dashboard tracks KYC, agreement, and renewal status in real time.</div>
+      </section>
+
+      <section class="section" id="r-s04">
+        <div class="section-outcome"><span>Learning Outcome:</span> <span data-editable="ch5-s04-outcome">Know the different types of businesses that need Virtual Office and why, so you can identify potential clients.</span></div>
+        <div class="section-num">04</div>
+        <h2 class="section-title" data-editable="ch5-s04-title">Who Needs Virtual Office</h2>
+        <div data-editable="ch5-s04-body">
+          <p class="section-body">All types of businesses need Virtual Office — demand cuts across industries and business sizes:</p>
+          <ul class="section-list">
+            <li><strong>Startups:</strong> Launch in a new city with a credible address before committing to physical office space. A founder can register a company and get GST sorted in days, then decide on real office space only once the business actually needs it.</li>
+            <li><strong>Corporates:</strong> Establish a regional entity or satellite presence in a new city as they expand — without hiring a local team or signing a long lease. A lot of corporates need this as they expand to different cities, especially when entering a new state purely to be GST-compliant for sales there, not because they need headcount on the ground.</li>
+            <li><strong>E-commerce sellers &amp; Freelancers:</strong> Many platforms require a GST number and registered address in the state where the seller operates. An e-commerce seller shipping from a warehouse in one state but selling pan-India may need GST registrations in several states — VO makes that scalable instead of requiring a real office in each one. Freelancers use VO to keep personal and professional addresses separate, which also looks more credible to clients on invoices.</li>
+          </ul>
+          <p class="section-body">Clients myHQ has served include FLiX, Hitachi, YourStory, Dolby, Bombay Shaving Company, NOTO, Lion Air, Unicorn (Apple Premium Reseller), Mahindra Business Solutions, Dream11, Swiggy, Spigen, TEQO by Mahindra, BookMyShow, CBRE, and Ford — spanning new-age D2C brands, large enterprises, and everything in between, which is the clearest signal that VO demand isn't tied to company size or industry, only to the need for a compliant address.</p>
+        </div>
+        <div class="takeaway" data-editable="ch5-s04-takeaway">If a business is expanding to a new city or needs a GST address, they need Virtual Office — that covers most growing businesses, from early-stage startups to large corporates like Ford and CBRE.</div>
+      </section>
+
+      <section class="section" id="r-s05">
+        <div class="section-outcome"><span>Learning Outcome:</span> <span data-editable="ch5-s05-outcome">Know the VO scale numbers and the growth trend over the last three years.</span></div>
+        <div class="section-num">05</div>
+        <h2 class="section-title" data-editable="ch5-s05-title">Scale &amp; Growth</h2>
+        <div data-editable="ch5-s05-body">
+          <p class="section-body">Virtual Office is myHQ's highest-volume product by number of companies serviced. Key numbers:</p>
+          <div class="minicard-grid" style="grid-template-columns:repeat(4,1fr);">
+            <div class="minicard">
+              <div class="mc-t" style="font-size:22px;color:var(--blue);">30,000+</div>
+              <div class="mc-b">Companies serviced.</div>
+            </div>
+            <div class="minicard">
+              <div class="mc-t" style="font-size:22px;color:var(--blue);">2,500</div>
+              <div class="mc-b">VOs sold every month.</div>
+            </div>
+            <div class="minicard">
+              <div class="mc-t" style="font-size:22px;color:var(--blue);">₹4.2 Cr</div>
+              <div class="mc-b">Worth of VOs sold per month.</div>
+            </div>
+            <div class="minicard">
+              <div class="mc-t" style="font-size:22px;color:var(--blue);">300+ addresses</div>
+              <div class="mc-b">Across 25+ cities, covering 20 states.</div>
+            </div>
+          </div>
+          <p class="section-body">Growth over the last three years, in crores:</p>
+          <div class="r-barchart">
+            <div class="r-barchart-group">
+              <div class="r-barchart-bars">
+                <div class="r-barchart-bar revenue" style="height:13px;"><span class="bv">3.1</span></div>
+                <div class="r-barchart-bar gmv" style="height:40px;"><span class="bv">10</span></div>
+              </div>
+              <div class="r-barchart-label">2023-24</div>
+            </div>
+            <div class="r-barchart-group">
+              <div class="r-barchart-bars">
+                <div class="r-barchart-bar revenue" style="height:30px;"><span class="bv">7.5</span></div>
+                <div class="r-barchart-bar gmv" style="height:100px;"><span class="bv">25</span></div>
+              </div>
+              <div class="r-barchart-label">2024-25</div>
+            </div>
+            <div class="r-barchart-group">
+              <div class="r-barchart-bars">
+                <div class="r-barchart-bar revenue" style="height:56px;"><span class="bv">14</span></div>
+                <div class="r-barchart-bar gmv" style="height:200px;"><span class="bv">50</span></div>
+              </div>
+              <div class="r-barchart-label">2025-26</div>
+            </div>
+          </div>
+          <p class="section-body" style="margin-top:8px;"><span style="display:inline-block;width:10px;height:10px;background:var(--green);border-radius:2px;margin-right:6px;"></span>Revenue &nbsp;&nbsp;<span style="display:inline-block;width:10px;height:10px;background:var(--blue);border-radius:2px;margin-right:6px;"></span>GMV</p>
+          <p class="section-body">Revenue grew from ₹3.1Cr (2023-24) to ₹14Cr (2025-26) — over 4.5x in two years — while GMV grew from ₹10Cr to ₹50Cr in the same period.</p>
+          <p class="section-body"><strong>We have exclusive rights of WeWork India</strong> for all virtual office and on-demand business. We manage the entire tech backend for WeWork India, and all bookings — even the ones placed on WeWork India's own website or app — are managed by us.</p>
+        </div>
+        <div class="takeaway" data-editable="ch5-s05-takeaway">Revenue 4.5x'd in two years (₹3.1Cr → ₹14Cr), GMV 5x'd (₹10Cr → ₹50Cr). Plus exclusive WeWork India rights — myHQ is the largest Virtual Office provider in India.</div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+
+<script>
+var CHAPTER_ID   = 'wwd_vo';
+var NEXT_CHAPTER = 'wwd_od';
+var CHAPTER_NAME = 'What We Do — Virtual Office';
+var DRIVE_FOLDER = 'Beginner Chapters/What We Do Virtual Office';
+
+var SHEET_URL = 'https://script.google.com/macros/s/AKfycbwX0Z5vx6DSwdwZwK26pKZL3V3U9XwEyWgPa9Ek_cFEH1_tpULnWNcn7RlgE-wT8M9M/exec';
+
+var DEV_PREVIEW = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || typeof window.firebaseAuth === 'undefined';
+(function() {
+  if (DEV_PREVIEW) return;
+  window.firebaseAuth.onAuthStateChanged(function(user) {
+    if (!user) { window.location.href = '../landing.html'; return; }
+    var db = window.firebaseDB;
+    db.collection('users').doc(user.uid).get().then(function(snap) {
+      var data = snap.exists ? snap.data() : {};
+      var unlocked = (data.unlockedChapters && data.unlockedChapters.beginner) || [];
+      if (unlocked.indexOf(CHAPTER_ID) === -1) {
+        document.getElementById('slide-mode').style.display = 'none';
+        var rm = document.getElementById('read-mode'); if (rm) rm.style.display = 'none';
+        var lock = document.createElement('div');
+        lock.style.cssText = 'position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;font-family:Manrope,sans-serif;z-index:9999;';
+        lock.innerHTML = '<div style="font-size:2.5rem;">🔒</div><div style="font-size:1.2rem;font-weight:800;color:#1E22AA;">This chapter is locked.</div><div style="font-size:14px;color:#7B7FE8;max-width:340px;text-align:center;">Ask your admin to unlock it.</div><a href="../hub.html" style="margin-top:8px;font-size:13px;font-weight:700;color:#1E22AA;text-decoration:underline;">← Back to Hub</a>';
+        document.body.appendChild(lock);
+        return;
+      }
+      if (!(data.progress && data.progress[CHAPTER_ID] && data.progress[CHAPTER_ID].completed)) {
+        db.collection('users').doc(user.uid).set({
+          progress: { wwd_vo: { completed: true, completedAt: firebase.firestore.FieldValue.serverTimestamp() } }
+        }, { merge: true });
+      }
+      db.collection('content').doc(CHAPTER_ID).get().then(function(cSnap) {
+        if (!cSnap.exists) return;
+        var cData = cSnap.data();
+        document.querySelectorAll('[data-editable]').forEach(function(el) {
+          var key = el.getAttribute('data-editable');
+          if (cData[key] !== undefined) el.innerHTML = cData[key];
+        });
+      });
+    });
+  });
+})();
+
+var currentMode = 'slide';
+function setMode(mode) {
+  currentMode = mode;
+  var isSlide = mode === 'slide';
+  document.getElementById('slide-mode').style.display = isSlide ? '' : 'none';
+  var readEl = document.getElementById('read-mode');
+  if (readEl) readEl.classList.toggle('hidden', isSlide);
+  document.body.style.overflow = 'auto';
+  document.getElementById('screenCounter').style.display = isSlide ? '' : 'none';
+  document.getElementById('dotNav').style.display = isSlide ? '' : 'none';
+  var keyHintEl = document.getElementById('keyHint'); if (keyHintEl) keyHintEl.style.display = isSlide ? '' : 'none';
+  var chapterLabelEl = document.getElementById('chapterLabel'); if (chapterLabelEl) chapterLabelEl.style.display = isSlide ? '' : 'none';
+  var btn = document.getElementById('btnRead');
+  if (isSlide) {
+    btn.innerHTML = '<i class="fa-solid fa-book-open"></i>&nbsp;Read Full Chapter';
+    btn.onclick = function() { setMode('read'); };
+  } else {
+    btn.innerHTML = '<i class="fa-solid fa-display"></i>&nbsp;Back to Slides';
+    btn.onclick = function() { setMode('slide'); };
+    window.scrollTo(0, 0);
+  }
+}
+
+var TOTAL = 0; var current = 0; var animating = false;
+function buildDots() {
+  var nav = document.getElementById('dotNav'); nav.innerHTML = '';
+  for (var i = 0; i < TOTAL; i++) {
+    var d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    (function(idx){ d.onclick = function(){ goTo(idx); }; })(i);
+    nav.appendChild(d);
+  }
+}
+function updateCounter() {
+  document.getElementById('screenCounter').textContent = (current + 1) + ' / ' + TOTAL;
+  var chap = document.getElementById('chapterLabel');
+  if (chap) chap.style.display = current === 0 ? '' : 'none';
+}
+
+/* ⚠⚠⚠ scaleSlides() — DO NOT EDIT ⚠⚠⚠ */
+var BASE_DPR = window.devicePixelRatio || 1;
+function scaleSlides() {
+  var REF_W = 1440, REF_H = 900; var wrap = document.getElementById('slides'); if (!wrap) return;
+  var topbar = document.querySelector('.topbar'); var topbarH = topbar ? topbar.offsetHeight : 52;
+  var vw = document.documentElement.clientWidth; var vh = document.documentElement.clientHeight - topbarH;
+  var zoom = (window.devicePixelRatio || 1) / BASE_DPR; var fit = Math.min(vw / REF_W, vh / REF_H); var scale = fit * zoom;
+  var scaledW = REF_W * scale, scaledH = REF_H * scale;
+  var offsetX = Math.max(0, Math.round((vw - scaledW) / 2)); var offsetY = Math.max(0, Math.round((vh - scaledH) / 2));
+  wrap.style.width = REF_W + 'px'; wrap.style.height = REF_H + 'px';
+  wrap.style.left = offsetX + 'px'; wrap.style.top = (topbarH + offsetY) + 'px';
+  wrap.style.right = 'auto'; wrap.style.bottom = 'auto';
+  wrap.style.transform = 'scale(' + scale + ')'; wrap.style.transformOrigin = 'top left';
+  document.body.style.minHeight = (topbarH + offsetY + scaledH) + 'px';
+  document.body.style.minWidth = (offsetX + scaledW) + 'px';
+}
+window.addEventListener('resize', scaleSlides);
+(function watchZoom() { var mq = window.matchMedia('(resolution: ' + window.devicePixelRatio + 'dppx)'); mq.addEventListener('change', function() { scaleSlides(); watchZoom(); }); })();
+/* ⚠ end scaleSlides ⚠ */
+
+function goTo(index) {
+  if (animating || index === current || index < 0 || index >= TOTAL) return;
+  animating = true;
+  var screens = document.querySelectorAll('.screen'); var dots = document.querySelectorAll('.dot'); var prev = current; current = index;
+  screens[prev].classList.add('exit-up'); screens[prev].classList.remove('active');
+  setTimeout(function(){ screens[prev].classList.remove('exit-up'); }, 500);
+  screens[current].classList.add('active'); dots[prev].classList.remove('active'); dots[current].classList.add('active');
+  updateCounter();
+  var keyHint = document.getElementById('keyHint'); if (keyHint) keyHint.classList.add('hidden');
+  setTimeout(function(){ animating = false; }, 520);
+}
+function next() { goTo(current + 1); }
+function prev() { goTo(current - 1); }
+document.addEventListener('keydown', function(e) {
+  if (currentMode !== 'slide') return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prev();
+});
+
+var tocLinks = document.querySelectorAll('.toc-link');
+var readSections = document.querySelectorAll('.section[id]');
+var tocObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      tocLinks.forEach(function(l){ l.classList.remove('active'); });
+      var a = document.querySelector('.toc-link[data-s="' + entry.target.id + '"]');
+      if (a) a.classList.add('active');
+    }
+  });
+}, { rootMargin: '-15% 0px -75% 0px', threshold: 0 });
+readSections.forEach(function(s){ tocObserver.observe(s); });
+
+window.addEventListener('DOMContentLoaded', function() {
+  TOTAL = document.querySelectorAll('#slides .screen').length;
+  scaleSlides(); buildDots();
+  var first = document.querySelectorAll('.screen')[0]; if (first) first.classList.add('active');
+  updateCounter();
+});
+
+</script>
+</body>
+</html>

@@ -460,27 +460,69 @@ body {
       </div>
     </div>
 
-    <!-- CHAPTER 4 (placeholder) -->
-    <div class="course-card locked has-backdrop" id="card-ch4">
+    <!-- CHAPTER 4 — What We Do: Assisted Marketplace -->
+    <div class="course-card locked has-backdrop" id="card-wwdam">
       <div class="card-top-bar"></div>
       <div class="card-backdrop" style="background-image:url('ch3_book_images/what_we_do_backdrop.png'); background-size:cover; background-position:center;">
         <div class="card-head">
           <div class="card-num">Chapter 04</div>
-          <div class="card-title">What We Do</div>
-          <div class="badge badge-locked" id="status-ch4">Coming soon</div>
+          <div class="card-title" id="title-wwdam">What We Do — Assisted Marketplace</div>
+          <div class="badge badge-locked" id="status-wwdam">Locked</div>
         </div>
       </div>
-      <div class="card-cta-wrap" id="footer-ch4">
-        <button class="card-cta cta-locked" disabled>Coming soon</button>
+      <div class="card-cta-wrap" id="footer-wwdam">
+        <button class="card-cta cta-locked" disabled>Locked</button>
+      </div>
+      <div class="unlock-section" id="unlock-section-wwdam">
+        <div class="unlock-label">Chapter 4 is locked</div>
+        <div class="unlock-hint">Complete Chapter 3 to unlock What We Do.</div>
       </div>
     </div>
 
-    <!-- CHAPTER 5 (placeholder) -->
+    <!-- CHAPTER 5 — What We Do: Virtual Office -->
+    <div class="course-card locked has-backdrop" id="card-wwdvo">
+      <div class="card-top-bar"></div>
+      <div class="card-backdrop" style="background-image:url('ch3_book_images/what_we_do_backdrop.png'); background-size:cover; background-position:center;">
+        <div class="card-head">
+          <div class="card-num">Chapter 05</div>
+          <div class="card-title" id="title-wwdvo">What We Do — Virtual Office</div>
+          <div class="badge badge-locked" id="status-wwdvo">Locked</div>
+        </div>
+      </div>
+      <div class="card-cta-wrap" id="footer-wwdvo">
+        <button class="card-cta cta-locked" disabled>Locked</button>
+      </div>
+      <div class="unlock-section" id="unlock-section-wwdvo">
+        <div class="unlock-label">Chapter 5 is locked</div>
+        <div class="unlock-hint">Complete Chapter 3 to unlock What We Do.</div>
+      </div>
+    </div>
+
+    <!-- CHAPTER 6 — What We Do: On-Demand -->
+    <div class="course-card locked has-backdrop" id="card-wwdod">
+      <div class="card-top-bar"></div>
+      <div class="card-backdrop" style="background-image:url('ch3_book_images/what_we_do_backdrop.png'); background-size:cover; background-position:center;">
+        <div class="card-head">
+          <div class="card-num">Chapter 06</div>
+          <div class="card-title" id="title-wwdod">What We Do — On-Demand</div>
+          <div class="badge badge-locked" id="status-wwdod">Locked</div>
+        </div>
+      </div>
+      <div class="card-cta-wrap" id="footer-wwdod">
+        <button class="card-cta cta-locked" disabled>Locked</button>
+      </div>
+      <div class="unlock-section" id="unlock-section-wwdod">
+        <div class="unlock-label">Chapter 6 is locked</div>
+        <div class="unlock-hint">Complete Chapter 3 to unlock What We Do.</div>
+      </div>
+    </div>
+
+    <!-- CHAPTER 7 (placeholder) -->
     <div class="course-card locked has-backdrop" id="card-ch5">
       <div class="card-top-bar"></div>
       <div class="card-backdrop" style="background-image:url('ch4_book_images/what_we_stand_for_backdrop.jpg'); background-size:cover; background-position:center;">
         <div class="card-head">
-          <div class="card-num">Chapter 05</div>
+          <div class="card-num">Chapter 07</div>
           <div class="card-title">What We Stand For</div>
           <div class="badge badge-locked" id="status-ch5">Coming soon</div>
         </div>
@@ -792,6 +834,45 @@ auth.onAuthStateChanged(function(user) {
     } else {
       if (unlockSec3) unlockSec3.style.display = '';
     }
+
+    // ── Chapter 4/5/6 — What We Do (AM / VO / OD) ──
+    var wwdLinks = {
+      wwdam: 'what_we_do/What_We_Do_AM.html',
+      wwdvo: 'what_we_do/What_We_Do_VO.html',
+      wwdod: 'what_we_do/What_We_Do_OnDemand.html'
+    };
+    var wwdToUnlock = ['wwdam', 'wwdvo', 'wwdod'].filter(function(id) {
+      return unlocked.indexOf(id) === -1;
+    });
+    if (ch3Completed && wwdToUnlock.length) {
+      db.collection('users').doc(user.uid).set({
+        unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion('wwdam', 'wwdvo', 'wwdod') }
+      }, { merge: true });
+    }
+    ['wwdam', 'wwdvo', 'wwdod'].forEach(function(id) {
+      var card       = document.getElementById('card-' + id);
+      var status     = document.getElementById('status-' + id);
+      var footer     = document.getElementById('footer-' + id);
+      var unlockSecW = document.getElementById('unlock-section-' + id);
+      var wUnlocked  = ch3Completed || unlocked.indexOf(id) !== -1;
+      var wCompleted = progress[id] && progress[id].completed;
+      var href       = wwdLinks[id];
+
+      if (wUnlocked) {
+        card.classList.remove('locked'); card.classList.add('unlocked');
+        if (unlockSecW) unlockSecW.style.display = 'none';
+        if (wCompleted) {
+          card.classList.add('completed');
+          status.textContent = 'Completed'; status.className = 'badge badge-mint';
+          footer.innerHTML = '<a class="card-cta cta-done" href="' + href + '"><span>Review</span><span class="arrow">→</span></a>';
+        } else {
+          status.textContent = 'Unlocked'; status.className = 'badge badge-blue';
+          footer.innerHTML = '<a class="card-cta cta-primary" href="' + href + '"><span>Start</span><span class="arrow">→</span></a>';
+        }
+      } else {
+        if (unlockSecW) unlockSecW.style.display = '';
+      }
+    });
 
     // ── AM Chapter 1 — Know Your City ──
     var amch1Card      = document.getElementById('card-amch1');

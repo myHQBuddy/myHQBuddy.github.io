@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 4: What We Do — Assisted Marketplace | myHQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" as="style">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" as="style">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="../firebase-config.js"></script>
+<style>
+:root {
+  --blue:       #1E22AA;
+  --blue-dark:  #161a8b;
+  --green:      #BEE5C2;
+  --coral:      #FF7351;
+  --amber:      #FFB848;
+  --ink:        #0B0F2C;
+  --body:       #4A4D63;
+  --muted:      #94909C;
+  --white:      #FFFFFF;
+  --hairline:   rgba(11,15,44,0.10);
+  --sans:       'Manrope', system-ui, sans-serif;
+  --radius:     8px;
+  --ease:       cubic-bezier(0.22,1,0.36,1);
+  --transition: 0.25s var(--ease);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--sans); background: var(--white); color: var(--ink); overflow: auto; font-size: 16px; line-height: 1.6; }
+
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: 52px; z-index: 100;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--hairline);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-logo { font-size: 15px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.topbar-chapter { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.topbar-center { font-size: 18px; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; position: absolute; left: 50%; transform: translateX(-50%); }
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+.screen-counter { font-size: 11px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.read-btn {
+  font-size: 11px; font-weight: 700; color: var(--white); background: var(--blue);
+  padding: 6px 14px; border-radius: var(--radius); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: var(--transition); cursor: pointer; border: none; font-family: var(--sans);
+}
+.read-btn:hover { background: var(--blue-dark); }
+.hub-btn {
+  font-size: 14px; color: var(--blue); background: transparent;
+  width: 32px; height: 32px; border-radius: var(--radius);
+  border: 1px solid rgba(30,34,170,0.3);
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: var(--transition); text-decoration: none;
+}
+.hub-btn:hover { background: rgba(30,34,170,0.06); border-color: var(--blue); }
+
+/* ⚠⚠⚠ SLIDE ENGINE CSS — DO NOT EDIT ⚠⚠⚠ */
+.dot-nav { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 100; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hairline); border: 1.5px solid rgba(11,15,44,0.2); cursor: pointer; transition: var(--transition); }
+.dot.active { background: var(--blue); border-color: var(--blue); transform: scale(1.3); }
+.key-hint { position: absolute; bottom: 18px; right: 48px; font-size: 11px; font-weight: 500; color: var(--muted); display: flex; align-items: center; gap: 6px; transition: opacity 0.5s; z-index: 100; }
+.key-hint.hidden { opacity: 0; pointer-events: none; }
+.slides { position: absolute; transform-origin: top left; }
+.screen { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); transform: translateY(20px); overflow: hidden; }
+.screen.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+.screen.exit-up { opacity: 0; transform: translateY(-20px); }
+/* end DO NOT EDIT */
+
+.screen-next-btn {
+  position: absolute; bottom: 40px; right: 56px;
+  background: transparent; color: var(--muted); border: 1px solid var(--hairline);
+  font-size: 11px; font-weight: 700; font-family: var(--sans);
+  padding: 7px 14px; border-radius: var(--radius); cursor: pointer;
+  display: flex; align-items: center; gap: 6px; transition: var(--transition);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.screen-next-btn:hover { color: var(--blue); border-color: rgba(30,34,170,0.3); }
+
+.slide-pad { height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 52px 76px; gap: 30px; }
+.slide-center { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 80px; }
+.eyebrow { font-size: 19px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); }
+.slide-headline { font-size: 57px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1.12; }
+.slide-headline span { color: var(--blue); }
+.slide-sub { font-size: 20px; color: var(--body); line-height: 1.6; max-width: 900px; }
+
+.cover-inner { display: grid; grid-template-columns: 1fr 1fr; height: 100%; align-items: center; padding: 0 80px; gap: 64px; }
+.cover-eyebrow { font-size: 17.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 27px; display: flex; align-items: center; gap: 13px; }
+.cover-eyebrow::before { content: ''; width: 12px; height: 12px; background: var(--blue); border-radius: 50%; display: block; }
+.cover-headline { font-size: 81px; font-weight: 800; line-height: 1.08; letter-spacing: -0.04em; color: var(--ink); margin-bottom: 32px; }
+.cover-headline em { font-style: normal; color: var(--blue); }
+.cover-sub { font-size: 24px; color: var(--body); line-height: 1.7; margin-bottom: 43px; }
+.cover-media { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: var(--radius); overflow: hidden; box-shadow: 0 16px 48px rgba(11,15,44,0.18); background: var(--ink); }
+.cover-media img { width: 100%; height: 100%; object-fit: cover; }
+
+.img-placeholder {
+  border: 2px dashed var(--hairline); border-radius: var(--radius);
+  background: #FAFBFF; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 8px;
+  color: var(--muted); text-align: center; padding: 20px;
+}
+.img-placeholder i { font-size: 28px; color: #B8BBF0; }
+.img-placeholder span { font-size: 12px; font-weight: 600; max-width: 220px; line-height: 1.4; }
+
+.bigstat-num { font-size: 189px; font-weight: 800; color: var(--ink); letter-spacing: -0.04em; line-height: 1; }
+.bigstat-num span { color: var(--blue); }
+.bigstat-caption { font-size: 32px; font-weight: 700; color: var(--body); max-width: 60ch; }
+.bigstat-facts { display: grid; grid-template-columns: repeat(5, auto); gap: 0; border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; max-width: 1180px; margin-top: 27px; }
+.bigstat-fact { padding: 24px 30px; border-right: 1px solid var(--hairline); text-align: left; }
+.bigstat-fact:last-child { border-right: none; }
+.bigstat-fact-num { font-size: 31px; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; margin-bottom: 5px; }
+.bigstat-fact-lbl { font-size: 16px; color: var(--muted); line-height: 1.4; }
+
+/* Timeline */
+.timeline { display: flex; align-items: stretch; gap: 0; width: 100%; max-width: 1280px; align-self: center; }
+.tl-node { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
+.tl-node:not(:last-child)::after { content: ''; position: absolute; top: 27px; left: calc(50% + 32px); right: calc(-50% + 32px); height: 1px; background: var(--hairline); }
+.tl-dot { width: 54px; height: 54px; border-radius: 50%; border: 2px solid var(--blue); background: rgba(30,34,170,0.06); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; font-size: 16px; font-weight: 800; color: var(--blue); z-index: 1; }
+.tl-year { font-size: 18px; font-weight: 800; color: var(--blue); margin-bottom: 5px; }
+.tl-title { font-size: 19px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+.tl-sub { font-size: 15.5px; color: var(--body); line-height: 1.5; padding: 0 14px; }
+
+.cardgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-content: center; }
+.card { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 30px; background: var(--white); display: flex; flex-direction: column; gap: 11px; }
+.card-icon { width: 68px; height: 68px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 30px; background: rgba(30,34,170,0.08); color: var(--blue); }
+.card h3 { font-size: 23px; font-weight: 800; color: var(--ink); }
+.card p { font-size: 18px; color: var(--body); line-height: 1.6; }
+.card .card-tag { font-size: 15px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.06em; }
+.card img.card-photo { width: 100%; height: 148px; object-fit: cover; border-radius: 6px; margin-bottom: 5px; }
+
+.twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-content: center; align-items: stretch; }
+.twocol-panel { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 35px 41px; background: #FAFBFF; display: flex; flex-direction: column; gap: 16px; }
+.twocol-panel h3 { font-size: 28px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.twocol-panel p { font-size: 19.5px; color: var(--body); line-height: 1.65; }
+.twocol-panel ul { padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.twocol-panel li { font-size: 19.5px; color: var(--body); line-height: 1.55; padding-left: 24px; position: relative; }
+.twocol-panel li::before { content: ''; position: absolute; left: 0; top: 11px; width: 7px; height: 7px; border-radius: 50%; background: var(--blue); }
+.twocol-panel li strong { color: var(--ink); }
+
+/* Process flow (lead -> book) */
+.flow { display: flex; align-items: stretch; gap: 0; width: 100%; max-width: 1260px; align-self: center; }
+.flow-step { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; }
+.flow-icon { width: 76px; height: 76px; border-radius: 50%; background: rgba(30,34,170,0.08); color: var(--blue); display: flex; align-items: center; justify-content: center; font-size: 30px; }
+.flow-title { font-size: 19px; font-weight: 800; color: var(--ink); }
+.flow-sub { font-size: 16px; color: var(--body); line-height: 1.5; padding: 0 8px; }
+.flow-arrow { display: flex; align-items: center; color: var(--hairline); font-size: 24px; padding-top: 38px; }
+
+#read-mode.hidden { display: none; }
+.r-layout { display: flex; max-width: 100%; margin: 0; padding: 0 48px 80px 0; align-items: flex-start; }
+.r-sidebar { width: 240px; flex-shrink: 0; position: sticky; top: 52px; padding: 32px 24px 0 24px; max-height: calc(100vh - 52px); overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.r-toc-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); margin-bottom: 12px; }
+.toc-link { font-size: 13px; color: var(--body); text-decoration: none; padding: 8px 12px; border-radius: var(--radius); border-left: 2px solid transparent; transition: var(--transition); }
+.toc-link:hover { background: #FAFBFF; color: var(--blue); }
+.toc-link.active { color: var(--blue); font-weight: 700; border-left-color: var(--blue); background: rgba(30,34,170,0.05); }
+.r-content { flex: 1; min-width: 0; padding: 40px 0 0 48px; }
+.section { margin-bottom: 56px; }
+.section-num { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 6px; }
+.section-title { font-size: 29px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1.15; margin-bottom: 16px; }
+.section-outcome { font-size: 13px; color: var(--body); background: #FAFBFF; border: 1px solid var(--hairline); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 16px; }
+.section-outcome span:first-child { font-weight: 700; color: var(--blue); }
+.section-body { font-size: 16px; color: var(--body); line-height: 1.8; margin-bottom: 14px; }
+.takeaway { font-size: 16px; font-weight: 600; color: var(--ink); background: rgba(190,229,194,0.25); border-left: 3px solid var(--green); padding: 16px 20px; border-radius: var(--radius); margin-top: 20px; }
+.section-list { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; padding: 0; }
+.section-list li { font-size: 15px; color: var(--body); line-height: 1.65; padding-left: 18px; position: relative; }
+.section-list li::before { content: ''; position: absolute; left: 0; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: var(--blue); }
+.minicard-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 4px; }
+.minicard { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 18px 16px; background: #FAFBFF; }
+.minicard i { font-size: 22px; margin-bottom: 8px; color: var(--blue); display: block; }
+.minicard .mc-t { font-size: 13px; font-weight: 800; color: var(--ink); margin-bottom: 4px; }
+.minicard .mc-b { font-size: 12px; color: var(--body); line-height: 1.5; }
+
+.aq-tracker { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.aq-tracker-bar { flex: 1; height: 4px; background: var(--hairline); border-radius: 99px; overflow: hidden; }
+.aq-tracker-fill { height: 100%; width: 0; background: var(--blue); transition: width 0.3s var(--ease); }
+.aq-tracker-label { font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.aq-question { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 16px; transition: var(--transition); }
+.aq-question.is-filled { border-color: var(--green); background: rgba(190,229,194,0.08); }
+.aq-q-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.aq-q-num { font-size: 12px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.08em; }
+.aq-q-status { font-size: 12px; font-weight: 600; color: var(--muted); }
+.aq-q-status.done { color: #2e7d32; }
+.aq-q-text { font-size: 16px; font-weight: 600; color: var(--ink); line-height: 1.5; margin-bottom: 12px; }
+.aq-textarea { width: 100%; font-family: var(--sans); font-size: 15px; color: var(--ink); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 12px 14px; resize: vertical; line-height: 1.6; }
+.aq-textarea:focus { outline: none; border-color: var(--blue); }
+.aq-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 24px; gap: 16px; }
+.aq-footer-note { font-size: 13px; color: var(--muted); }
+.aq-submit-btn { font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--white); background: var(--blue); border: none; border-radius: var(--radius); padding: 12px 28px; cursor: pointer; transition: var(--transition); }
+.aq-submit-btn:disabled { background: var(--hairline); color: var(--muted); cursor: not-allowed; }
+.aq-submit-btn:not(:disabled):hover { background: var(--blue-dark); }
+.aq-error { font-size: 13px; color: var(--coral); margin-top: 12px; }
+</style>
+</head>
+<body>
+
+<header class="topbar" id="topbar">
+  <div class="topbar-left">
+    <span class="topbar-logo">myHQ</span>
+    <span class="topbar-chapter" id="chapterLabel">Chapter 4</span>
+  </div>
+  <div class="topbar-center" data-editable="ch4-title">What We Do — Assisted Marketplace</div>
+  <div class="topbar-right">
+    <a class="hub-btn" href="../hub.html" title="Back to Hub"><i class="fa-solid fa-house"></i></a>
+    <span class="screen-counter" id="screenCounter">1 / 1</span>
+    <button class="read-btn" id="btnRead" onclick="setMode('read')">
+      <i class="fa-solid fa-book-open"></i>&nbsp;Read Full Chapter
+    </button>
+  </div>
+</header>
+
+<div id="slide-mode">
+  <div class="slides" id="slides">
+
+  <!-- SCREEN 0 · COVER -->
+  <div class="screen">
+    <div class="cover-inner">
+      <div>
+        <div class="cover-eyebrow" data-editable="ch4-cover-eyebrow">Assisted Marketplace</div>
+        <h1 class="cover-headline" data-editable="ch4-cover-headline">Find the right office.<br><em>We'll get you there.</em></h1>
+        <p class="cover-sub" data-editable="ch4-cover-sub">Fixed desks, managed office, conventional leasing — our consultants assist clients at every step in finding the perfect office solution, tailored to their unique needs.</p>
+      </div>
+      <div>
+        <div class="cover-media">
+          <img src="chapter_images/ch4-cover.png" alt="Assisted Marketplace">
+        </div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 1 · TWO COLUMN — Intro + Target Audience -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ch4-sl1-eyebrow">Introduction</div>
+      <h2 class="slide-headline" data-editable="ch4-sl1-headline">A consultant, <span>not a listing site.</span></h2>
+      <div class="twocol">
+        <div class="twocol-panel">
+          <h3 data-editable="ch4-sl1-c1t">Key Benefits of myHQ</h3>
+          <p data-editable="ch4-sl1-c1b">Our consultants assist the client in finding the perfect office solution tailored to their unique needs.</p>
+          <ul>
+            <li data-editable="ch4-sl1-c1l1"><strong>End to End Office Consultant:</strong> one point of contact, start to finish</li>
+            <li data-editable="ch4-sl1-c1l2"><strong>Zero Brokerage</strong> for the client</li>
+            <li data-editable="ch4-sl1-c1l3"><strong>Faster Decisions, Smooth Move-ins</strong></li>
+            <li data-editable="ch4-sl1-c1l4"><strong>Best Negotiated Prices</strong></li>
+          </ul>
+        </div>
+        <div class="twocol-panel">
+          <h3 data-editable="ch4-sl1-c2t">Target Audience</h3>
+          <ul>
+            <li data-editable="ch4-sl1-c2l1"><strong>Startups:</strong> Early and growth stage companies</li>
+            <li data-editable="ch4-sl1-c2l2"><strong>Mid-Size Companies:</strong> Growing businesses, 20–100 employees</li>
+            <li data-editable="ch4-sl1-c2l3"><strong>Large Businesses:</strong> Larger businesses with stable headcount</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 2 · CARD GRID — Three Solutions -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ch4-sl2-eyebrow">AM Solutions for Clients</div>
+      <h2 class="slide-headline" data-editable="ch4-sl2-headline">Three solutions. <span>One team.</span></h2>
+      <div class="cardgrid">
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-people-roof"></i></div>
+          <h3 data-editable="ch4-sl2-c1t">Coworking Spaces</h3>
+          <p data-editable="ch4-sl2-c1b">Your own reserved desk for your team — in a shared, vibrant coworking environment. Can be open desks (1–100) or cabins (4–100 seater). Dealing in # of seats.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-building"></i></div>
+          <h3 data-editable="ch4-sl2-c2t">Managed Office</h3>
+          <p data-editable="ch4-sl2-c2b">A fully serviced, custom-built office — designed, furnished, and run for you so your team moves in faster. Generally for 50+ team size. Dealing in # of seats/sqft.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-file-contract"></i></div>
+          <h3 data-editable="ch4-sl2-c3t">Conventional Leasing</h3>
+          <p data-editable="ch4-sl2-c3b">Long-term leased spaces for companies needing full control &amp; flexibility. Generally for 150+ team size (5,000 sqft or more). Dealing in sqft.</p>
+        </div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 3 · TIMELINE (6-step) — End to end consulting -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ch4-sl3-eyebrow">How It Works</div>
+      <h2 class="slide-headline" data-editable="ch4-sl3-headline">End to end consulting, <span>in 6 steps.</span></h2>
+      <div class="timeline">
+        <div class="tl-node">
+          <div class="tl-dot">01</div>
+          <div class="tl-year" data-editable="ch4-sl3-t1y">Discovery</div>
+          <div class="tl-title" data-editable="ch4-sl3-t1t">Strategic Discovery</div>
+          <div class="tl-sub" data-editable="ch4-sl3-t1s">Identify potential office space via city &amp; micro-market analysis — talent pool, competitors, traffic, cost of living.</div>
+        </div>
+        <div class="tl-node">
+          <div class="tl-dot">02</div>
+          <div class="tl-year" data-editable="ch4-sl3-t2y">Shortlist</div>
+          <div class="tl-title" data-editable="ch4-sl3-t2t">Curated Shortlist</div>
+          <div class="tl-sub" data-editable="ch4-sl3-t2s">Evaluate &amp; benchmark options on budget, connectivity, asset type, and centre experience — create a visit-ready shortlist.</div>
+        </div>
+        <div class="tl-node">
+          <div class="tl-dot">03</div>
+          <div class="tl-year" data-editable="ch4-sl3-t3y">Negotiate</div>
+          <div class="tl-title" data-editable="ch4-sl3-t3t">Commercial Structuring</div>
+          <div class="tl-sub" data-editable="ch4-sl3-t3s">Negotiate cost/sqft, deposit, lock-in &amp; notice period, upfront/opex cost, and annual escalation.</div>
+        </div>
+        <div class="tl-node">
+          <div class="tl-dot">04</div>
+          <div class="tl-year" data-editable="ch4-sl3-t4y">Compliance</div>
+          <div class="tl-title" data-editable="ch4-sl3-t4t">Compliance, Interiors, Legal</div>
+          <div class="tl-sub" data-editable="ch4-sl3-t4s">Check fire norms, security compliance, property ownership, layout design, and agreement registration.</div>
+        </div>
+        <div class="tl-node">
+          <div class="tl-dot">05</div>
+          <div class="tl-year" data-editable="ch4-sl3-t5y">Transition</div>
+          <div class="tl-title" data-editable="ch4-sl3-t5t">Transition Period Mgmt</div>
+          <div class="tl-sub" data-editable="ch4-sl3-t5s">Support the client through any wait for the new office — temporary solutions, ongoing project-pace check-ins.</div>
+        </div>
+        <div class="tl-node">
+          <div class="tl-dot">06</div>
+          <div class="tl-year" data-editable="ch4-sl3-t6y">Move-in</div>
+          <div class="tl-title" data-editable="ch4-sl3-t6t">Move-in Date &amp; Month</div>
+          <div class="tl-sub" data-editable="ch4-sl3-t6s">Inauguration setup, office/building branding, and resolving minor interiors or infra issues in the first 1–2 weeks.</div>
+        </div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 4 · FLOW — Client Journey -->
+  <div class="screen">
+    <div class="slide-pad">
+      <h2 class="slide-headline" data-editable="ch4-sl4-headline">Client journey. <span>Lead to booking.</span></h2>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+          <div class="flow-title" data-editable="ch4-sl4-f1t">Lead Posted</div>
+          <div class="flow-sub" data-editable="ch4-sl4-f1s">A new lead is posted into the system.</div>
+        </div>
+        <div class="flow-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        <div class="flow-step">
+          <div class="flow-icon"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="flow-title" data-editable="ch4-sl4-f2t">Lead Qualified</div>
+          <div class="flow-sub" data-editable="ch4-sl4-f2s">The qualification team reviews and qualifies the lead.</div>
+        </div>
+        <div class="flow-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        <div class="flow-step">
+          <div class="flow-icon"><i class="fa-solid fa-building"></i></div>
+          <div class="flow-title" data-editable="ch4-sl4-f3t">Options Shared</div>
+          <div class="flow-sub" data-editable="ch4-sl4-f3s">The sales point of contact shares workspace options.</div>
+        </div>
+        <div class="flow-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        <div class="flow-step">
+          <div class="flow-icon"><i class="fa-solid fa-calendar-check"></i></div>
+          <div class="flow-title" data-editable="ch4-sl4-f4t">Visit Scheduled</div>
+          <div class="flow-sub" data-editable="ch4-sl4-f4s">The client schedules a visit to the workspace.</div>
+        </div>
+        <div class="flow-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        <div class="flow-step">
+          <div class="flow-icon"><i class="fa-solid fa-key"></i></div>
+          <div class="flow-title" data-editable="ch4-sl4-f5t">Contract + Booking Done</div>
+          <div class="flow-sub" data-editable="ch4-sl4-f5s">The workspace is successfully booked by the client.</div>
+        </div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 5 · WEWORK + CRM strip -->
+  <div class="screen">
+    <div class="slide-center" style="background:var(--blue); color:var(--white);">
+      <div class="eyebrow" style="color:rgba(255,255,255,0.7);" data-editable="ch4-sl5-eyebrow">Our Tools &amp; Partnership</div>
+      <h2 class="slide-headline" style="color:var(--white); margin:19px 0 38px;" data-editable="ch4-sl5-headline">Internal + Zoho CRM. <span style="color:#BEE5C2;">Lead to close.</span></h2>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1350px;">
+        <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:24px;font-size:19px;line-height:1.6;" data-editable="ch4-sl5-c1">For the team to manage leads &amp; track progress — proposals can be shared straight from the CRM.</div>
+        <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:24px;font-size:19px;line-height:1.6;" data-editable="ch4-sl5-c2">Our internal CRM works in tandem with Zoho CRM.</div>
+        <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:24px;font-size:19px;line-height:1.6;" data-editable="ch4-sl5-c3">myHQ Website is our lead generation channel — 5,000+ clients served and counting.</div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 6 · BIG STAT — Scale -->
+  <div class="screen">
+    <div class="slide-center">
+      <div class="eyebrow" data-editable="ch4-sl6-eyebrow">Current Scale</div>
+      <div class="bigstat-num" data-editable="ch4-sl6-num" style="margin:16px 0;">₹35<span>Cr</span></div>
+      <div class="bigstat-caption" data-editable="ch4-sl6-caption">our take rate per year — the highest revenue driver of the firm</div>
+      <div class="bigstat-facts">
+        <div class="bigstat-fact">
+          <div class="bigstat-fact-num" data-editable="ch4-sl6-f1n">100</div>
+          <div class="bigstat-fact-lbl" data-editable="ch4-sl6-f1l">Consultants across 10 cities</div>
+        </div>
+        <div class="bigstat-fact">
+          <div class="bigstat-fact-num" data-editable="ch4-sl6-f2n">40K+</div>
+          <div class="bigstat-fact-lbl" data-editable="ch4-sl6-f2l">Seats leased annually</div>
+        </div>
+        <div class="bigstat-fact">
+          <div class="bigstat-fact-num" data-editable="ch4-sl6-f3n">1M sqft</div>
+          <div class="bigstat-fact-lbl" data-editable="ch4-sl6-f3l">Conventional leasing (our newest product line)</div>
+        </div>
+        <div class="bigstat-fact">
+          <div class="bigstat-fact-num" data-editable="ch4-sl6-f4n">₹300Cr</div>
+          <div class="bigstat-fact-lbl" data-editable="ch4-sl6-f4l">Annual transaction value (GMV)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /.slides -->
+  <div class="dot-nav" id="dotNav"></div>
+  <div class="key-hint" id="keyHint"><i class="fa-solid fa-arrows-left-right"></i> Use arrow keys</div>
+</div>
+
+
+<div id="read-mode" class="hidden" style="margin-top:52px;">
+  <div class="r-layout">
+
+    <aside class="r-sidebar">
+      <div class="r-toc-label">Chapter 4</div>
+      <a href="#r-intro"  class="toc-link" data-s="r-intro">Introduction</a>
+      <a href="#r-s01"    class="toc-link" data-s="r-s01">01 · What is AM</a>
+      <a href="#r-s02"    class="toc-link" data-s="r-s02">02 · Three Solutions</a>
+      <a href="#r-s03"    class="toc-link" data-s="r-s03">03 · End-to-End Process</a>
+      <a href="#r-s04"    class="toc-link" data-s="r-s04">04 · Client Journey &amp; Tools</a>
+      <a href="#r-s05"    class="toc-link" data-s="r-s05">05 · Scale</a>
+    </aside>
+
+    <main class="r-content">
+
+      <section class="section" id="r-intro">
+        <div data-editable="ch4-intro-body" style="padding:28px 32px;border:1px solid var(--hairline);border-radius:var(--radius);background:#FAFBFF;">
+          <p class="section-body" style="margin-bottom:0;">Assisted Marketplace (AM) is myHQ's consultative office-finding service — covering fixed desks/area, managed office, and conventional leasing. Our consultants work with companies to identify, shortlist, visit, negotiate, and close the right office, end to end. It is myHQ's largest revenue-driving vertical.</p>
+        </div>
+      </section>
+
+      <section class="section" id="r-s01">
+        <div class="section-outcome"><span>Learning Outcome:</span> <span data-editable="ch4-s01-outcome">Understand what Assisted Marketplace is, its key benefits, and which client segments it targets.</span></div>
+        <div class="section-num">01</div>
+        <h2 class="section-title" data-editable="ch4-s01-title">What is Assisted Marketplace?</h2>
+        <div data-editable="ch4-s01-body">
+          <p class="section-body">Assisted Marketplace is myHQ's consultative solution for companies looking for office space. Most companies looking for an office have never done it before, don't know the market, and don't have the time to visit dozens of properties. Our consultants assist the client in finding the perfect office solution tailored to their unique needs — across coworking, managed office, or conventional leasing — instead of leaving them to navigate a fragmented, broker-driven market alone.</p>
+          <p class="section-body"><strong>Key benefits of myHQ:</strong></p>
+          <ul class="section-list">
+            <li><strong>End to End Office Consultant:</strong> one dedicated point of contact owns the search from brief to move-in — the client isn't bounced between a broker for the space, a lawyer for the agreement, and an interior team for the fit-out.</li>
+            <li><strong>Zero Brokerage:</strong> clients don't pay us a brokerage fee. This removes the single biggest reason companies are wary of going through an intermediary in the first place.</li>
+            <li><strong>Faster Decisions, Smooth Move-ins:</strong> a structured process compresses decision time and de-risks the move — clients aren't second-guessing themselves three weeks into a search because they have no benchmark for what "a good deal" looks like.</li>
+            <li><strong>Best Negotiated Prices:</strong> our scale and market knowledge get clients better commercial terms than they'd get alone, since we run this volume of transactions across the same set of landlords and operators repeatedly.</li>
+          </ul>
+          <p class="section-body"><strong>Target audience</strong> spans three segments, each with different urgency and decision-making style:</p>
+          <ul class="section-list">
+            <li><strong>Startups:</strong> early and growth stage companies. These clients move fast, often need flexibility built into the deal (shorter lock-ins), and are usually choosing coworking.</li>
+            <li><strong>Mid-Size Companies:</strong> growing businesses, typically 20–100 employees. These clients are often deciding between coworking and a managed office as headcount stabilises.</li>
+            <li><strong>Large Businesses:</strong> larger businesses with a stable headcount. These clients have the scale and predictability to justify a managed office or a full conventional lease.</li>
+          </ul>
+        </div>
+        <div class="takeaway" data-editable="ch4-s01-takeaway">AM = expert consultant + zero brokerage + best negotiated prices. The client doesn't need to know the market — that's what we're here for.</div>
+      </section>
+
+      <section class="section" id="r-s02">
+        <div class="section-outcome"><span>Learning Outcome:</span> <span data-editable="ch4-s02-outcome">Know the three office solutions AM offers, how each is priced, and when to recommend each.</span></div>
+        <div class="section-num">02</div>
+        <h2 class="section-title" data-editable="ch4-s02-title">AM Solutions for Clients</h2>
+        <div data-editable="ch4-s02-body">
+          <p class="section-body">AM offers three distinct office products, each suited to a different stage and style of company:</p>
+          <div class="minicard-grid">
+            <div class="minicard">
+              <i class="fa-solid fa-people-roof"></i>
+              <div class="mc-t">Coworking Spaces</div>
+              <div class="mc-b">Your own reserved desk in a shared, vibrant coworking environment. Open desks (1–100) or cabins (4–100 seater). <strong>Dealing in # of seats.</strong></div>
+            </div>
+            <div class="minicard">
+              <i class="fa-solid fa-building"></i>
+              <div class="mc-t">Managed Office</div>
+              <div class="mc-b">A fully serviced, custom-built office — designed, furnished, and run for you so your team moves in faster. Generally for 50+ team size. <strong>Dealing in # of seats/sqft.</strong></div>
+            </div>
+            <div class="minicard">
+              <i class="fa-solid fa-file-contract"></i>
+              <div class="mc-t">Conventional Leasing</div>
+              <div class="mc-b">Long-term leased spaces for companies needing full control &amp; flexibility. Generally for 150+ team size (5,000 sqft+). <strong>Dealing in sqft.</strong></div>
+            </div>
+          </div>
+          <p class="section-body">The three products sit on a spectrum of control versus convenience. <strong>Coworking</strong> trades the lowest control for the highest convenience — the client doesn't manage facilities, security, or interiors at all, they just occupy seats. <strong>Managed Office</strong> sits in the middle — the client gets a space built and run to their brand and layout, but myHQ's operator still handles the day-to-day running of it. <strong>Conventional Leasing</strong> gives the client full control of the space (their own fit-out, their own facilities management) in exchange for taking on more of the operational and compliance burden themselves.</p>
+          <p class="section-body">This is also why the pricing unit changes as you move along that spectrum: coworking is priced per seat because the operator is selling occupancy, not square footage; managed office blends seats and sqft because the build is customised to headcount; and conventional leasing is priced purely in sqft because the client is taking the whole floor or building, regardless of how many seats they eventually fit into it.</p>
+        </div>
+        <div class="takeaway" data-editable="ch4-s02-takeaway">Know your client's stage and headcount — that tells you which solution fits before you even show them options. Coworking = seats, Managed = seats/sqft, Leasing = sqft.</div>
+      </section>
+
+      <section class="section" id="r-s03">
+        <div class="section-outcome"><span>Learning Outcome:</span> <span data-editable="ch4-s03-outcome">Walk through the six-step consulting process from discovery to move-in, knowing what to evaluate at each stage.</span></div>
+        <div class="section-num">03</div>
+        <h2 class="section-title" data-editable="ch4-s03-title">End-to-End Consulting in 6 Steps</h2>
+        <div data-editable="ch4-s03-body">
+          <p class="section-body">We provide end-to-end consulting at each step, in ALL transactions. Each step has its own checklist of factors a consultant must evaluate before moving the client forward:</p>
+          <ul class="section-list">
+            <li><strong>1. Strategic Discovery:</strong> Identify potential office space through city and micro-market analysis. Factors: talent pool, competitors, traffic, cost of living. This is where you narrow down the right city and even the right neighbourhood before a single property is shown — getting this wrong means every later step has to be redone.</li>
+            <li><strong>2. Curated Shortlist:</strong> Evaluate and benchmark office space to create a shortlist that can be visited. Factors: budget, connectivity, kind of assets, experience at the centre. The goal is a tight shortlist the client can actually visit in a day or two, not an overwhelming list of every available property.</li>
+            <li><strong>3. Commercial Structuring:</strong> Negotiate and structure commercial terms for the shortlisted options. Factors: cost per sqft/seat, security deposit, lock-in &amp; notice period, upfront cost, regular opex cost, annual escalation. This is the step where myHQ's scale and relationships with landlords/operators directly translate into a better deal than the client could get on their own.</li>
+            <li><strong>4. Compliance, Interiors, Legal Advisory:</strong> Double-check all key compliance requirements and consult on interiors efficiency. Factors: fire norms, security compliances, ownership of property, office layout design, registration of office agreement. Skipping this step is how clients end up signing for a space that later fails a fire-safety audit or has an ownership dispute.</li>
+            <li><strong>5. Transition Period Management:</strong> If the new office will take time, support the client through that period. Factors: current office terms, temporary office solution (if needed), regular check-ups on project pace and timeline. A managed office or lease build-out can take weeks to months — this step keeps the client operational in the gap.</li>
+            <li><strong>6. Move-in Date &amp; Month:</strong> Help with the inauguration and any minor issues that come up in the first 1–2 weeks. Factors: inauguration setup, branding in office/building, minor setup issues (interiors/infrastructure). Our job isn't done at signing — we stay involved until the client is actually settled in.</li>
+          </ul>
+        </div>
+        <div class="takeaway" data-editable="ch4-s03-takeaway">Discovery → Shortlist → Structuring → Compliance → Transition → Move-in. Know this process cold — every AM transaction follows it.</div>
+      </section>
+
+      <section class="section" id="r-s04">
+        <div class="section-outcome"><span>Learning Outcome:</span> <span data-editable="ch4-s04-outcome">Know the AM client journey stages in the CRM and the tools you'll use day to day.</span></div>
+        <div class="section-num">04</div>
+        <h2 class="section-title" data-editable="ch4-s04-title">Client Journey &amp; Tools</h2>
+        <div data-editable="ch4-s04-body">
+          <p class="section-body">Every AM lead moves through five stages in the CRM, and a consultant should always know exactly which stage each of their leads is sitting in:</p>
+          <ul class="section-list">
+            <li><strong>Lead Posted:</strong> A new lead is posted into the system — from the myHQ website (our lead generation channel) or other inbound/outbound sources. Nothing happens to a lead until it's logged here; an enquiry that isn't posted into the system effectively doesn't exist for tracking purposes.</li>
+            <li><strong>Lead Qualified:</strong> The qualification team reviews and qualifies the lead — checking that the requirement (city, team size, budget, timeline) is real and specific enough to act on, before it's handed to a sales consultant.</li>
+            <li><strong>Options Shared:</strong> The sales point of contact shares workspace options — this is effectively the output of the Strategic Discovery and Curated Shortlist steps from the consulting process.</li>
+            <li><strong>Visit Scheduled:</strong> The client schedules a visit to the workspace. This is the moment a lead becomes a serious prospect rather than a browsing enquiry.</li>
+            <li><strong>Contract + Booking Done:</strong> The workspace is successfully booked by the client — at this point the Commercial Structuring and Compliance steps have already closed out.</li>
+          </ul>
+          <p class="section-body">The AM tech product has two parts: the <strong>myHQ Website</strong> (desktop + mobile), which is our lead generation channel — it has served 5,000+ clients and counting — and our <strong>Internal CRM, which works in tandem with Zoho CRM.</strong> The team manages leads and tracks progress here, and can share proposals directly from the CRM. Keeping the CRM up to date isn't optional admin work — it's how the qualification team, the sales consultant, and management all stay aligned on where every single deal stands.</p>
+        </div>
+        <div class="takeaway" data-editable="ch4-s04-takeaway">Lead → Qualify → Options → Visit → Book. The myHQ Website brings leads in; the Internal + Zoho CRM is where you move them through to close.</div>
+      </section>
+
+      <section class="section" id="r-s05">
+        <div class="section-outcome"><span>Learning Outcome:</span> <span data-editable="ch4-s05-outcome">Know the AM scale numbers — AM is the largest revenue driver in the firm.</span></div>
+        <div class="section-num">05</div>
+        <h2 class="section-title" data-editable="ch4-s05-title">Current Scale (Assisted Marketplace)</h2>
+        <div data-editable="ch4-s05-body">
+          <p class="section-body">AM is myHQ's largest revenue product. Key scale numbers:</p>
+          <div class="minicard-grid" style="grid-template-columns:repeat(3,1fr);">
+            <div class="minicard">
+              <div class="mc-t" style="font-size:22px;color:var(--blue);">10 cities</div>
+              <div class="mc-b">On-ground teams — we service Pan-India (30+ cities), with on-ground support concentrated in 10.</div>
+            </div>
+            <div class="minicard">
+              <div class="mc-t" style="font-size:22px;color:var(--blue);">100 consultants</div>
+              <div class="mc-b">Working with clients on their requirements, end to end.</div>
+            </div>
+            <div class="minicard">
+              <div class="mc-t" style="font-size:22px;color:var(--blue);">40,000+ seats</div>
+              <div class="mc-b">Leased annually in the flex/coworking industry.</div>
+            </div>
+            <div class="minicard">
+              <div class="mc-t" style="font-size:22px;color:var(--blue);">1M sqft</div>
+              <div class="mc-b">Conventional leasing — our newest product line, already at 1M sqft.</div>
+            </div>
+            <div class="minicard">
+              <div class="mc-t" style="font-size:22px;color:var(--blue);">₹35 Cr</div>
+              <div class="mc-b">Our take rate per year — AM is a profitable vertical and the highest revenue driver of the firm.</div>
+            </div>
+            <div class="minicard">
+              <div class="mc-t" style="font-size:22px;color:var(--blue);">₹300 Cr</div>
+              <div class="mc-b">Annual transaction value — the GMV of space sold.</div>
+            </div>
+          </div>
+        </div>
+        <div class="takeaway" data-editable="ch4-s05-takeaway">₹35Cr take rate, ₹300Cr GMV, 100 consultants, 10 cities. You're joining the largest and most profitable vertical in the firm.</div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+
+<script>
+var CHAPTER_ID   = 'wwd_am';
+var NEXT_CHAPTER = 'wwd_vo';
+var CHAPTER_NAME = 'What We Do — Assisted Marketplace';
+var DRIVE_FOLDER = 'Beginner Chapters/What We Do Assisted Marketplace';
+
+var SHEET_URL = 'https://script.google.com/macros/s/AKfycbwX0Z5vx6DSwdwZwK26pKZL3V3U9XwEyWgPa9Ek_cFEH1_tpULnWNcn7RlgE-wT8M9M/exec';
+
+var DEV_PREVIEW = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || typeof window.firebaseAuth === 'undefined';
+(function() {
+  if (DEV_PREVIEW) return;
+  window.firebaseAuth.onAuthStateChanged(function(user) {
+    if (!user) { window.location.href = '../landing.html'; return; }
+    var db = window.firebaseDB;
+    db.collection('users').doc(user.uid).get().then(function(snap) {
+      var data = snap.exists ? snap.data() : {};
+      var unlocked = (data.unlockedChapters && data.unlockedChapters.beginner) || [];
+      if (unlocked.indexOf(CHAPTER_ID) === -1) {
+        document.getElementById('slide-mode').style.display = 'none';
+        var rm = document.getElementById('read-mode'); if (rm) rm.style.display = 'none';
+        var lock = document.createElement('div');
+        lock.style.cssText = 'position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;font-family:Manrope,sans-serif;z-index:9999;';
+        lock.innerHTML = '<div style="font-size:2.5rem;">🔒</div><div style="font-size:1.2rem;font-weight:800;color:#1E22AA;">This chapter is locked.</div><div style="font-size:14px;color:#7B7FE8;max-width:340px;text-align:center;">Ask your admin to unlock it.</div><a href="../hub.html" style="margin-top:8px;font-size:13px;font-weight:700;color:#1E22AA;text-decoration:underline;">← Back to Hub</a>';
+        document.body.appendChild(lock);
+        return;
+      }
+      if (!(data.progress && data.progress[CHAPTER_ID] && data.progress[CHAPTER_ID].completed)) {
+        db.collection('users').doc(user.uid).set({
+          progress: { wwd_am: { completed: true, completedAt: firebase.firestore.FieldValue.serverTimestamp() } },
+          unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion('wwd_vo', 'wwd_od') }
+        }, { merge: true });
+      }
+      db.collection('content').doc(CHAPTER_ID).get().then(function(cSnap) {
+        if (!cSnap.exists) return;
+        var cData = cSnap.data();
+        document.querySelectorAll('[data-editable]').forEach(function(el) {
+          var key = el.getAttribute('data-editable');
+          if (cData[key] !== undefined) el.innerHTML = cData[key];
+        });
+      });
+    });
+  });
+})();
+
+var currentMode = 'slide';
+function setMode(mode) {
+  currentMode = mode;
+  var isSlide = mode === 'slide';
+  document.getElementById('slide-mode').style.display = isSlide ? '' : 'none';
+  var readEl = document.getElementById('read-mode');
+  if (readEl) readEl.classList.toggle('hidden', isSlide);
+  document.body.style.overflow = 'auto';
+  document.getElementById('screenCounter').style.display = isSlide ? '' : 'none';
+  document.getElementById('dotNav').style.display = isSlide ? '' : 'none';
+  var keyHintEl = document.getElementById('keyHint'); if (keyHintEl) keyHintEl.style.display = isSlide ? '' : 'none';
+  var chapterLabelEl = document.getElementById('chapterLabel'); if (chapterLabelEl) chapterLabelEl.style.display = isSlide ? '' : 'none';
+  var btn = document.getElementById('btnRead');
+  if (isSlide) {
+    btn.innerHTML = '<i class="fa-solid fa-book-open"></i>&nbsp;Read Full Chapter';
+    btn.onclick = function() { setMode('read'); };
+  } else {
+    btn.innerHTML = '<i class="fa-solid fa-display"></i>&nbsp;Back to Slides';
+    btn.onclick = function() { setMode('slide'); };
+    window.scrollTo(0, 0);
+  }
+}
+
+var TOTAL = 0; var current = 0; var animating = false;
+
+function buildDots() {
+  var nav = document.getElementById('dotNav'); nav.innerHTML = '';
+  for (var i = 0; i < TOTAL; i++) {
+    var d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    (function(idx){ d.onclick = function(){ goTo(idx); }; })(i);
+    nav.appendChild(d);
+  }
+}
+function updateCounter() {
+  document.getElementById('screenCounter').textContent = (current + 1) + ' / ' + TOTAL;
+  var chap = document.getElementById('chapterLabel');
+  if (chap) chap.style.display = current === 0 ? '' : 'none';
+}
+
+/* ⚠⚠⚠ scaleSlides() — DO NOT EDIT ⚠⚠⚠ */
+var BASE_DPR = window.devicePixelRatio || 1;
+function scaleSlides() {
+  var REF_W = 1440, REF_H = 900; var wrap = document.getElementById('slides'); if (!wrap) return;
+  var topbar = document.querySelector('.topbar'); var topbarH = topbar ? topbar.offsetHeight : 52;
+  var vw = document.documentElement.clientWidth; var vh = document.documentElement.clientHeight - topbarH;
+  var zoom = (window.devicePixelRatio || 1) / BASE_DPR; var fit = Math.min(vw / REF_W, vh / REF_H); var scale = fit * zoom;
+  var scaledW = REF_W * scale, scaledH = REF_H * scale;
+  var offsetX = Math.max(0, Math.round((vw - scaledW) / 2)); var offsetY = Math.max(0, Math.round((vh - scaledH) / 2));
+  wrap.style.width = REF_W + 'px'; wrap.style.height = REF_H + 'px';
+  wrap.style.left = offsetX + 'px'; wrap.style.top = (topbarH + offsetY) + 'px';
+  wrap.style.right = 'auto'; wrap.style.bottom = 'auto';
+  wrap.style.transform = 'scale(' + scale + ')'; wrap.style.transformOrigin = 'top left';
+  document.body.style.minHeight = (topbarH + offsetY + scaledH) + 'px';
+  document.body.style.minWidth = (offsetX + scaledW) + 'px';
+}
+window.addEventListener('resize', scaleSlides);
+(function watchZoom() { var mq = window.matchMedia('(resolution: ' + window.devicePixelRatio + 'dppx)'); mq.addEventListener('change', function() { scaleSlides(); watchZoom(); }); })();
+/* ⚠ end scaleSlides ⚠ */
+
+function goTo(index) {
+  if (animating || index === current || index < 0 || index >= TOTAL) return;
+  animating = true;
+  var screens = document.querySelectorAll('.screen'); var dots = document.querySelectorAll('.dot'); var prev = current; current = index;
+  screens[prev].classList.add('exit-up'); screens[prev].classList.remove('active');
+  setTimeout(function(){ screens[prev].classList.remove('exit-up'); }, 500);
+  screens[current].classList.add('active'); dots[prev].classList.remove('active'); dots[current].classList.add('active');
+  updateCounter();
+  var keyHint = document.getElementById('keyHint'); if (keyHint) keyHint.classList.add('hidden');
+  setTimeout(function(){ animating = false; }, 520);
+}
+function next() { goTo(current + 1); }
+function prev() { goTo(current - 1); }
+document.addEventListener('keydown', function(e) {
+  if (currentMode !== 'slide') return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prev();
+});
+
+var tocLinks = document.querySelectorAll('.toc-link');
+var readSections = document.querySelectorAll('.section[id]');
+var tocObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      tocLinks.forEach(function(l){ l.classList.remove('active'); });
+      var a = document.querySelector('.toc-link[data-s="' + entry.target.id + '"]');
+      if (a) a.classList.add('active');
+    }
+  });
+}, { rootMargin: '-15% 0px -75% 0px', threshold: 0 });
+readSections.forEach(function(s){ tocObserver.observe(s); });
+
+window.addEventListener('DOMContentLoaded', function() {
+  TOTAL = document.querySelectorAll('#slides .screen').length;
+  scaleSlides(); buildDots();
+  var first = document.querySelectorAll('.screen')[0]; if (first) first.classList.add('active');
+  updateCounter();
+});
+
+</script>
+</body>
+</html>

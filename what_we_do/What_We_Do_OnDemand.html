@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 3: What We Do — On-Demand | myHQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" as="style">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" as="style">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="../firebase-config.js"></script>
+<style>
+:root {
+  --blue:       #1E22AA;
+  --blue-dark:  #161a8b;
+  --green:      #BEE5C2;
+  --coral:      #FF7351;
+  --amber:      #FFB848;
+  --ink:        #0B0F2C;
+  --body:       #4A4D63;
+  --muted:      #94909C;
+  --white:      #FFFFFF;
+  --hairline:   rgba(11,15,44,0.10);
+  --sans:       'Manrope', system-ui, sans-serif;
+  --radius:     8px;
+  --ease:       cubic-bezier(0.22,1,0.36,1);
+  --transition: 0.25s var(--ease);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--sans); background: var(--white); color: var(--ink); overflow: auto; font-size: 16px; line-height: 1.6; }
+
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: 52px; z-index: 100;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--hairline);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-logo { font-size: 15px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.topbar-chapter { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.topbar-center { font-size: 18px; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; position: absolute; left: 50%; transform: translateX(-50%); }
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+.screen-counter { font-size: 11px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.read-btn {
+  font-size: 11px; font-weight: 700; color: var(--white); background: var(--blue);
+  padding: 6px 14px; border-radius: var(--radius); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: var(--transition); cursor: pointer; border: none; font-family: var(--sans);
+}
+.read-btn:hover { background: var(--blue-dark); }
+.hub-btn {
+  font-size: 14px; color: var(--blue); background: transparent;
+  width: 32px; height: 32px; border-radius: var(--radius);
+  border: 1px solid rgba(30,34,170,0.3);
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: var(--transition); text-decoration: none;
+}
+.hub-btn:hover { background: rgba(30,34,170,0.06); border-color: var(--blue); }
+
+/* ⚠⚠⚠ SLIDE ENGINE CSS — DO NOT EDIT ⚠⚠⚠ */
+.dot-nav { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 100; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hairline); border: 1.5px solid rgba(11,15,44,0.2); cursor: pointer; transition: var(--transition); }
+.dot.active { background: var(--blue); border-color: var(--blue); transform: scale(1.3); }
+.key-hint { position: absolute; bottom: 18px; right: 48px; font-size: 11px; font-weight: 500; color: var(--muted); display: flex; align-items: center; gap: 6px; transition: opacity 0.5s; z-index: 100; }
+.key-hint.hidden { opacity: 0; pointer-events: none; }
+.slides { position: absolute; transform-origin: top left; }
+.screen { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); transform: translateY(20px); overflow: hidden; }
+.screen.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+.screen.exit-up { opacity: 0; transform: translateY(-20px); }
+/* end DO NOT EDIT */
+
+.screen-next-btn {
+  position: absolute; bottom: 40px; right: 56px;
+  background: transparent; color: var(--muted); border: 1px solid var(--hairline);
+  font-size: 11px; font-weight: 700; font-family: var(--sans);
+  padding: 7px 14px; border-radius: var(--radius); cursor: pointer;
+  display: flex; align-items: center; gap: 6px; transition: var(--transition);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.screen-next-btn:hover { color: var(--blue); border-color: rgba(30,34,170,0.3); }
+
+/* Slide scaffolding */
+.slide-pad { height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 56px 80px; gap: 30px; }
+.slide-center { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 80px; }
+.eyebrow { font-size: 19px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); }
+.slide-headline { font-size: 59px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1.12; }
+.slide-headline span { color: var(--blue); }
+.slide-sub { font-size: 21.5px; color: var(--body); line-height: 1.6; max-width: 900px; }
+
+/* Cover */
+.cover-inner { display: grid; grid-template-columns: 1fr 1fr; height: 100%; align-items: center; padding: 0 80px; gap: 64px; }
+.cover-eyebrow { font-size: 17.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 27px; display: flex; align-items: center; gap: 13px; }
+.cover-eyebrow::before { content: ''; width: 12px; height: 12px; background: var(--blue); border-radius: 50%; display: block; }
+.cover-headline { font-size: 81px; font-weight: 800; line-height: 1.08; letter-spacing: -0.04em; color: var(--ink); margin-bottom: 32px; }
+.cover-headline em { font-style: normal; color: var(--blue); }
+.cover-sub { font-size: 24px; color: var(--body); line-height: 1.7; margin-bottom: 43px; }
+.cover-media { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: var(--radius); overflow: hidden; box-shadow: 0 16px 48px rgba(11,15,44,0.18); background: var(--ink); }
+.cover-media img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Image placeholder */
+.img-placeholder {
+  border: 2px dashed var(--hairline); border-radius: var(--radius);
+  background: #FAFBFF; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 8px;
+  color: var(--muted); text-align: center; padding: 20px;
+}
+.img-placeholder i { font-size: 28px; color: #B8BBF0; }
+.img-placeholder span { font-size: 12px; font-weight: 600; max-width: 220px; line-height: 1.4; }
+
+/* Big Stat */
+.bigstat-num { font-size: 189px; font-weight: 800; color: var(--ink); letter-spacing: -0.04em; line-height: 1; }
+.bigstat-num span { color: var(--blue); }
+.bigstat-caption { font-size: 32px; font-weight: 700; color: var(--body); max-width: 60ch; }
+.bigstat-facts { display: grid; grid-template-columns: repeat(5, auto); gap: 0; border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; max-width: 1280px; margin-top: 27px; }
+.bigstat-fact { padding: 24px 30px; border-right: 1px solid var(--hairline); text-align: left; }
+.bigstat-fact:last-child { border-right: none; }
+.bigstat-fact-num { font-size: 32px; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; margin-bottom: 5px; }
+.bigstat-fact-lbl { font-size: 16px; color: var(--muted); line-height: 1.4; }
+
+/* Uniform stat grid */
+.statgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; max-width: 1180px; width: 100%; }
+.statbox { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 26px 22px; background: #FAFBFF; text-align: left; }
+.statbox-num { font-size: 32px; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; margin-bottom: 7px; }
+.statbox-lbl { font-size: 14.5px; color: var(--body); line-height: 1.4; }
+
+/* Two Column */
+.twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 38px; align-content: center; align-items: stretch; }
+.twocol-panel { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 43px 49px; background: #FAFBFF; display: flex; flex-direction: column; gap: 19px; }
+.twocol-panel h3 { font-size: 32px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.twocol-panel p { font-size: 21.5px; color: var(--body); line-height: 1.7; }
+.twocol-panel ul { padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 16px; }
+.twocol-panel li { font-size: 20px; color: var(--body); line-height: 1.6; padding-left: 24px; position: relative; }
+.twocol-panel li::before { content: ''; position: absolute; left: 0; top: 12px; width: 7px; height: 7px; border-radius: 50%; background: var(--blue); }
+.twocol-panel li strong { color: var(--ink); }
+.twocol.compact { align-items: stretch; }
+.twocol.compact .twocol-panel { justify-content: center; }
+.twocol.compact .twocol-panel { padding: 32px 36px; gap: 14px; }
+.twocol.compact .twocol-panel h3 { font-size: 24px; }
+.twocol.compact .twocol-panel p { font-size: 16px; line-height: 1.7; }
+.twocol.compact .twocol-panel ul { gap: 12px; }
+.twocol.compact .twocol-panel li { font-size: 15px; line-height: 1.6; padding-left: 18px; }
+.twocol.compact .twocol-panel li::before { top: 9px; width: 5px; height: 5px; }
+
+.icon-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+.icon-list li { display: flex; align-items: center; gap: 14px; font-size: 15px; color: var(--body); line-height: 1.5; }
+.icon-list li .il-icon { flex-shrink: 0; width: 38px; height: 38px; border-radius: 10px; background: rgba(30,34,170,0.08); color: var(--blue); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.icon-list li strong { color: var(--ink); }
+
+/* Card Grid */
+.cardgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-content: center; }
+.cardgrid.cols-5 { grid-template-columns: repeat(5, 1fr); gap: 16px; }
+.cardgrid.cols-5 .card { padding: 20px 16px; gap: 8px; }
+.cardgrid.cols-5 .card-icon { width: 46px; height: 46px; font-size: 20px; }
+.cardgrid.cols-5 .card h3 { font-size: 16px; }
+.cardgrid.cols-5 .card p { font-size: 13.5px; line-height: 1.5; }
+.card { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 30px 27px; background: var(--white); display: flex; flex-direction: column; gap: 11px; }
+.card-icon { width: 65px; height: 65px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 28px; background: rgba(30,34,170,0.08); color: var(--blue); }
+.card h3 { font-size: 21.5px; font-weight: 800; color: var(--ink); }
+.card p { font-size: 17.5px; color: var(--body); line-height: 1.55; }
+.card .card-tag { font-size: 15px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* Logo strip */
+.logo-strip { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: center; }
+.logo-pill { border: 1px solid var(--hairline); border-radius: 999px; padding: 8px 18px; font-size: 13px; font-weight: 700; color: var(--body); background: #FAFBFF; }
+
+/* Read mode */
+#read-mode.hidden { display: none; }
+.r-layout { display: flex; max-width: 100%; margin: 0; padding: 0 48px 80px 0; align-items: flex-start; }
+.r-sidebar { width: 240px; flex-shrink: 0; position: sticky; top: 52px; padding: 32px 24px 0 24px; max-height: calc(100vh - 52px); overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.r-toc-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); margin-bottom: 12px; }
+.toc-link { font-size: 13px; color: var(--body); text-decoration: none; padding: 8px 12px; border-radius: var(--radius); border-left: 2px solid transparent; transition: var(--transition); }
+.toc-link:hover { background: #FAFBFF; color: var(--blue); }
+.toc-link.active { color: var(--blue); font-weight: 700; border-left-color: var(--blue); background: rgba(30,34,170,0.05); }
+.r-content { flex: 1; min-width: 0; padding: 40px 0 0 48px; }
+.section { margin-bottom: 56px; }
+.section-num { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 6px; }
+.section-title { font-size: 29px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1.15; margin-bottom: 16px; }
+.section-outcome { font-size: 13px; color: var(--body); background: #FAFBFF; border: 1px solid var(--hairline); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 16px; }
+.section-outcome span:first-child { font-weight: 700; color: var(--blue); }
+.section-body { font-size: 16px; color: var(--body); line-height: 1.8; margin-bottom: 14px; }
+.takeaway { font-size: 16px; font-weight: 600; color: var(--ink); background: rgba(190,229,194,0.25); border-left: 3px solid var(--green); padding: 16px 20px; border-radius: var(--radius); margin-top: 20px; }
+.section-list { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; padding: 0; }
+.section-list li { font-size: 15px; color: var(--body); line-height: 1.65; padding-left: 18px; position: relative; }
+.section-list li::before { content: ''; position: absolute; left: 0; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: var(--blue); }
+.minicard-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 4px; }
+.minicard { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 18px 16px; background: #FAFBFF; }
+.minicard i { font-size: 22px; margin-bottom: 8px; color: var(--blue); display: block; }
+.minicard .mc-t { font-size: 13px; font-weight: 800; color: var(--ink); margin-bottom: 4px; }
+.minicard .mc-b { font-size: 12px; color: var(--body); line-height: 1.5; }
+
+/* Assessment */
+.aq-tracker { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.aq-tracker-bar { flex: 1; height: 4px; background: var(--hairline); border-radius: 99px; overflow: hidden; }
+.aq-tracker-fill { height: 100%; width: 0; background: var(--blue); transition: width 0.3s var(--ease); }
+.aq-tracker-label { font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.aq-question { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 16px; transition: var(--transition); }
+.aq-question.is-filled { border-color: var(--green); background: rgba(190,229,194,0.08); }
+.aq-q-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.aq-q-num { font-size: 12px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.08em; }
+.aq-q-status { font-size: 12px; font-weight: 600; color: var(--muted); }
+.aq-q-status.done { color: #2e7d32; }
+.aq-q-text { font-size: 16px; font-weight: 600; color: var(--ink); line-height: 1.5; margin-bottom: 12px; }
+.aq-textarea { width: 100%; font-family: var(--sans); font-size: 15px; color: var(--ink); border: 1px solid var(--hairline); border-radius: var(--radius); padding: 12px 14px; resize: vertical; line-height: 1.6; }
+.aq-textarea:focus { outline: none; border-color: var(--blue); }
+.aq-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 24px; gap: 16px; }
+.aq-footer-note { font-size: 13px; color: var(--muted); }
+.aq-submit-btn { font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--white); background: var(--blue); border: none; border-radius: var(--radius); padding: 12px 28px; cursor: pointer; transition: var(--transition); }
+.aq-submit-btn:disabled { background: var(--hairline); color: var(--muted); cursor: not-allowed; }
+.aq-submit-btn:not(:disabled):hover { background: var(--blue-dark); }
+.aq-error { font-size: 13px; color: var(--coral); margin-top: 12px; }
+</style>
+</head>
+<body>
+
+<header class="topbar" id="topbar">
+  <div class="topbar-left">
+    <span class="topbar-logo">myHQ</span>
+    <span class="topbar-chapter" id="chapterLabel">Chapter 3</span>
+  </div>
+  <div class="topbar-center" data-editable="ch3-title">What We Do — On-Demand</div>
+  <div class="topbar-right">
+    <a class="hub-btn" href="../hub.html" title="Back to Hub"><i class="fa-solid fa-house"></i></a>
+    <span class="screen-counter" id="screenCounter">1 / 1</span>
+    <button class="read-btn" id="btnRead" onclick="setMode('read')">
+      <i class="fa-solid fa-book-open"></i>&nbsp;Read Full Chapter
+    </button>
+  </div>
+</header>
+
+<div id="slide-mode">
+  <div class="slides" id="slides">
+
+  <!-- SCREEN 0 · COVER -->
+  <div class="screen">
+    <div class="cover-inner">
+      <div>
+        <div class="cover-eyebrow" data-editable="ch3-cover-eyebrow">On-Demand Business</div>
+        <h1 class="cover-headline" data-editable="ch3-cover-headline">Book a desk.<br><em>No commitments.</em></h1>
+        <p class="cover-sub" data-editable="ch3-cover-sub">FlexiPass, meeting rooms, training rooms &amp; event spaces — On-Demand lets anyone book premium workspace by the day, with zero long-term commitment.</p>
+      </div>
+      <div>
+        <div class="cover-media">
+          <img src="chapter_images/ch3-cover.png" alt="On-Demand workspace">
+        </div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 1 · TWO COLUMN — What is OD + Key Benefits -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ch3-sl1-eyebrow">The Product</div>
+      <h2 class="slide-headline" data-editable="ch3-sl1-headline">Pay by the day. <span>Skip the lease.</span></h2>
+      <div class="twocol compact">
+        <div class="twocol-panel">
+          <h3 data-editable="ch3-sl1-c1t">What is On-Demand?</h3>
+          <p data-editable="ch3-sl1-c1b">On-Demand enables users to book workspaces by the day without any long-term commitments — across a wide network of premium coworking brands and cities.</p>
+          <ul>
+            <li data-editable="ch3-sl1-c1l1"><strong>Pay-per-day usage:</strong> Only pay for the days you use the service</li>
+            <li data-editable="ch3-sl1-c1l2"><strong>Flexible locations:</strong> Access a wide range of brands and cities</li>
+            <li data-editable="ch3-sl1-c1l3"><strong>Instant booking:</strong> Book quickly and easily through the app or web</li>
+            <li data-editable="ch3-sl1-c1l4"><strong>Best pricing:</strong> Get the best deal since this inventory is perishable</li>
+          </ul>
+        </div>
+        <div class="twocol-panel">
+          <h3 data-editable="ch3-sl1-c2t">Target Audience</h3>
+          <ul class="icon-list">
+            <li data-editable="ch3-sl1-c2l1"><span class="il-icon"><i class="fa-solid fa-user"></i></span><span><strong>Individuals:</strong> Freelancers &amp; solo workers</span></li>
+            <li data-editable="ch3-sl1-c2l2"><span class="il-icon"><i class="fa-solid fa-people-group"></i></span><span><strong>Small Teams:</strong> Groups collaborating on projects</span></li>
+            <li data-editable="ch3-sl1-c2l3"><span class="il-icon"><i class="fa-solid fa-rocket"></i></span><span><strong>Startups:</strong> New businesses needing flexible space</span></li>
+            <li data-editable="ch3-sl1-c2l4"><span class="il-icon"><i class="fa-solid fa-bolt"></i></span><span><strong>Ad-hoc Work:</strong> Temporary or occasional tasks</span></li>
+            <li data-editable="ch3-sl1-c2l5"><span class="il-icon"><i class="fa-solid fa-handshake"></i></span><span><strong>Meetings:</strong> Professional spaces for client interactions</span></li>
+            <li data-editable="ch3-sl1-c2l6"><span class="il-icon"><i class="fa-solid fa-chalkboard-user"></i></span><span><strong>Training &amp; Events:</strong> Workshops, seminars, gatherings</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 2 · CARD GRID — OD Products (5) -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ch3-sl2-eyebrow">OD Products</div>
+      <h2 class="slide-headline" data-editable="ch3-sl2-headline">Five products. <span>Every use-case.</span></h2>
+      <p class="slide-sub" data-editable="ch3-sl2-sub">From solo workdays to large team events, across premium coworking spaces.</p>
+      <div class="cardgrid cols-5">
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-chair"></i></div>
+          <h3 data-editable="ch3-sl2-c1t">Day Passes &amp; Exec Day Passes</h3>
+          <p data-editable="ch3-sl2-c1b">Working moms, hybrid teams, professionals without an office. Book by the day.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-door-closed"></i></div>
+          <h3 data-editable="ch3-sl2-c2t">Private Cabins</h3>
+          <p data-editable="ch3-sl2-c2b">Hybrid/sales team catch-ups, brainstorming sessions, teams without an office. Book by the day.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-people-roof"></i></div>
+          <h3 data-editable="ch3-sl2-c3t">Meeting Rooms / Board Rooms</h3>
+          <p data-editable="ch3-sl2-c3b">Interviews, board meetings, client presentations. Book by the hour.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
+          <h3 data-editable="ch3-sl2-c4t">Training Rooms</h3>
+          <p data-editable="ch3-sl2-c4b">Upskilling, recruitment drives, on-ground sales team training. Book by the hour.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-clapperboard"></i></div>
+          <h3 data-editable="ch3-sl2-c5t">Event Spaces</h3>
+          <p data-editable="ch3-sl2-c5b">Video shoots, event launches, meetups, conferences. Book by the day.</p>
+        </div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 3 · TWO COLUMN — B2C vs B2B2C -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ch3-sl3-eyebrow">Who We Serve</div>
+      <h2 class="slide-headline" data-editable="ch3-sl3-headline">Two models. <span>Same network.</span></h2>
+      <p class="slide-sub" data-editable="ch3-sl3-sub">On-Demand serves both B2C and B2B2C users, using the same supply network but with tailored pricing, services, and different workflows.</p>
+      <div class="twocol">
+        <div class="twocol-panel">
+          <h3 data-editable="ch3-sl3-c1t">B2C Has</h3>
+          <ul>
+            <li data-editable="ch3-sl3-c1l1">Instant booking</li>
+            <li data-editable="ch3-sl3-c1l2">Flexible usage</li>
+            <li data-editable="ch3-sl3-c1l3">Pay per go payment option</li>
+            <li data-editable="ch3-sl3-c1l4">App-focused experience</li>
+          </ul>
+        </div>
+        <div class="twocol-panel">
+          <h3 data-editable="ch3-sl3-c2t">B2B2C Has</h3>
+          <ul>
+            <li data-editable="ch3-sl3-c2l1">Wallet credits</li>
+            <li data-editable="ch3-sl3-c2l2">Centralized billing</li>
+            <li data-editable="ch3-sl3-c2l3">Admin controls on employee usage</li>
+            <li data-editable="ch3-sl3-c2l4">Employee leaderboards</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 4 · CARD GRID — OD Platforms -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ch3-sl4-eyebrow">OD Platforms</div>
+      <h2 class="slide-headline" data-editable="ch3-sl4-headline">Three platforms. <span>One booking engine.</span></h2>
+      <div class="cardgrid">
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-mobile-screen"></i></div>
+          <span class="card-tag">B2C</span>
+          <h3 data-editable="ch3-sl4-c1t">myHQ Mobile App</h3>
+          <p data-editable="ch3-sl4-c1b">Day Pass, Meeting Rooms, Event Space booking — discovery, payment and bookings history in one app.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-globe"></i></div>
+          <span class="card-tag">B2C</span>
+          <h3 data-editable="ch3-sl4-c2t">myHQ Website</h3>
+          <p data-editable="ch3-sl4-c2b">Filter by product, city, brand, price range. Compare offers and get the best price before booking.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-table-columns"></i></div>
+          <span class="card-tag">B2B2C</span>
+          <h3 data-editable="ch3-sl4-c3t">Team Flexi Dashboard</h3>
+          <p data-editable="ch3-sl4-c3b">Invite users, create groups, purchase plans, and track credits — all from one corporate dashboard.</p>
+        </div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 5 · WEWORK PARTNERSHIP -->
+  <div class="screen">
+    <div class="slide-center" style="background:var(--blue); color:var(--white);">
+      <div class="eyebrow" style="color:rgba(255,255,255,0.7);" data-editable="ch3-sl5-eyebrow">Exclusive Partnership</div>
+      <img src="chapter_images/myhq_wework.png" alt="myHQ + WeWork" style="max-width:480px; width:100%; margin:18px 0;">
+      <h2 class="slide-headline" style="color:var(--white); margin:14px 0 38px;" data-editable="ch3-sl5-headline">We have exclusive rights of <span style="color:#BEE5C2;">WeWork India.</span></h2>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1350px;">
+        <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:24px;font-size:19px;line-height:1.6;" data-editable="ch3-sl5-c1">Exclusive partner for all on-demand &amp; virtual office business</div>
+        <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:24px;font-size:19px;line-height:1.6;" data-editable="ch3-sl5-c2">Managing the entire tech backend for WeWork India to fulfil this business</div>
+        <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:24px;font-size:19px;line-height:1.6;" data-editable="ch3-sl5-c3">All bookings, even the ones on WW India website / app, are managed by us</div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 6 · BIG STAT — Scale -->
+  <div class="screen">
+    <div class="slide-center">
+      <div class="eyebrow" data-editable="ch3-sl6-eyebrow">Current Scale</div>
+      <div class="bigstat-num" data-editable="ch3-sl6-num" style="margin:16px 0;">35<span>K</span></div>
+      <div class="bigstat-caption" data-editable="ch3-sl6-caption" style="margin-bottom:32px;">monthly bookings across premium coworking spaces</div>
+      <div class="statgrid">
+        <div class="statbox">
+          <div class="statbox-num" data-editable="ch3-sl6-f1n">1,500</div>
+          <div class="statbox-lbl" data-editable="ch3-sl6-f1l">Daily active users</div>
+        </div>
+        <div class="statbox">
+          <div class="statbox-num" data-editable="ch3-sl6-f2n">₹30L</div>
+          <div class="statbox-lbl" data-editable="ch3-sl6-f2l">Monthly marketing spend</div>
+        </div>
+        <div class="statbox">
+          <div class="statbox-num" data-editable="ch3-sl6-f3n">₹8–9Cr</div>
+          <div class="statbox-lbl" data-editable="ch3-sl6-f3l">Our take rate / year</div>
+        </div>
+        <div class="statbox">
+          <div class="statbox-num" data-editable="ch3-sl6-f4n">₹30Cr</div>
+          <div class="statbox-lbl" data-editable="ch3-sl6-f4l">Annual transaction value</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /.slides -->
+
+  <div class="dot-nav" id="dotNav"></div>
+  <div class="key-hint" id="keyHint"><i class="fa-solid fa-arrows-left-right"></i> Use arrow keys</div>
+</div><!-- /#slide-mode -->
+
+
+<div id="read-mode" class="hidden" style="margin-top:52px;">
+  <div class="r-layout">
+
+    <aside class="r-sidebar">
+      <div class="r-toc-label">Chapter 3</div>
+      <a href="#r-intro"   class="toc-link" data-s="r-intro">Introduction</a>
+      <a href="#r-s01"     class="toc-link" data-s="r-s01">01 · What is On-Demand</a>
+      <a href="#r-s02"     class="toc-link" data-s="r-s02">02 · OD Products</a>
+      <a href="#r-s03"     class="toc-link" data-s="r-s03">03 · B2C &amp; B2B2C</a>
+      <a href="#r-s04"     class="toc-link" data-s="r-s04">04 · Platforms &amp; WeWork</a>
+      <a href="#r-s05"     class="toc-link" data-s="r-s05">05 · Current Scale</a>
+    </aside>
+
+    <main class="r-content">
+
+      <section class="section" id="r-intro">
+        <div data-editable="ch3-intro-body" style="padding:28px 32px;border:1px solid var(--hairline);border-radius:var(--radius);background:#FAFBFF;">
+          <p class="section-body" style="margin-bottom:0;">On-Demand is myHQ's pay-per-use workspace product — FlexiPass, meeting/training rooms, private cabins and event spaces. It lets anyone, from a freelancer needing a focus day to a company running a recruitment drive, book premium coworking space by the day or by the hour, with no long-term lease. It is myHQ's highest-volume, highest-frequency product.</p>
+        </div>
+      </section>
+
+      <section class="section" id="r-s01">
+        <div class="section-outcome"><span>Learning Outcome:</span> <span data-editable="ch3-s01-outcome">Understand what On-Demand is, the four key benefits it offers, and who typically uses it.</span></div>
+        <div class="section-num">01</div>
+        <h2 class="section-title" data-editable="ch3-s01-title">What is On-Demand (OD)?</h2>
+        <div data-editable="ch3-s01-body">
+          <p class="section-body">On-Demand enables users to book workspaces by the day without any long-term commitments. There's no lease, no security deposit, no notice period — just book and show up.</p>
+          <p class="section-body"><strong>Key benefits:</strong></p>
+          <ul class="section-list">
+            <li><strong>Pay-per-day usage:</strong> Only pay for the days you actually use the service.</li>
+            <li><strong>Flexible locations:</strong> Access a wide range of brands and cities through one network.</li>
+            <li><strong>Instant booking:</strong> Book quickly and easily through the app or web.</li>
+            <li><strong>Best pricing:</strong> Get the best deal since this inventory is perishable.</li>
+          </ul>
+          <p class="section-body"><strong>Target audience:</strong></p>
+          <ul class="section-list">
+            <li><strong>Individuals:</strong> Freelancers and solo workers.</li>
+            <li><strong>Small Teams:</strong> Groups collaborating on a project.</li>
+            <li><strong>Startups:</strong> New businesses needing flexible space.</li>
+            <li><strong>Ad-hoc Work:</strong> Temporary or occasional tasks.</li>
+            <li><strong>Meetings:</strong> Professional spaces for client interactions.</li>
+            <li><strong>Training &amp; Events:</strong> Workshops, seminars, and gatherings.</li>
+          </ul>
+        </div>
+        <div class="takeaway" data-editable="ch3-s01-takeaway">On-Demand = flexible workspace, booked by the day or hour, at the best price because the inventory is perishable. No commitment, no lease.</div>
+      </section>
+
+      <section class="section" id="r-s02">
+        <div class="section-outcome"><span>Learning Outcome:</span> <span data-editable="ch3-s02-outcome">Know the five OD products, who each is built for, and the booking unit (day vs. hour) for each.</span></div>
+        <div class="section-num">02</div>
+        <h2 class="section-title" data-editable="ch3-s02-title">OD Products</h2>
+        <div data-editable="ch3-s02-body">
+          <p class="section-body">The On-Demand product covers a wide range of use-cases — from solo workdays to large team events — across premium coworking spaces. There are five distinct products:</p>
+          <div class="minicard-grid">
+            <div class="minicard">
+              <i class="fa-solid fa-chair"></i>
+              <div class="mc-t">Day Passes &amp; Executive Day Passes</div>
+              <div class="mc-b">Working moms, hybrid teams, professionals without an office. <strong>Book by the day.</strong></div>
+            </div>
+            <div class="minicard">
+              <i class="fa-solid fa-door-closed"></i>
+              <div class="mc-t">Private Cabins</div>
+              <div class="mc-b">Hybrid/sales team catch-ups, brainstorming sessions, teams without an office. <strong>Book by the day.</strong></div>
+            </div>
+            <div class="minicard">
+              <i class="fa-solid fa-people-roof"></i>
+              <div class="mc-t">Meeting Rooms / Board Rooms</div>
+              <div class="mc-b">Interviews, board meetings, client presentations. <strong>Book by the hour.</strong></div>
+            </div>
+            <div class="minicard">
+              <i class="fa-solid fa-chalkboard-user"></i>
+              <div class="mc-t">Training Rooms</div>
+              <div class="mc-b">Upskilling, recruitment drives, on-ground sales team training. <strong>Book by the hour.</strong></div>
+            </div>
+          </div>
+          <div class="minicard-grid" style="grid-template-columns:repeat(4,1fr);">
+            <div class="minicard">
+              <i class="fa-solid fa-clapperboard"></i>
+              <div class="mc-t">Event Spaces</div>
+              <div class="mc-b">Video shoots, event launches, meetups, conferences. <strong>Book by the day.</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="takeaway" data-editable="ch3-s02-takeaway">Day-rate products (passes, cabins, events) suit longer occupancy; hour-rate products (meeting &amp; training rooms) suit short, high-intensity use. Match the product to how long the client will actually be in the room.</div>
+      </section>
+
+      <section class="section" id="r-s03">
+        <div class="section-outcome"><span>Learning Outcome:</span> <span data-editable="ch3-s03-outcome">Explain the difference between B2C and B2B2C access, and why both run on the same supply.</span></div>
+        <div class="section-num">03</div>
+        <h2 class="section-title" data-editable="ch3-s03-title">B2C &amp; B2B2C Offerings</h2>
+        <div data-editable="ch3-s03-body">
+          <p class="section-body">On-Demand is built for both individuals and corporate users. It serves both B2C and B2B2C users on the same supply network, but with tailored pricing, services, and different workflows.</p>
+          <p class="section-body"><strong>B2C has:</strong></p>
+          <ul class="section-list">
+            <li>Instant booking</li>
+            <li>Flexible usage</li>
+            <li>Pay per go payment option</li>
+            <li>App-focused experience</li>
+          </ul>
+          <p class="section-body"><strong>B2B2C has:</strong></p>
+          <ul class="section-list">
+            <li>Wallet credits</li>
+            <li>Centralized billing</li>
+            <li>Admin controls on employee usage</li>
+            <li>Employee leaderboards</li>
+          </ul>
+        </div>
+        <div class="takeaway" data-editable="ch3-s03-takeaway">Same spaces, same supply network — but B2C is self-serve and pay-as-you-go, while B2B2C runs on company-purchased credits with admin controls and central billing.</div>
+      </section>
+
+      <section class="section" id="r-s04">
+        <div class="section-outcome"><span>Learning Outcome:</span> <span data-editable="ch3-s04-outcome">Know the three OD platforms, which user type each serves, and the scope of the WeWork India partnership.</span></div>
+        <div class="section-num">04</div>
+        <h2 class="section-title" data-editable="ch3-s04-title">Platforms &amp; the WeWork Partnership</h2>
+        <div data-editable="ch3-s04-body">
+          <p class="section-body">myHQ operates On-Demand across three platforms:</p>
+          <ul class="section-list">
+            <li><strong>myHQ Mobile App:</strong> Day Pass, Meeting Room, and Event Space booking — discovery, booking and payments, and bookings history in one app.</li>
+            <li><strong>myHQ Website:</strong> Filter by product, city, brand, and price range. Compare offers and get the best price before booking.</li>
+            <li><strong>Team Flexi Dashboard:</strong> Invite users, create groups, purchase plans, and track credits — all from one corporate dashboard.</li>
+          </ul>
+          <p class="section-body"><strong>We have exclusive rights of WeWork India.</strong> myHQ is the exclusive partner for all of WeWork India's on-demand and virtual office business. We manage the entire tech backend for WeWork India to fulfil this business — and all bookings, even the ones placed directly on the WeWork India website or app, are managed by us.</p>
+        </div>
+        <div class="takeaway" data-editable="ch3-s04-takeaway">Three platforms, one supply network. And every WeWork India on-demand/VO booking — wherever it's placed — runs through myHQ's backend.</div>
+      </section>
+
+      <section class="section" id="r-s05">
+        <div class="section-outcome"><span>Learning Outcome:</span> <span data-editable="ch3-s05-outcome">Know the OD scale numbers cold — they come up in client conversations and internal reviews.</span></div>
+        <div class="section-num">05</div>
+        <h2 class="section-title" data-editable="ch3-s05-title">Current Scale (OD)</h2>
+        <div data-editable="ch3-s05-body">
+          <p class="section-body">On-Demand is myHQ's highest-frequency, fastest-turnaround product. Key numbers:</p>
+          <div class="minicard-grid" style="grid-template-columns:repeat(3,1fr);">
+            <div class="minicard">
+              <div class="mc-t" style="font-size:22px;color:var(--blue);">1,500</div>
+              <div class="mc-b">Daily active users.</div>
+            </div>
+            <div class="minicard">
+              <div class="mc-t" style="font-size:22px;color:var(--blue);">35,000</div>
+              <div class="mc-b">Monthly bookings.</div>
+            </div>
+            <div class="minicard">
+              <div class="mc-t" style="font-size:22px;color:var(--blue);">₹30L</div>
+              <div class="mc-b">Monthly marketing spend.</div>
+            </div>
+            <div class="minicard">
+              <div class="mc-t" style="font-size:22px;color:var(--blue);">₹8–9 Cr</div>
+              <div class="mc-b">Our take rate per year.</div>
+            </div>
+            <div class="minicard">
+              <div class="mc-t" style="font-size:22px;color:var(--blue);">₹30 Cr</div>
+              <div class="mc-b">Annual transaction value.</div>
+            </div>
+          </div>
+        </div>
+        <div class="takeaway" data-editable="ch3-s05-takeaway">35,000 bookings a month, ₹30Cr in annual transaction value — On-Demand is the highest-volume, highest-frequency product in the myHQ portfolio.</div>
+      </section>
+
+    </main>
+  </div>
+</div><!-- /#read-mode -->
+
+
+<script>
+var CHAPTER_ID   = 'wwd_od';
+var NEXT_CHAPTER = '';
+var CHAPTER_NAME = 'What We Do — On-Demand';
+var DRIVE_FOLDER = 'Beginner Chapters/What We Do On-Demand';
+
+var SHEET_URL = 'https://script.google.com/macros/s/AKfycbwX0Z5vx6DSwdwZwK26pKZL3V3U9XwEyWgPa9Ek_cFEH1_tpULnWNcn7RlgE-wT8M9M/exec';
+
+var DEV_PREVIEW = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || typeof window.firebaseAuth === 'undefined';
+(function() {
+  if (DEV_PREVIEW) return;
+  window.firebaseAuth.onAuthStateChanged(function(user) {
+    if (!user) { window.location.href = '../landing.html'; return; }
+    var db = window.firebaseDB;
+    db.collection('users').doc(user.uid).get().then(function(snap) {
+      var data = snap.exists ? snap.data() : {};
+      var unlocked = (data.unlockedChapters && data.unlockedChapters.beginner) || [];
+      if (unlocked.indexOf(CHAPTER_ID) === -1) {
+        document.getElementById('slide-mode').style.display = 'none';
+        var rm = document.getElementById('read-mode'); if (rm) rm.style.display = 'none';
+        var lock = document.createElement('div');
+        lock.style.cssText = 'position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;font-family:Manrope,sans-serif;z-index:9999;';
+        lock.innerHTML = '<div style="font-size:2.5rem;">🔒</div><div style="font-size:1.2rem;font-weight:800;color:#1E22AA;">This chapter is locked.</div><div style="font-size:14px;color:#7B7FE8;max-width:340px;text-align:center;">Ask your admin to unlock it.</div><a href="../hub.html" style="margin-top:8px;font-size:13px;font-weight:700;color:#1E22AA;text-decoration:underline;">← Back to Hub</a>';
+        document.body.appendChild(lock);
+        return;
+      }
+      if (!(data.progress && data.progress[CHAPTER_ID] && data.progress[CHAPTER_ID].completed)) {
+        db.collection('users').doc(user.uid).set({
+          progress: { wwd_od: { completed: true, completedAt: firebase.firestore.FieldValue.serverTimestamp() } }
+        }, { merge: true });
+      }
+      db.collection('content').doc(CHAPTER_ID).get().then(function(cSnap) {
+        if (!cSnap.exists) return;
+        var cData = cSnap.data();
+        document.querySelectorAll('[data-editable]').forEach(function(el) {
+          var key = el.getAttribute('data-editable');
+          if (cData[key] !== undefined) el.innerHTML = cData[key];
+        });
+      });
+    });
+  });
+})();
+
+var currentMode = 'slide';
+function setMode(mode) {
+  currentMode = mode;
+  var isSlide = mode === 'slide';
+  document.getElementById('slide-mode').style.display = isSlide ? '' : 'none';
+  var readEl = document.getElementById('read-mode');
+  if (readEl) readEl.classList.toggle('hidden', isSlide);
+  document.body.style.overflow = 'auto';
+  document.getElementById('screenCounter').style.display = isSlide ? '' : 'none';
+  document.getElementById('dotNav').style.display = isSlide ? '' : 'none';
+  var keyHintEl = document.getElementById('keyHint'); if (keyHintEl) keyHintEl.style.display = isSlide ? '' : 'none';
+  var chapterLabelEl = document.getElementById('chapterLabel'); if (chapterLabelEl) chapterLabelEl.style.display = isSlide ? '' : 'none';
+  var btn = document.getElementById('btnRead');
+  if (isSlide) {
+    btn.innerHTML = '<i class="fa-solid fa-book-open"></i>&nbsp;Read Full Chapter';
+    btn.onclick = function() { setMode('read'); };
+  } else {
+    btn.innerHTML = '<i class="fa-solid fa-display"></i>&nbsp;Back to Slides';
+    btn.onclick = function() { setMode('slide'); };
+    window.scrollTo(0, 0);
+  }
+}
+
+var TOTAL = 0;
+var current = 0;
+var animating = false;
+
+function buildDots() {
+  var nav = document.getElementById('dotNav');
+  nav.innerHTML = '';
+  for (var i = 0; i < TOTAL; i++) {
+    var d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    (function(idx){ d.onclick = function(){ goTo(idx); }; })(i);
+    nav.appendChild(d);
+  }
+}
+function updateCounter() {
+  document.getElementById('screenCounter').textContent = (current + 1) + ' / ' + TOTAL;
+  var chap = document.getElementById('chapterLabel');
+  if (chap) chap.style.display = current === 0 ? '' : 'none';
+}
+
+/* ⚠⚠⚠ scaleSlides() — DO NOT EDIT ⚠⚠⚠ */
+var BASE_DPR = window.devicePixelRatio || 1;
+function scaleSlides() {
+  var REF_W = 1440, REF_H = 900;
+  var wrap = document.getElementById('slides');
+  if (!wrap) return;
+  var topbar = document.querySelector('.topbar');
+  var topbarH = topbar ? topbar.offsetHeight : 52;
+  var vw = document.documentElement.clientWidth;
+  var vh = document.documentElement.clientHeight - topbarH;
+  var zoom = (window.devicePixelRatio || 1) / BASE_DPR;
+  var fit = Math.min(vw / REF_W, vh / REF_H);
+  var scale = fit * zoom;
+  var scaledW = REF_W * scale, scaledH = REF_H * scale;
+  var offsetX = Math.max(0, Math.round((vw - scaledW) / 2));
+  var offsetY = Math.max(0, Math.round((vh - scaledH) / 2));
+  wrap.style.width = REF_W + 'px';
+  wrap.style.height = REF_H + 'px';
+  wrap.style.left = offsetX + 'px';
+  wrap.style.top = (topbarH + offsetY) + 'px';
+  wrap.style.right = 'auto';
+  wrap.style.bottom = 'auto';
+  wrap.style.transform = 'scale(' + scale + ')';
+  wrap.style.transformOrigin = 'top left';
+  document.body.style.minHeight = (topbarH + offsetY + scaledH) + 'px';
+  document.body.style.minWidth = (offsetX + scaledW) + 'px';
+}
+window.addEventListener('resize', scaleSlides);
+(function watchZoom() {
+  var mq = window.matchMedia('(resolution: ' + window.devicePixelRatio + 'dppx)');
+  mq.addEventListener('change', function() { scaleSlides(); watchZoom(); });
+})();
+/* ⚠ end scaleSlides ⚠ */
+
+function goTo(index) {
+  if (animating || index === current || index < 0 || index >= TOTAL) return;
+  animating = true;
+  var screens = document.querySelectorAll('.screen');
+  var dots = document.querySelectorAll('.dot');
+  var prev = current;
+  current = index;
+  screens[prev].classList.add('exit-up');
+  screens[prev].classList.remove('active');
+  setTimeout(function(){ screens[prev].classList.remove('exit-up'); }, 500);
+  screens[current].classList.add('active');
+  dots[prev].classList.remove('active');
+  dots[current].classList.add('active');
+  updateCounter();
+  var keyHint = document.getElementById('keyHint'); if (keyHint) keyHint.classList.add('hidden');
+  setTimeout(function(){ animating = false; }, 520);
+}
+function next() { goTo(current + 1); }
+function prev() { goTo(current - 1); }
+
+document.addEventListener('keydown', function(e) {
+  if (currentMode !== 'slide') return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prev();
+});
+
+var tocLinks = document.querySelectorAll('.toc-link');
+var readSections = document.querySelectorAll('.section[id]');
+var tocObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      tocLinks.forEach(function(l){ l.classList.remove('active'); });
+      var a = document.querySelector('.toc-link[data-s="' + entry.target.id + '"]');
+      if (a) a.classList.add('active');
+    }
+  });
+}, { rootMargin: '-15% 0px -75% 0px', threshold: 0 });
+readSections.forEach(function(s){ tocObserver.observe(s); });
+
+window.addEventListener('DOMContentLoaded', function() {
+  TOTAL = document.querySelectorAll('#slides .screen').length;
+  scaleSlides();
+  buildDots();
+  var first = document.querySelectorAll('.screen')[0];
+  if (first) first.classList.add('active');
+  updateCounter();
+});
+
+</script>
+</body>
+</html>
