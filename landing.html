@@ -273,17 +273,38 @@ body {
 .course-list-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--blue-soft); margin-bottom: 4px; }
 .course-list-item {
   display: flex; align-items: center; gap: 14px;
-  padding: 14px 18px; border: 1px solid var(--blue-pale);
+  padding: 16px 20px; border: 1px solid #E6E8FF; border-radius: 10px;
   text-decoration: none; cursor: pointer;
-  transition: background 0.15s;
+  transition: border-color 0.18s var(--ease), box-shadow 0.18s var(--ease);
 }
-a.course-list-item { background: #f0f2ff; }
-a.course-list-item:hover { background: #e4e7ff; }
-.course-list-item.locked { opacity: 0.45; cursor: not-allowed; background: transparent; }
+a.course-list-item { background: var(--blue-wash); }
+a.course-list-item:hover { border-color: var(--border-mid); box-shadow: 0 4px 12px rgba(26,30,158,0.07); }
+.course-list-item.locked {
+  background: var(--white);
+  opacity: 0.55;
+  cursor: default;
+}
 .course-list-num { font-size: 10px; font-weight: 700; color: var(--blue-soft); letter-spacing: 0.1em; width: 20px; }
 .course-list-name { flex: 1; font-size: 13px; font-weight: 700; color: var(--blue); }
 .course-list-arrow { font-size: 14px; color: var(--blue); }
-.course-list-lock { font-size: 12px; }
+.course-list-status {
+  font-size: 11px; font-weight: 600; color: var(--blue-soft);
+  letter-spacing: -0.005em;
+}
+.admin-portal-link {
+  display: flex; align-items: baseline; gap: 10px;
+  border: 1px solid #E6E8FF;
+  border-radius: 10px;
+  background: var(--white);
+  padding: 12px 16px;
+  text-decoration: none;
+  margin-top: 8px;
+  transition: border-color 0.18s var(--ease);
+}
+.admin-portal-link:hover { border-color: var(--border-mid); }
+.admin-portal-link-label { font-size: 12px; font-weight: 600; color: var(--blue); letter-spacing: -0.005em; }
+.admin-portal-link-hint { font-size: 11px; font-weight: 500; color: var(--blue-soft); }
+.admin-portal-link-arrow { margin-left: auto; font-size: 12px; color: var(--blue-soft); }
 .signout-btn {
   margin-top: 8px; background: none; border: none;
   font-family: var(--sans); font-size: 11px; font-weight: 600;
@@ -332,15 +353,6 @@ a.course-list-item:hover { background: #e4e7ff; }
     <!-- LOGGED IN: welcome + courses -->
     <div class="success-panel" id="success-panel">
       <div class="success-title">Welcome,<br><span class="success-name" id="success-name">—</span>.</div>
-      <div id="admin-portal-landing" style="display:none;">
-        <a href="admin.html" style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border:1px solid rgba(30,34,170,0.15);border-left:4px solid #1A1E9E;background:#f0f2ff;text-decoration:none;margin-bottom:4px;">
-          <div>
-            <div style="font-size:13px;font-weight:800;color:#1A1E9E;">⚙️ Admin Portal</div>
-            <div style="font-size:9px;font-weight:600;color:#7B7FE8;letter-spacing:0.08em;text-transform:uppercase;margin-top:2px;font-family:'JetBrains Mono',monospace;">Manage users &amp; content</div>
-          </div>
-          <span style="font-size:16px;color:#1A1E9E;">→</span>
-        </a>
-      </div>
       <div class="course-list">
         <div class="course-list-label">Your Courses</div>
         <a class="course-list-item" href="hub.html">
@@ -351,13 +363,20 @@ a.course-list-item:hover { background: #e4e7ff; }
         <div class="course-list-item locked">
           <span class="course-list-num">02</span>
           <span class="course-list-name">Intermediate</span>
-          <span class="course-list-lock">🔒</span>
+          <span class="course-list-status">Locked</span>
         </div>
         <div class="course-list-item locked">
           <span class="course-list-num">03</span>
           <span class="course-list-name">Advanced</span>
-          <span class="course-list-lock">🔒</span>
+          <span class="course-list-status">Locked</span>
         </div>
+      </div>
+      <div id="admin-portal-landing" style="display:none;">
+        <a href="admin.html" class="admin-portal-link">
+          <span class="admin-portal-link-label">Admin Portal</span>
+          <span class="admin-portal-link-hint">Manage users &amp; content</span>
+          <span class="admin-portal-link-arrow">→</span>
+        </a>
       </div>
       <button class="signout-btn" onclick="doSignOut()">Sign out</button>
     </div>
