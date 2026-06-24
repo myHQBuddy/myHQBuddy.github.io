@@ -269,27 +269,50 @@ body {
 /* Admin portal row */
 .admin-portal-row {
   display: flex; align-items: center; justify-content: space-between;
-  border: 1px solid var(--border);
+  border: 1px solid #E6E8FF;
+  border-radius: 12px;
   background: var(--white);
-  padding: 18px 28px;
+  box-shadow: 0 1px 2px rgba(26,30,158,0.04);
+  padding: 28px 32px;
   cursor: pointer;
+  position: relative;
+  transition: border-color 0.18s var(--ease), box-shadow 0.18s var(--ease);
+}
+.admin-portal-row::before {
+  content: '';
+  position: absolute; left: 0; top: 18px; bottom: 18px; width: 2px;
+  background: var(--blue-pale);
+  border-radius: 2px;
   transition: background 0.18s var(--ease);
 }
-.admin-portal-row:hover { background: var(--blue-wash); }
-.admin-portal-row .admin-icon {
-  font-size: 14px; color: var(--blue); margin-right: 12px;
+.admin-portal-row:hover {
+  border-color: var(--border-md);
+  box-shadow: 0 4px 12px rgba(26,30,158,0.07);
 }
+.admin-portal-row:hover::before { background: var(--blue-mid); }
 .admin-portal-label {
-  font-size: 13px; font-weight: 800;
+  font-size: 15px; font-weight: 700;
   color: var(--blue); letter-spacing: -0.01em;
 }
 .admin-portal-hint {
-  font-family: var(--mono);
-  font-size: 9px; font-weight: 600;
-  letter-spacing: 0.13em; text-transform: uppercase;
+  font-size: 13px; font-weight: 500;
   color: var(--blue-soft); margin-top: 4px;
+  letter-spacing: -0.005em;
 }
-.admin-portal-row .admin-arrow { font-size: 14px; color: var(--blue); }
+.admin-portal-arrow-btn {
+  flex-shrink: 0;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border-md);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--blue);
+  font-size: 13px;
+  transition: background 0.18s var(--ease), border-color 0.18s var(--ease);
+}
+.admin-portal-row:hover .admin-portal-arrow-btn {
+  background: var(--blue-wash);
+  border-color: var(--blue-mid);
+}
 
 /* CTA */
 .card-cta-wrap { padding: 0; }
@@ -388,14 +411,11 @@ body {
 <!-- ADMIN PORTAL ROW (shown only if isAdmin or masterAdmin) -->
 <div class="courses-wrap" id="admin-portal-wrap" style="display:none;padding-bottom:0;">
   <div class="admin-portal-row" onclick="window.location.href='admin.html'">
-    <div style="display:flex;align-items:center;">
-      <i class="fa-solid fa-gear admin-icon"></i>
-      <div>
-        <div class="admin-portal-label">Admin Portal</div>
-        <div class="admin-portal-hint">Manage users &amp; content</div>
-      </div>
+    <div>
+      <div class="admin-portal-label">Admin Portal</div>
+      <div class="admin-portal-hint">Manage users &amp; content</div>
     </div>
-    <i class="fa-solid fa-arrow-right admin-arrow"></i>
+    <div class="admin-portal-arrow-btn"><i class="fa-solid fa-arrow-right"></i></div>
   </div>
 </div>
 
