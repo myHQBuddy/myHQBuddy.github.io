@@ -1290,7 +1290,7 @@ async function toggleChapter(chId, pill) {
   } else {
     updated = [...existing, chId];
   }
-  await ref.update({ [`unlockedChapters.${selectedCourse}`]: updated });
+  await ref.set({ unlockedChapters: { [selectedCourse]: updated } }, { merge: true });
   if (!currentUserDoc.unlockedChapters) currentUserDoc.unlockedChapters = {};
   currentUserDoc.unlockedChapters[selectedCourse] = updated;
   renderChapterList();
