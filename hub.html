@@ -441,28 +441,32 @@ body {
       </div>
     </div>
 
-    <!-- CHAPTER 3 (placeholder) -->
+    <!-- CHAPTER 3 -->
     <div class="course-card locked has-backdrop" id="card-ch3">
       <div class="card-top-bar"></div>
-      <div class="card-backdrop" style="background-image:url('ch3_book_images/what_we_do_backdrop.png'); background-size:cover; background-position:center;">
+      <div class="card-backdrop" style="background-image:url('ch5_book_images/how_we_support_you_backdrop.png'); background-size:cover; background-position:center;">
         <div class="card-head">
           <div class="card-num">Chapter 03</div>
-          <div class="card-title">What We Do</div>
-          <div class="badge badge-locked" id="status-ch3">Coming soon</div>
+          <div class="card-title">How We Support You</div>
+          <div class="badge badge-locked" id="status-ch3">Locked</div>
         </div>
       </div>
       <div class="card-cta-wrap" id="footer-ch3">
-        <button class="card-cta cta-locked" disabled>Coming soon</button>
+        <button class="card-cta cta-locked" disabled>Locked</button>
+      </div>
+      <div class="unlock-section" id="unlock-section-ch3">
+        <div class="unlock-label" id="unlock-ch3-label">Chapter 3 is locked</div>
+        <div class="unlock-hint" id="hint-ch3">Complete Chapter 2 and submit your answers to unlock Chapter 3.</div>
       </div>
     </div>
 
     <!-- CHAPTER 4 (placeholder) -->
     <div class="course-card locked has-backdrop" id="card-ch4">
       <div class="card-top-bar"></div>
-      <div class="card-backdrop" style="background-image:url('ch4_book_images/what_we_stand_for_backdrop.jpg'); background-size:cover; background-position:center;">
+      <div class="card-backdrop" style="background-image:url('ch3_book_images/what_we_do_backdrop.png'); background-size:cover; background-position:center;">
         <div class="card-head">
           <div class="card-num">Chapter 04</div>
-          <div class="card-title">What We Stand For</div>
+          <div class="card-title">What We Do</div>
           <div class="badge badge-locked" id="status-ch4">Coming soon</div>
         </div>
       </div>
@@ -474,10 +478,10 @@ body {
     <!-- CHAPTER 5 (placeholder) -->
     <div class="course-card locked has-backdrop" id="card-ch5">
       <div class="card-top-bar"></div>
-      <div class="card-backdrop" style="background-image:url('ch5_book_images/how_we_support_you_backdrop.png'); background-size:cover; background-position:center;">
+      <div class="card-backdrop" style="background-image:url('ch4_book_images/what_we_stand_for_backdrop.jpg'); background-size:cover; background-position:center;">
         <div class="card-head">
           <div class="card-num">Chapter 05</div>
-          <div class="card-title">How We Support You</div>
+          <div class="card-title">What We Stand For</div>
           <div class="badge badge-locked" id="status-ch5">Coming soon</div>
         </div>
       </div>
@@ -757,6 +761,36 @@ auth.onAuthStateChanged(function(user) {
         status2.textContent = 'Unlocked'; status2.className = 'badge badge-blue';
         footer2.innerHTML = '<a class="card-cta cta-primary" href="Who_We_Are_v2.html"><span>Start</span><span class="arrow">→</span></a>';
       }
+    }
+
+    // ── Chapter 3 — How We Support You ──
+    var adminUnlockedCh3 = unlocked.indexOf('ch3') !== -1;
+    var ch3Unlocked      = ch2Completed || adminUnlockedCh3;
+    var ch3Completed     = progress.ch3 && progress.ch3.completed;
+    var card3        = document.getElementById('card-ch3');
+    var footer3      = document.getElementById('footer-ch3');
+    var unlockSec3   = document.getElementById('unlock-section-ch3');
+    var status3      = document.getElementById('status-ch3');
+
+    if (ch2Completed && !adminUnlockedCh3) {
+      db.collection('users').doc(user.uid).set({
+        unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion('ch3') }
+      }, { merge: true });
+    }
+
+    if (ch3Unlocked) {
+      card3.classList.remove('locked'); card3.classList.add('unlocked');
+      if (unlockSec3) unlockSec3.style.display = 'none';
+      if (ch3Completed) {
+        card3.classList.add('completed');
+        status3.textContent = 'Completed'; status3.className = 'badge badge-mint';
+        footer3.innerHTML = '<a class="card-cta cta-done" href="policies_benefits.html"><span>Review</span><span class="arrow">→</span></a>';
+      } else {
+        status3.textContent = 'Unlocked'; status3.className = 'badge badge-blue';
+        footer3.innerHTML = '<a class="card-cta cta-primary" href="policies_benefits.html"><span>Start</span><span class="arrow">→</span></a>';
+      }
+    } else {
+      if (unlockSec3) unlockSec3.style.display = '';
     }
 
     // ── AM Chapter 1 — Know Your City ──

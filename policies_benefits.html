@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 3: How We Support You | myHQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" as="style">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" as="style">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<style>
+:root {
+  --blue:       #1E22AA;
+  --blue-dark:  #161a8b;
+  --green:      #BEE5C2;
+  --coral:      #FF7351;
+  --amber:      #FFB848;
+  --ink:        #0B0F2C;
+  --body:       #4A4D63;
+  --muted:      #94909C;
+  --white:      #FFFFFF;
+  --hairline:   rgba(11,15,44,0.10);
+  --sans:       'Manrope', system-ui, sans-serif;
+  --radius:     8px;
+  --ease:       cubic-bezier(0.22,1,0.36,1);
+  --transition: 0.25s var(--ease);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--sans); background: var(--white); color: var(--ink); overflow: auto; font-size: 16px; line-height: 1.6; }
+
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: 52px; z-index: 100;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--hairline);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-logo { font-size: 15px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.topbar-chapter { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.topbar-center { font-size: 18px; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; position: absolute; left: 50%; transform: translateX(-50%); }
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+.screen-counter { font-size: 11px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.read-btn {
+  font-size: 11px; font-weight: 700; color: var(--white); background: var(--blue);
+  padding: 6px 14px; border-radius: var(--radius); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: var(--transition); cursor: pointer; border: none; font-family: var(--sans);
+}
+.read-btn:hover { background: var(--blue-dark); }
+.hub-btn {
+  font-size: 14px; color: var(--blue); background: transparent;
+  width: 32px; height: 32px; border-radius: var(--radius);
+  border: 1px solid rgba(30,34,170,0.3);
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: var(--transition); text-decoration: none;
+}
+.hub-btn:hover { background: rgba(30,34,170,0.06); border-color: var(--blue); }
+
+/* ⚠⚠⚠ SLIDE ENGINE CSS — DO NOT EDIT ⚠⚠⚠ */
+.dot-nav { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 100; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hairline); border: 1.5px solid rgba(11,15,44,0.2); cursor: pointer; transition: var(--transition); }
+.dot.active { background: var(--blue); border-color: var(--blue); transform: scale(1.3); }
+.key-hint { position: absolute; bottom: 18px; right: 48px; font-size: 11px; font-weight: 500; color: var(--muted); display: flex; align-items: center; gap: 6px; transition: opacity 0.5s; z-index: 100; }
+.key-hint.hidden { opacity: 0; pointer-events: none; }
+.slides { position: absolute; transform-origin: top left; }
+.screen { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); transform: translateY(20px); overflow: hidden; }
+.screen.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+.screen.exit-up { opacity: 0; transform: translateY(-20px); }
+/* end DO NOT EDIT */
+
+.screen-next-btn {
+  position: absolute; bottom: 40px; right: 56px;
+  background: transparent; color: var(--muted); border: 1px solid var(--hairline);
+  font-size: 11px; font-weight: 700; font-family: var(--sans);
+  padding: 7px 14px; border-radius: var(--radius); cursor: pointer;
+  display: flex; align-items: center; gap: 6px; transition: var(--transition);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.screen-next-btn:hover { color: var(--blue); border-color: rgba(30,34,170,0.3); }
+
+/* Slide scaffolding */
+.slide-pad { height: 100%; display: flex; flex-direction: column; padding: 56px 80px; gap: 28px; }
+.slide-center { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 80px; }
+.eyebrow { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); }
+.slide-headline { font-size: 44px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1.12; }
+.slide-headline span { color: var(--blue); }
+
+/* Cover */
+.cover-inner { display: grid; grid-template-columns: 1fr 1fr; height: 100%; align-items: center; padding: 0 80px; gap: 64px; }
+.cover-eyebrow { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+.cover-eyebrow::before { content: ''; width: 9px; height: 9px; background: var(--blue); border-radius: 50%; display: block; }
+.cover-headline { font-size: 60px; font-weight: 800; line-height: 1.08; letter-spacing: -0.04em; color: var(--ink); margin-bottom: 24px; }
+.cover-headline em { font-style: normal; color: var(--blue); }
+.cover-sub { font-size: 18px; color: var(--body); line-height: 1.7; margin-bottom: 32px; }
+.cover-media { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: var(--radius); overflow: hidden; box-shadow: 0 16px 48px rgba(11,15,44,0.18); background: var(--ink); }
+.cover-media img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Image placeholder */
+.img-placeholder {
+  border: 2px dashed var(--hairline); border-radius: var(--radius);
+  background: #FAFBFF; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 8px;
+  color: var(--muted); text-align: center; padding: 20px;
+}
+.img-placeholder i { font-size: 28px; color: var(--blue-pale, #B8BBF0); }
+.img-placeholder span { font-size: 12px; font-weight: 600; max-width: 220px; line-height: 1.4; }
+
+/* Card Grid */
+.cardgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; flex: 1; min-height: 0; align-content: center; align-items: start; }
+.card { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 32px 28px; background: var(--white); display: flex; flex-direction: column; gap: 16px; }
+.card-icon { width: 64px; height: 64px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 28px; background: rgba(30,34,170,0.08); color: var(--blue); }
+.card h3 { font-size: 21px; font-weight: 800; color: var(--ink); }
+.card p { font-size: 16px; color: var(--body); line-height: 1.7; }
+.card ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.card ul li { font-size: 15px; color: var(--body); line-height: 1.6; padding-left: 16px; position: relative; }
+.card ul li::before { content: ''; position: absolute; left: 0; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: var(--blue); }
+
+/* Compact variant for dense grids (e.g. 8-card Keka HRMS) */
+.cardgrid-compact .card { padding: 18px 16px; gap: 8px; }
+.cardgrid-compact .card-icon { width: 40px; height: 40px; font-size: 18px; }
+.cardgrid-compact .card h3 { font-size: 15px; }
+.cardgrid-compact .card p { font-size: 12.5px; line-height: 1.5; }
+
+/* Two Column */
+.twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; flex: 1; min-height: 0; align-content: center; align-items: stretch; }
+.twocol-panel { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 40px 44px; background: #FAFBFF; display: flex; flex-direction: column; gap: 18px; }
+.twocol-panel h3 { font-size: 26px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.twocol-panel p { font-size: 17px; color: var(--body); line-height: 1.75; }
+.twocol-panel ul { padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 18px; }
+.twocol-panel li { font-size: 17px; color: var(--body); line-height: 1.65; padding-left: 20px; position: relative; }
+.twocol-panel li::before { content: ''; position: absolute; left: 0; top: 10px; width: 6px; height: 6px; border-radius: 50%; background: var(--blue); }
+.twocol-panel li strong { color: var(--ink); }
+
+/* Alert pill for non-negotiables */
+.alert-pill { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,115,81,0.1); color: var(--coral); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; padding: 4px 10px; border-radius: 99px; margin-bottom: 6px; }
+
+/* Read mode */
+#read-mode.hidden { display: none; }
+.r-layout { display: flex; max-width: 100%; margin: 0; padding: 0 48px 80px 0; align-items: flex-start; }
+.r-sidebar { width: 240px; flex-shrink: 0; position: sticky; top: 52px; padding: 32px 24px 0 24px; max-height: calc(100vh - 52px); overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.r-toc-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); margin-bottom: 12px; }
+.toc-link { font-size: 13px; color: var(--body); text-decoration: none; padding: 8px 12px; border-radius: var(--radius); border-left: 2px solid transparent; transition: var(--transition); }
+.toc-link:hover { background: #FAFBFF; color: var(--blue); }
+.toc-link.active { color: var(--blue); font-weight: 700; border-left-color: var(--blue); background: rgba(30,34,170,0.05); }
+.r-content { flex: 1; min-width: 0; padding: 40px 0 0 48px; }
+.section { margin-bottom: 56px; }
+.section-num { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 6px; }
+.section-title { font-size: 29px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1.15; margin-bottom: 16px; }
+.section-outcome { font-size: 13px; color: var(--body); background: #FAFBFF; border: 1px solid var(--hairline); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 16px; }
+.section-outcome span:first-child { font-weight: 700; color: var(--blue); }
+.section-body { font-size: 16px; color: var(--body); line-height: 1.8; margin-bottom: 14px; }
+.takeaway { font-size: 16px; font-weight: 600; color: var(--ink); background: rgba(190,229,194,0.25); border-left: 3px solid var(--green); padding: 16px 20px; border-radius: var(--radius); margin-top: 20px; }
+.section-list { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; padding: 0; }
+.section-list li { font-size: 15px; color: var(--body); line-height: 1.65; padding-left: 18px; position: relative; }
+.section-list li::before { content: ''; position: absolute; left: 0; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: var(--blue); }
+
+/* Assessment MCQ */
+.aq-tracker { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.aq-tracker-bar { flex: 1; height: 4px; background: var(--hairline); border-radius: 99px; overflow: hidden; }
+.aq-tracker-fill { height: 100%; width: 0; background: var(--blue); transition: width 0.3s var(--ease); }
+.aq-tracker-label { font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.mcq-q { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 24px; margin-bottom: 16px; transition: border-color 0.2s; }
+.mcq-q.is-answered { border-color: rgba(30,34,170,0.25); }
+.aq-q-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.aq-q-num { font-size: 11px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.1em; }
+.aq-q-status { font-size: 12px; font-weight: 600; color: var(--muted); }
+.aq-q-status.done { color: #2e7d32; }
+.aq-q-text { font-size: 15px; font-weight: 600; color: var(--ink); line-height: 1.55; margin-bottom: 16px; }
+.mcq-hint { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+.mcq-options { display: flex; flex-direction: column; gap: 8px; }
+.mcq-opt { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border: 1.5px solid var(--hairline); border-radius: var(--radius); cursor: pointer; transition: var(--transition); user-select: none; }
+.mcq-opt:hover:not(.revealed) { border-color: rgba(30,34,170,0.3); background: rgba(30,34,170,0.03); }
+.mcq-opt input { display: none; }
+.mcq-opt.selected:not(.revealed) { border-color: var(--blue); background: rgba(30,34,170,0.06); }
+.mcq-badge { width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0; background: var(--hairline); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--muted); margin-top: 1px; transition: var(--transition); }
+.mcq-opt.selected:not(.revealed) .mcq-badge { background: var(--blue); color: #fff; }
+.mcq-opt-text { font-size: 14px; color: var(--body); line-height: 1.55; }
+.mcq-opt.revealed.correct { border-color: #2e7d32; background: rgba(46,125,50,0.06); }
+.mcq-opt.revealed.correct .mcq-badge { background: #2e7d32; color: #fff; }
+.mcq-opt.revealed.correct .mcq-opt-text { color: #1b5e20; font-weight: 600; }
+.mcq-opt.revealed.wrong { border-color: var(--coral); background: rgba(255,115,81,0.06); }
+.mcq-opt.revealed.wrong .mcq-badge { background: var(--coral); color: #fff; }
+.mcq-opt.revealed.wrong .mcq-opt-text { color: #b71c1c; }
+.mcq-opt.revealed { cursor: default; pointer-events: none; }
+.mcq-explain { display: none; font-size: 13px; color: var(--body); background: #F7F8FF; border-radius: var(--radius); padding: 10px 14px; margin-top: 12px; line-height: 1.6; border-left: 3px solid var(--blue); }
+.mcq-explain.visible { display: block; }
+.aq-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 24px; gap: 16px; }
+.aq-footer-note { font-size: 13px; color: var(--muted); }
+.aq-submit-btn { font-family: var(--sans); font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--white); background: var(--blue); border: none; border-radius: var(--radius); padding: 12px 28px; cursor: pointer; transition: var(--transition); }
+.aq-submit-btn:disabled { background: var(--hairline); color: var(--muted); cursor: not-allowed; }
+.aq-submit-btn:not(:disabled):hover { background: var(--blue-dark); }
+.mcq-score { font-size: 28px; font-weight: 800; color: var(--blue); text-align: center; padding: 20px; background: rgba(30,34,170,0.05); border-radius: var(--radius); margin-bottom: 16px; }
+.aq-error { font-size: 13px; color: var(--coral); margin-top: 12px; }
+</style>
+</head>
+<body>
+
+<header class="topbar" id="topbar">
+  <div class="topbar-left">
+    <span class="topbar-logo">myHQ</span>
+    <span class="topbar-chapter" id="chapterLabel">Chapter 3</span>
+  </div>
+  <div class="topbar-center" data-editable="ch3-title">Policies &amp; Benefits</div>
+  <div class="topbar-right">
+    <a class="hub-btn" href="hub.html" title="Back to Hub"><i class="fa-solid fa-house"></i></a>
+    <span class="screen-counter" id="screenCounter">1 / 1</span>
+    <button class="read-btn" id="btnRead" onclick="setMode('read')">
+      <i class="fa-solid fa-book-open"></i>&nbsp;Read Full Chapter
+    </button>
+  </div>
+</header>
+
+<div id="slide-mode">
+  <div class="slides" id="slides">
+
+  <!-- SCREEN 0 · COVER -->
+  <div class="screen">
+    <div class="cover-inner">
+      <div>
+        <div class="cover-eyebrow" data-editable="ch3-cover-eyebrow">Chapter 3 · How We Support You</div>
+        <h1 class="cover-headline" data-editable="ch3-cover-headline">Your benefits.<br><em>Know them all.</em></h1>
+        <p class="cover-sub" data-editable="ch3-cover-sub">myHQ invests in you, your work family, and your actual family. This chapter covers what you get, your leave entitlements, and the three things that are non-negotiable from day one.</p>
+      </div>
+      <div>
+        <div class="cover-media">
+          <img src="chapter_images/ch3-cover.jpg" alt="How We Support You" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="img-placeholder" style="display:none; position:absolute; inset:0; border:none; border-radius:0;">
+            <i class="fa-solid fa-image"></i>
+            <span>Photo: Team celebrating a benefit or milestone (e.g. offsite, team dinner)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 1 · CARD GRID — 3 Pillars -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ch3-sl1-eyebrow">The Philosophy</div>
+      <h2 class="slide-headline" data-editable="ch3-sl1-headline">We invest in <span>all three.</span></h2>
+      <div class="img-placeholder" style="height:90px; flex-direction:row; gap:14px; margin-bottom:16px;">
+        <i class="fa-solid fa-image" style="font-size:20px;"></i>
+        <span style="max-width:none;">Photo: Team at an offsite or a family-friendly company event</span>
+      </div>
+      <div class="cardgrid">
+        <div class="card">
+          <div class="card-icon" style="background:rgba(255,184,72,0.15);color:var(--amber);"><i class="fa-solid fa-person"></i></div>
+          <h3 data-editable="ch3-sl1-c1t">You</h3>
+          <ul>
+            <li data-editable="ch3-sl1-c1l1">HSBC banking (2–5% cashback)</li>
+            <li data-editable="ch3-sl1-c1l2">Flexi benefits — fuel, car, phone, food</li>
+            <li data-editable="ch3-sl1-c1l3">Optional 12% PF to save more tax</li>
+            <li data-editable="ch3-sl1-c1l4">Mental wellness: free anonymous counselling</li>
+            <li data-editable="ch3-sl1-c1l5">Buddy program (first 3 months)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-people-group"></i></div>
+          <h3 data-editable="ch3-sl1-c2t">Work Family</h3>
+          <ul>
+            <li data-editable="ch3-sl1-c2l1">Annual offsite — 3 days, 2 nights, another city</li>
+            <li data-editable="ch3-sl1-c2l2">Monthly/quarterly RnR — trips, vouchers, trophies</li>
+            <li data-editable="ch3-sl1-c2l3">Friday evening team snacks</li>
+            <li data-editable="ch3-sl1-c2l4">Quarterly team dinner budget</li>
+            <li data-editable="ch3-sl1-c2l5">POSH policy — safe workplace for everyone</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-icon" style="background:rgba(190,229,194,0.4);color:#2a7d3a;"><i class="fa-solid fa-house"></i></div>
+          <h3 data-editable="ch3-sl1-c3t">Your Family</h3>
+          <ul>
+            <li data-editable="ch3-sl1-c3l1">PLUM health insurance — ₹3L/year, family included</li>
+            <li data-editable="ch3-sl1-c3l2">PLUM term life — 3x salary (min ₹15L)</li>
+            <li data-editable="ch3-sl1-c3l3">Maternity, paternity &amp; bereavement leaves</li>
+            <li data-editable="ch3-sl1-c3l4">Crèche &amp; daycare support for working parents</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 2 · TWO COLUMN — Benefits Package -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ch3-sl2-eyebrow">Your Benefits</div>
+      <h2 class="slide-headline" data-editable="ch3-sl2-headline">Financial benefits <span>&amp; pay structure.</span></h2>
+      <div class="twocol">
+        <div class="twocol-panel">
+          <h3 data-editable="ch3-sl2-c1t">Health, Life &amp; Savings</h3>
+          <ul>
+            <li data-editable="ch3-sl2-c1l1"><strong>PLUM Health:</strong> ₹3L/year — self, spouse, kids, parents. Sign up within 3 days of joining.</li>
+            <li data-editable="ch3-sl2-c1l2"><strong>PLUM Life:</strong> 3x salary, min ₹15L, max ₹45L. In case of untimely death. Sign up within 3 days.</li>
+            <li data-editable="ch3-sl2-c1l3"><strong>HSBC Account:</strong> Issued on joining. 2–5% cashback + exclusive digital brand offers.</li>
+            <li data-editable="ch3-sl2-c1l4"><strong>PF Options:</strong> ₹3,600/month (default) OR 12% of basic. 8–8.5% interest, tax-free up to ₹2.5L.</li>
+          </ul>
+        </div>
+        <div class="twocol-panel">
+          <h3 data-editable="ch3-sl2-c2t">Pay &amp; Incentives</h3>
+          <ul>
+            <li data-editable="ch3-sl2-c2l1"><strong>Variable pay:</strong> Annual variable (if in offer letter) paid post-appraisal in May/June.</li>
+            <li data-editable="ch3-sl2-c2l2"><strong>Sales incentive:</strong> Individual — cleared monthly. TL/PnL — cleared annually in May/June.</li>
+            <li data-editable="ch3-sl2-c2l3"><strong>Appraisal cycle:</strong> April–March. Discussions in April–May. Rolled out by end of May.</li>
+            <li data-editable="ch3-sl2-c2l4"><strong>Uber for corporate:</strong> AM team only. ₹5K–8K/month cap for client visits.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div style="background:rgba(255,184,72,0.1);border:1px solid rgba(255,184,72,0.4);border-radius:8px;padding:12px 20px;display:flex;align-items:center;gap:14px;margin-top:-4px;">
+      <i class="fa-brands fa-uber" style="font-size:22px;color:#0B0F2C;flex-shrink:0;"></i>
+      <div>
+        <span style="font-size:12px;font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:0.08em;">Uber Corporate — Policy Applies</span>
+        <span style="font-size:12px;color:var(--body);margin-left:10px;">Official visits only · No personal rides · No Moto / Black / Rentals · See Read Mode for full policy</span>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 3 · TWO COLUMN — Leaves + WFH -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ch3-sl3-eyebrow">Leave &amp; Work Policy</div>
+      <h2 class="slide-headline" data-editable="ch3-sl3-headline">Plan your time. <span>Know the rules.</span></h2>
+      <div class="twocol">
+        <div class="twocol-panel">
+          <h3 data-editable="ch3-sl3-c1t">Leave Types</h3>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:10px;">
+            <div style="background:#F0F1FF;border-radius:6px;padding:18px 10px;text-align:center;">
+              <i class="fa-solid fa-suitcase-medical" style="font-size:28px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:14px;font-weight:800;color:var(--blue);">SL</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.4;">Sick</div>
+            </div>
+            <div style="background:#F0F1FF;border-radius:6px;padding:18px 10px;text-align:center;">
+              <i class="fa-solid fa-umbrella-beach" style="font-size:28px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:14px;font-weight:800;color:var(--blue);">PL</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.4;">Planned</div>
+            </div>
+            <div style="background:#F0F1FF;border-radius:6px;padding:18px 10px;text-align:center;">
+              <i class="fa-solid fa-mug-hot" style="font-size:28px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:14px;font-weight:800;color:var(--blue);">CL</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.4;">Casual</div>
+            </div>
+            <div style="background:#F0F1FF;border-radius:6px;padding:18px 10px;text-align:center;">
+              <i class="fa-solid fa-cake-candles" style="font-size:28px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:14px;font-weight:800;color:var(--blue);">Special</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.4;">B-day/Anniv</div>
+            </div>
+            <div style="background:#F0F1FF;border-radius:6px;padding:18px 10px;text-align:center;">
+              <i class="fa-solid fa-baby" style="font-size:28px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:14px;font-weight:800;color:var(--blue);">Mat/Pat</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.4;">Parenting</div>
+            </div>
+            <div style="background:#F0F1FF;border-radius:6px;padding:18px 10px;text-align:center;">
+              <i class="fa-solid fa-dove" style="font-size:28px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:14px;font-weight:800;color:var(--blue);">Bereavmt</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.4;">Family loss</div>
+            </div>
+            <div style="background:#F0F1FF;border-radius:6px;padding:18px 10px;text-align:center;">
+              <i class="fa-solid fa-paw" style="font-size:28px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:14px;font-weight:800;color:var(--blue);">Pet</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.4;">Adoption</div>
+            </div>
+            <div style="background:#F0F1FF;border-radius:6px;padding:18px 10px;text-align:center;">
+              <i class="fa-solid fa-arrows-rotate" style="font-size:28px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:14px;font-weight:800;color:var(--blue);">Floater</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.4;">Flexible day</div>
+            </div>
+            <div style="background:#F0F1FF;border-radius:6px;padding:18px 10px;text-align:center;">
+              <i class="fa-solid fa-heart" style="font-size:28px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:14px;font-weight:800;color:var(--blue);">Marriage</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.4;">Own wedding</div>
+            </div>
+            <div style="background:#F0F1FF;border-radius:6px;padding:18px 10px;text-align:center;">
+              <i class="fa-solid fa-rotate-left" style="font-size:28px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:14px;font-weight:800;color:var(--blue);">Comp Off</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.4;">Holiday work</div>
+            </div>
+          </div>
+          <p style="font-size:13px;color:var(--muted);margin-top:14px;border-top:1px solid var(--hairline);padding-top:12px;" data-editable="ch3-sl3-c1note">Accrual: quarterly · Cycle: Jan–Dec · PLs carry forward to Feb · Check Keka</p>
+        </div>
+        <div class="twocol-panel">
+          <h3 data-editable="ch3-sl3-c2t">Attendance &amp; WFH</h3>
+          <ul>
+            <li data-editable="ch3-sl3-c2l1"><strong>WFO-first company</strong> — everyone is expected in office by default.</li>
+            <li data-editable="ch3-sl3-c2l2"><strong>WFH:</strong> Apply via Keka. Manager approves. Check with your TL if your team allows it.</li>
+            <li data-editable="ch3-sl3-c2l3"><strong>Tracked departments:</strong> VO, On-Demand, Lead Qualification — geotagged attendance on Keka app.</li>
+            <li data-editable="ch3-sl3-c2l4"><strong>Late arrivals:</strong> Automatic leave marked after warnings. Corrections must be made within 2–3 days.</li>
+            <li data-editable="ch3-sl3-c2l5"><strong>Other departments:</strong> No formal attendance tracking — but be in office.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 4 · KEKA HRMS -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ch3-sl4-eyebrow">Your HRMS</div>
+      <h2 class="slide-headline" data-editable="ch3-sl4-headline">Keka. <span>One place for everything.</span></h2>
+      <div class="img-placeholder" style="height:56px; flex-direction:row; gap:14px; margin-bottom:12px;">
+        <i class="fa-solid fa-image" style="font-size:16px;"></i>
+        <span style="max-width:none; font-size:11px;">Screenshot: Keka app/dashboard home screen</span>
+      </div>
+      <div class="cardgrid cardgrid-compact" style="grid-template-columns:repeat(4,1fr);">
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-calendar-check"></i></div>
+          <h3 data-editable="ch3-sl4-k1t">Apply Leaves</h3>
+          <p data-editable="ch3-sl4-k1b">Apply for any leave type and get manager approval — all in one place.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+          <h3 data-editable="ch3-sl4-k2t">Payslips &amp; Tax</h3>
+          <p data-editable="ch3-sl4-k2b">Download payslips, share IT saving proofs, and view your bank details.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-receipt"></i></div>
+          <h3 data-editable="ch3-sl4-k3t">Expenses &amp; Claims</h3>
+          <p data-editable="ch3-sl4-k3b">Submit and track all reimbursement claims through the expenses section.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-headset"></i></div>
+          <h3 data-editable="ch3-sl4-k4t">HR &amp; IT Helpdesk</h3>
+          <p data-editable="ch3-sl4-k4b">Raise tickets for IT issues, HR queries, or any admin requirement.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-user-plus"></i></div>
+          <h3 data-editable="ch3-sl4-k5t">Referrals</h3>
+          <p data-editable="ch3-sl4-k5b">Submit employee referrals here. Only Keka referrals qualify for the referral bonus.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-clock"></i></div>
+          <h3 data-editable="ch3-sl4-k6t">Attendance</h3>
+          <p data-editable="ch3-sl4-k6b">Mark and view attendance (for tracked departments). Correct errors within 2–3 days.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-calendar-days"></i></div>
+          <h3 data-editable="ch3-sl4-k7t">Holiday Calendar</h3>
+          <p data-editable="ch3-sl4-k7b">View all company holidays for the year in one place.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+          <h3 data-editable="ch3-sl4-k8t">Search Everything</h3>
+          <p data-editable="ch3-sl4-k8b">Use the search bar to navigate any page, policy, or feature instantly.</p>
+        </div>
+      </div>
+    </div>
+    <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <!-- SCREEN 5 · NON-NEGOTIABLES — POSH + Anti-Bribery -->
+  <div class="screen">
+    <div class="slide-pad">
+      <div class="eyebrow" data-editable="ch3-sl5-eyebrow">Non-Negotiable</div>
+      <h2 class="slide-headline" data-editable="ch3-sl5-headline">Two rules. <span>Zero exceptions.</span></h2>
+      <div class="img-placeholder" style="height:90px; flex-direction:row; gap:14px; margin-bottom:16px;">
+        <i class="fa-solid fa-image" style="font-size:20px;"></i>
+        <span style="max-width:none;">Photo: Workplace conduct training session or team briefing</span>
+      </div>
+      <div class="cardgrid" style="grid-template-columns:repeat(2,1fr);">
+        <div class="card" style="border-color:rgba(255,115,81,0.3);background:rgba(255,115,81,0.03);">
+          <div class="card-icon" style="background:rgba(255,115,81,0.12);color:var(--coral);"><i class="fa-solid fa-shield-halved"></i></div>
+          <div class="alert-pill"><i class="fa-solid fa-circle-exclamation"></i> Mandatory · Salary blocked until done</div>
+          <h3 data-editable="ch3-sl5-c1t" style="font-size:22px;">POSH Training</h3>
+          <p data-editable="ch3-sl5-c1b">Complete within 1 month of joining. <strong>First salary is only processed after POSH is done.</strong> 45-minute online session via Serein. This is non-negotiable — no exceptions for any role.</p>
+        </div>
+        <div class="card" style="border-color:rgba(255,115,81,0.3);background:rgba(255,115,81,0.03);">
+          <div class="card-icon" style="background:rgba(255,115,81,0.12);color:var(--coral);"><i class="fa-solid fa-ban"></i></div>
+          <div class="alert-pill"><i class="fa-solid fa-triangle-exclamation"></i> Zero Tolerance · Immediate termination</div>
+          <h3 data-editable="ch3-sl5-c2t" style="font-size:22px;">Anti-Bribery &amp; Integrity</h3>
+          <p data-editable="ch3-sl5-c2b">Any act of bribery = immediate termination, all bonuses and ESOPs lapse. Gifts &gt;₹1,000 need approval. Moonlighting must be declared to Finance Controller before you begin.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /.slides -->
+
+  <div class="dot-nav" id="dotNav"></div>
+  <div class="key-hint" id="keyHint"><i class="fa-solid fa-arrows-left-right"></i> Use arrow keys</div>
+</div><!-- /#slide-mode -->
+
+
+<div id="read-mode" class="hidden" style="margin-top:52px;">
+  <div class="r-layout">
+
+    <aside class="r-sidebar">
+      <div class="r-toc-label">Chapter 3</div>
+      <a href="#r-intro"  class="toc-link" data-s="r-intro">Introduction</a>
+      <a href="#r-s01"    class="toc-link" data-s="r-s01">01 · The 3 Pillars</a>
+      <a href="#r-s02"    class="toc-link" data-s="r-s02">02 · Benefits &amp; Pay</a>
+      <a href="#r-s03"    class="toc-link" data-s="r-s03">03 · Leave &amp; Work Policy</a>
+      <a href="#r-s04"    class="toc-link" data-s="r-s04">04 · Keka HRMS</a>
+      <a href="#r-s05"    class="toc-link" data-s="r-s05">05 · Non-Negotiables</a>
+      <a href="#r-assess" class="toc-link" data-s="r-assess">Assessment</a>
+    </aside>
+
+    <main class="r-content">
+
+      <section class="section" id="r-intro">
+        <div data-editable="ch3-intro-body" style="padding:28px 32px;border:1px solid var(--hairline);border-radius:var(--radius);background:#FAFBFF;">
+          <p class="section-body" style="margin-bottom:0;">myHQ's benefits and policies are built around three groups: you personally, your work family (colleagues), and your actual family. This chapter walks through your financial benefits, leave entitlements, how attendance and WFH work, the HRMS tool you'll use every day (Keka), and three non-negotiables that apply to every employee from day one.</p>
+        </div>
+      </section>
+
+      <section class="section" id="r-s01">
+        <div class="section-num">01</div>
+        <h2 class="section-title" data-editable="ch3-s01-title">The 3 Pillars</h2>
+        <div data-editable="ch3-s01-body">
+          <p class="section-body" style="margin-bottom:20px;">myHQ's people philosophy: three things need to work in parallel for you to thrive — you as an individual, your work relationships, and your family at home.</p>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:20px;background:#FFFDF5;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+                <div style="width:36px;height:36px;border-radius:8px;background:rgba(255,184,72,0.15);display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-hand" style="font-size:18px;color:#C97A1A;"></i></div>
+                <span style="font-size:15px;font-weight:800;color:var(--ink);">For You</span>
+              </div>
+              <ul class="section-list">
+                <li>HSBC banking — 2–5% cashback on all spends</li>
+                <li>Flexi benefits — fuel, car, driver, phone, food (tax-saving reimbursements)</li>
+                <li>Optional 12% PF to build a larger retirement corpus</li>
+                <li>Free &amp; anonymous mental wellness counselling</li>
+                <li>Buddy Programme for your first 3 months</li>
+              </ul>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:20px;background:#F5F7FF;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+                <div style="width:36px;height:36px;border-radius:8px;background:rgba(30,34,170,0.08);display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-people-group" style="font-size:18px;color:var(--blue);"></i></div>
+                <span style="font-size:15px;font-weight:800;color:var(--ink);">Work Family</span>
+              </div>
+              <ul class="section-list">
+                <li>Annual offsite — 3 days, 2 nights, another city</li>
+                <li>Monthly/quarterly RnR — trips, Amazon vouchers, trophies</li>
+                <li>Friday evening team snacks</li>
+                <li>Quarterly team dinner budget</li>
+                <li>POSH policy — safe workplace for everyone</li>
+              </ul>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:20px;background:#F5FFF6;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+                <div style="width:36px;height:36px;border-radius:8px;background:rgba(190,229,194,0.4);display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-house" style="font-size:18px;color:#2a7d3a;"></i></div>
+                <span style="font-size:15px;font-weight:800;color:var(--ink);">Your Family</span>
+              </div>
+              <ul class="section-list">
+                <li>PLUM health insurance — ₹3L/year, covers spouse, kids, parents/in-laws</li>
+                <li>PLUM term life — 3x salary (min ₹15L)</li>
+                <li>Maternity &amp; paternity leaves</li>
+                <li>Bereavement leave for immediate family</li>
+                <li>Crèche &amp; daycare support for working parents</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="takeaway" data-editable="ch3-s01-takeaway">The company invests in three layers — not just your salary. Know what you're entitled to and use it.</div>
+      </section>
+
+      <section class="section" id="r-s02">
+        <div class="section-num">02</div>
+        <h2 class="section-title" data-editable="ch3-s02-title">Benefits &amp; Pay Structure</h2>
+        <div data-editable="ch3-s02-body">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:4px;">
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
+              <i class="fa-solid fa-hospital" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">PLUM Health Insurance</div>
+              <div style="font-size:12px;color:var(--body);line-height:1.5;">₹3L/year. Covers self, spouse, children, parents/in-laws. Sign up within 3 days. Over and above CTC.</div>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
+              <i class="fa-solid fa-shield-halved" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">PLUM Term Life</div>
+              <div style="font-size:12px;color:var(--body);line-height:1.5;">3x monthly salary (min ₹15L, max ₹45L). Sign up within 3 days. Also above CTC.</div>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
+              <i class="fa-solid fa-building-columns" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">HSBC Banking</div>
+              <div style="font-size:12px;color:var(--body);line-height:1.5;">New account on joining. 2–5% cashback + exclusive offers (Swiggy, Amazon Prime, BookMyShow, Mokobara).</div>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
+              <i class="fa-solid fa-briefcase" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">PF — Option 1</div>
+              <div style="font-size:12px;color:var(--body);line-height:1.5;">Default: ₹1,800 employee + ₹1,800 employer = ₹3,600/month total.</div>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
+              <i class="fa-solid fa-chart-line" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">PF — Option 2</div>
+              <div style="font-size:12px;color:var(--body);line-height:1.5;">12% of basic (both sides). 8–8.5% compound interest. Up to ₹1.5L deductible under 80C.</div>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
+              <i class="fa-solid fa-sack-dollar" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">Variable Pay</div>
+              <div style="font-size:12px;color:var(--body);line-height:1.5;">Annual variable post-appraisal (May/June). Sales incentives monthly. Appraisal cycle: Apr–Mar.</div>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
+              <i class="fa-solid fa-car" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">Uber Corporate</div>
+              <div style="font-size:12px;color:var(--body);line-height:1.5;">AM team only. Official client visits. Cap: ₹5K–8K/month by role. See policy below.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="takeaway" data-editable="ch3-s02-takeaway">Sign up for PLUM health and life insurance within 3 days of joining — they're above your CTC and lapse if you don't activate them.</div>
+
+        <div style="border:1px solid rgba(255,184,72,0.5);background:rgba(255,184,72,0.07);border-radius:var(--radius);padding:20px 24px;margin-top:24px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <i class="fa-brands fa-uber" style="font-size:20px;color:var(--ink);"></i>
+            <span style="font-size:14px;font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:0.08em;">Uber Corporate Account — Usage Policy</span>
+          </div>
+          <p class="section-body" style="margin-bottom:12px;">Provided strictly for official client visits. All rides are reviewed monthly. The following apply to all users:</p>
+          <ul class="section-list" style="margin-bottom:0;">
+            <li><strong>No personal rides</strong> — includes rides before or after office hours.</li>
+            <li><strong>No courier services</strong> — use BlueDart for official couriers. Contact admin for requirements.</li>
+            <li><strong>No Uber Rentals</strong> — unless prior Manager approval.</li>
+            <li><strong>No Uber Black or premium options</strong> — standard rides only.</li>
+            <li><strong>No Uber Moto.</strong></li>
+          </ul>
+          <p style="font-size:13px;color:var(--coral);font-weight:700;margin-top:14px;">Non-compliance may result in your corporate access being revoked.</p>
+        </div>
+      </section>
+
+      <section class="section" id="r-s03">
+        <div class="section-num">03</div>
+        <h2 class="section-title" data-editable="ch3-s03-title">Leave &amp; Work Policy</h2>
+        <div data-editable="ch3-s03-body">
+          <p class="section-body" style="margin-bottom:16px;font-weight:700;color:var(--ink);">Leave Types</p>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:24px;">
+            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
+              <i class="fa-solid fa-suitcase-medical" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
+              <div style="font-size:12px;font-weight:800;color:var(--blue);">SL</div>
+              <div style="font-size:11px;color:var(--body);line-height:1.3;">Sick Leave</div>
+            </div>
+            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
+              <i class="fa-solid fa-umbrella-beach" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
+              <div style="font-size:12px;font-weight:800;color:var(--blue);">PL</div>
+              <div style="font-size:11px;color:var(--body);line-height:1.3;">Planned Leave</div>
+            </div>
+            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
+              <i class="fa-solid fa-mug-hot" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
+              <div style="font-size:12px;font-weight:800;color:var(--blue);">CL</div>
+              <div style="font-size:11px;color:var(--body);line-height:1.3;">Casual Leave</div>
+            </div>
+            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
+              <i class="fa-solid fa-cake-candles" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
+              <div style="font-size:12px;font-weight:800;color:var(--blue);">Special</div>
+              <div style="font-size:11px;color:var(--body);line-height:1.3;">B-day / Anniv</div>
+            </div>
+            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
+              <i class="fa-solid fa-baby" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
+              <div style="font-size:12px;font-weight:800;color:var(--blue);">Mat / Pat</div>
+              <div style="font-size:11px;color:var(--body);line-height:1.3;">Parenting</div>
+            </div>
+            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
+              <i class="fa-solid fa-heart" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
+              <div style="font-size:12px;font-weight:800;color:var(--blue);">Marriage</div>
+              <div style="font-size:11px;color:var(--body);line-height:1.3;">Own wedding</div>
+            </div>
+            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
+              <i class="fa-solid fa-paw" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
+              <div style="font-size:12px;font-weight:800;color:var(--blue);">Pet</div>
+              <div style="font-size:11px;color:var(--body);line-height:1.3;">Adoption</div>
+            </div>
+            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
+              <i class="fa-solid fa-arrows-rotate" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
+              <div style="font-size:12px;font-weight:800;color:var(--blue);">Floater</div>
+              <div style="font-size:11px;color:var(--body);line-height:1.3;">Flexible day</div>
+            </div>
+            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
+              <i class="fa-solid fa-dove" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
+              <div style="font-size:12px;font-weight:800;color:var(--blue);">Bereavmt</div>
+              <div style="font-size:11px;color:var(--body);line-height:1.3;">Family loss</div>
+            </div>
+            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
+              <i class="fa-solid fa-rotate-left" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
+              <div style="font-size:12px;font-weight:800;color:var(--blue);">Comp Off</div>
+              <div style="font-size:11px;color:var(--body);line-height:1.3;">Holiday work</div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
+              <i class="fa-solid fa-calendar-days" style="font-size:20px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:6px;">How Leaves Work</div>
+              <ul class="section-list">
+                <li>Accrue quarterly based on tenure</li>
+                <li>Cycle: Jan–Dec, expire Dec 31st</li>
+                <li>PLs only carry forward to Feb end</li>
+                <li>Check Keka for exact balances</li>
+              </ul>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
+              <i class="fa-solid fa-building" style="font-size:20px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:6px;">WFH Policy</div>
+              <ul class="section-list">
+                <li>WFO-first — in office is the default</li>
+                <li>Apply WFH via Keka portal</li>
+                <li>Manager/TL approves</li>
+                <li>Check with your TL if your team allows WFH before assuming</li>
+              </ul>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
+              <i class="fa-solid fa-location-dot" style="font-size:20px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:6px;">Attendance</div>
+              <ul class="section-list">
+                <li>Tracked: VO, On-Demand, Lead Qualification</li>
+                <li>Mark via Keka app — geotagged, must be in building</li>
+                <li>Late arrivals → auto leave deduction after warnings</li>
+                <li>Corrections must be made within 2–3 days</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="takeaway" data-editable="ch3-s03-takeaway">Know your leave types and apply on time via Keka. Don't wait — PLs are the only ones that carry forward, and the rest expire December 31st.</div>
+      </section>
+
+      <section class="section" id="r-s04">
+        <div class="section-num">04</div>
+        <h2 class="section-title" data-editable="ch3-s04-title">Keka HRMS</h2>
+        <div data-editable="ch3-s04-body">
+          <p class="section-body" style="margin-bottom:20px;">Keka is myHQ's HRMS — the single platform for everything people-related. You will use it from day one, every day.</p>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:4px;">
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
+              <i class="fa-solid fa-calendar-check" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">Apply Leaves</div>
+              <div style="font-size:12px;color:var(--body);line-height:1.5;">All leave requests go through Keka. WhatsApp or email doesn't count.</div>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
+              <i class="fa-solid fa-sack-dollar" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">Payslips &amp; Tax</div>
+              <div style="font-size:12px;color:var(--body);line-height:1.5;">Download payslips, submit investment declarations &amp; tax proofs.</div>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
+              <i class="fa-solid fa-receipt" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">Expenses &amp; Claims</div>
+              <div style="font-size:12px;color:var(--body);line-height:1.5;">Submit travel and client reimbursements. Not on Keka = not processed.</div>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
+              <i class="fa-solid fa-headset" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">HR &amp; IT Helpdesk</div>
+              <div style="font-size:12px;color:var(--body);line-height:1.5;">Raise tickets for laptop issues, ID cards, access requests, onboarding queries.</div>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
+              <i class="fa-solid fa-handshake" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">Referrals</div>
+              <div style="font-size:12px;color:var(--body);line-height:1.5;">Only Keka referrals qualify for the bonus. Email referrals don't count.</div>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
+              <i class="fa-solid fa-location-dot" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">Attendance</div>
+              <div style="font-size:12px;color:var(--body);line-height:1.5;">VO, On-Demand &amp; LQ teams: mark on Keka app (geotagged). Corrections within 2–3 days.</div>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
+              <i class="fa-solid fa-calendar" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">Holiday Calendar</div>
+              <div style="font-size:12px;color:var(--body);line-height:1.5;">Official holiday list for the year lives on Keka. Check before planning.</div>
+            </div>
+            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
+              <i class="fa-solid fa-magnifying-glass" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
+              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">Search Everything</div>
+              <div style="font-size:12px;color:var(--body);line-height:1.5;">Find policies, org chart, colleagues &amp; team information all in one place.</div>
+            </div>
+          </div>
+        </div>
+        <div class="takeaway" data-editable="ch3-s04-takeaway">Keka is not optional — it is the only official channel for leaves, payslips, expenses, referrals, and helpdesk. If it's not on Keka, it doesn't exist.</div>
+      </section>
+
+      <section class="section" id="r-s05">
+        <div class="section-num">05</div>
+        <h2 class="section-title" data-editable="ch3-s05-title">Non-Negotiables</h2>
+        <div data-editable="ch3-s05-body">
+          <p class="section-body"><strong>1. POSH Training — Mandatory Before First Salary</strong></p>
+          <p class="section-body">myHQ has a Prevention of Sexual Harassment (POSH) policy in line with the Sexual Harassment of Women at the Workplace Act. Training is conducted by their partner, Serein. It is a 45-minute online session and must be completed within one month of joining. <strong>Your first month's salary will not be processed until POSH training is complete.</strong> This is non-negotiable.</p>
+          <p class="section-body"><strong>2. Anti-Bribery, Gifting &amp; Moonlighting</strong></p>
+          <ul class="section-list">
+            <li><strong>Bribery:</strong> Absolute zero tolerance. Any act of bribery — to government officials, commercial parties, or space admins — results in immediate termination. All pending bonuses and ESOPs lapse instantly.</li>
+            <li><strong>Giving gifts:</strong> Allowed (chocolates, stationery, etc.) but no cash, gift vouchers, or alcohol. Any gift above ₹1,000 needs management approval. No gifts to government officials.</li>
+            <li><strong>Receiving gifts:</strong> Any gift above ₹1,000 also needs approval. Receipt of alcohol bottles or gift vouchers is not allowed.</li>
+            <li><strong>Moonlighting / Additional income:</strong> Any consulting, freelancing, or mentorship income must be reported to the Finance Controller before you begin. Once approved, you may proceed. Income from your own capital investments is exempt.</li>
+          </ul>
+        </div>
+        <div class="takeaway" data-editable="ch3-s05-takeaway">POSH training before your first salary — no exceptions. Zero tolerance on bribery: it means immediate termination. These are the lines you never cross.</div>
+      </section>
+
+      <section class="section" id="r-assess" style="margin-top:64px;padding-top:48px;border-top:2px solid var(--hairline);">
+        <div class="section-num">Assessment</div>
+        <h2 class="section-title">Chapter 3 — Check Your Understanding</h2>
+        <p class="section-body" style="margin-bottom:28px;">Select the correct answer(s) for each question. Some questions have more than one right answer.</p>
+
+        <div class="aq-tracker" id="aqTracker">
+          <div class="aq-tracker-bar"><div class="aq-tracker-fill" id="aqTrackerFill"></div></div>
+          <span class="aq-tracker-label" id="aqTrackerLabel">0 / 5 answered</span>
+        </div>
+
+        <!-- Q1 -->
+        <div class="mcq-q" id="mcq1" data-type="single" data-correct="2">
+          <div class="aq-q-header"><span class="aq-q-num">Q1</span><span class="aq-q-status" id="mcq1-status"></span></div>
+          <p class="aq-q-text">You joined 5 days ago and still haven't activated your PLUM health insurance. What happens?</p>
+          <div class="mcq-hint">Select one</div>
+          <div class="mcq-options">
+            <label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="q1"><span class="mcq-badge">A</span><span class="mcq-opt-text">HR will automatically enroll you before the end of the month.</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="q1"><span class="mcq-badge">B</span><span class="mcq-opt-text">You can sign up any time — there's no deadline for insurance.</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="q1"><span class="mcq-badge">C</span><span class="mcq-opt-text">The insurance lapses — you lose the benefit entirely, as it's above your CTC and must be activated within 3 days.</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="q1"><span class="mcq-badge">D</span><span class="mcq-opt-text">You'll be charged a penalty to reactivate it later.</span></label>
+          </div>
+          <div class="mcq-explain" id="mcq1-exp">PLUM health and life insurance are over and above your CTC. They require you to sign up via an invite link within 3 days of joining. If you miss this window, the benefit lapses — HR won't chase you.</div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="mcq-q" id="mcq2" data-type="single" data-correct="1">
+          <div class="aq-q-header"><span class="aq-q-num">Q2</span><span class="aq-q-status" id="mcq2-status"></span></div>
+          <p class="aq-q-text">End of Month 1 — your salary hasn't been credited. HR says something is blocking it. What's the most likely reason?</p>
+          <div class="mcq-hint">Select one</div>
+          <div class="mcq-options">
+            <label class="mcq-opt" onclick="selectOpt(this,2)"><input type="radio" name="q2"><span class="mcq-badge">A</span><span class="mcq-opt-text">Your HSBC bank account wasn't set up in time.</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,2)"><input type="radio" name="q2"><span class="mcq-badge">B</span><span class="mcq-opt-text">You haven't completed your POSH training.</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,2)"><input type="radio" name="q2"><span class="mcq-badge">C</span><span class="mcq-opt-text">Your manager didn't mark your attendance on Keka.</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,2)"><input type="radio" name="q2"><span class="mcq-badge">D</span><span class="mcq-opt-text">You forgot to submit your tax proofs in time.</span></label>
+          </div>
+          <div class="mcq-explain" id="mcq2-exp">POSH training is mandatory and must be completed within one month of joining. Your first salary will not be processed until it's done. It's a 45-minute online session with Serein — complete it in Week 1.</div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="mcq-q" id="mcq3" data-type="multi" data-correct="0,2">
+          <div class="aq-q-header"><span class="aq-q-num">Q3</span><span class="aq-q-status" id="mcq3-status"></span></div>
+          <p class="aq-q-text">You're an AM consultant. Which of the following are allowed on the Uber Corporate account?</p>
+          <div class="mcq-hint">Select all that apply</div>
+          <div class="mcq-options">
+            <label class="mcq-opt" onclick="selectOpt(this,3)"><input type="checkbox" name="q3"><span class="mcq-badge">A</span><span class="mcq-opt-text">Riding to a client office for an official meeting.</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,3)"><input type="checkbox" name="q3"><span class="mcq-badge">B</span><span class="mcq-opt-text">Riding home after a late evening in office.</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,3)"><input type="checkbox" name="q3"><span class="mcq-badge">C</span><span class="mcq-opt-text">Booking Uber Rentals after getting manager approval.</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,3)"><input type="checkbox" name="q3"><span class="mcq-badge">D</span><span class="mcq-opt-text">Booking Uber Moto to save time during a busy day.</span></label>
+          </div>
+          <div class="mcq-explain" id="mcq3-exp">Only official client visits are covered. Personal rides (including rides home) are not allowed. Uber Moto is never allowed. Rentals require prior manager approval. All rides are reviewed monthly.</div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="mcq-q" id="mcq4" data-type="single" data-correct="2">
+          <div class="aq-q-header"><span class="aq-q-num">Q4</span><span class="aq-q-status" id="mcq4-status"></span></div>
+          <p class="aq-q-text">You want to take a 5-day trip in March and have planned it 3 weeks in advance. Which leave type should you apply for?</p>
+          <div class="mcq-hint">Select one</div>
+          <div class="mcq-options">
+            <label class="mcq-opt" onclick="selectOpt(this,4)"><input type="radio" name="q4"><span class="mcq-badge">A</span><span class="mcq-opt-text">Casual Leave — it's flexible and can be used for anything.</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,4)"><input type="radio" name="q4"><span class="mcq-badge">B</span><span class="mcq-opt-text">Floater Leave — designed for full-day breaks.</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,4)"><input type="radio" name="q4"><span class="mcq-badge">C</span><span class="mcq-opt-text">Paid Leave — designed for planned trips and breaks, and is the only type that carries forward.</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,4)"><input type="radio" name="q4"><span class="mcq-badge">D</span><span class="mcq-opt-text">Sick Leave — just say you were unwell.</span></label>
+          </div>
+          <div class="mcq-explain" id="mcq4-exp">Paid Leave (PL) is for planned time off — trips, personal breaks. It's the only leave type that carries forward (to February end). Casual Leave is for urgent, short-notice needs. Always apply for the correct type.</div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="mcq-q" id="mcq5" data-type="single" data-correct="1">
+          <div class="aq-q-header"><span class="aq-q-num">Q5</span><span class="aq-q-status" id="mcq5-status"></span></div>
+          <p class="aq-q-text">A space admin sends you a gift hamper worth ₹1,800 after you close a deal with their space. What do you do?</p>
+          <div class="mcq-hint">Select one</div>
+          <div class="mcq-options">
+            <label class="mcq-opt" onclick="selectOpt(this,5)"><input type="radio" name="q5"><span class="mcq-badge">A</span><span class="mcq-opt-text">Accept it — space admins aren't government officials, so it's fine.</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,5)"><input type="radio" name="q5"><span class="mcq-badge">B</span><span class="mcq-opt-text">Get management approval before accepting — any gift above ₹1,000 requires it, regardless of who it's from.</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,5)"><input type="radio" name="q5"><span class="mcq-badge">C</span><span class="mcq-opt-text">Accept it and report it to Finance within a week.</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,5)"><input type="radio" name="q5"><span class="mcq-badge">D</span><span class="mcq-opt-text">Decline only if it contains alcohol or gift vouchers.</span></label>
+          </div>
+          <div class="mcq-explain" id="mcq5-exp">Any gift above ₹1,000 — from anyone — requires management approval before you accept it. This applies to commercial parties like space admins too. Don't assume it's fine just because it's not from a government official.</div>
+        </div>
+
+        <div class="aq-footer" id="aqFooter">
+          <span class="aq-footer-note" id="aqFooterNote">Answer all 5 questions to submit.</span>
+          <button class="aq-submit-btn" id="aqSubmitBtn" onclick="submitMCQ()" disabled>Check Answers</button>
+        </div>
+        <div class="aq-error" id="aqError" style="display:none;"></div>
+      </section>
+
+    </main>
+  </div>
+</div><!-- /#read-mode -->
+
+
+<script>
+var CHAPTER_ID   = 'ch3';
+var NEXT_CHAPTER = '';
+var CHAPTER_NAME = 'How We Support You';
+var DRIVE_FOLDER = 'Beginner Chapters/How We Support You';
+
+var SHEET_URL = 'https://script.google.com/macros/s/AKfycbwX0Z5vx6DSwdwZwK26pKZL3V3U9XwEyWgPa9Ek_cFEH1_tpULnWNcn7RlgE-wT8M9M/exec';
+
+var DEV_PREVIEW = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || typeof window.firebaseAuth === 'undefined';
+(function() {
+  if (DEV_PREVIEW) return;
+  window.firebaseAuth.onAuthStateChanged(function(user) {
+    if (!user) { window.location.href = 'landing.html'; return; }
+    var db = window.firebaseDB;
+    db.collection('users').doc(user.uid).get().then(function(snap) {
+      var data = snap.exists ? snap.data() : {};
+      var unlocked = (data.unlockedChapters && data.unlockedChapters.beginner) || [];
+      if (unlocked.indexOf(CHAPTER_ID) === -1) {
+        document.getElementById('slide-mode').style.display = 'none';
+        var rm = document.getElementById('read-mode'); if (rm) rm.style.display = 'none';
+        var lock = document.createElement('div');
+        lock.style.cssText = 'position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;font-family:Manrope,sans-serif;z-index:9999;';
+        lock.innerHTML = '<i class="fa-solid fa-lock" style="font-size:2.5rem;color:#1E22AA;"></i><div style="font-size:1.2rem;font-weight:800;color:#1E22AA;">This chapter is locked.</div><div style="font-size:14px;color:#7B7FE8;max-width:340px;text-align:center;">Ask your admin to unlock it.</div><a href="hub.html" style="margin-top:8px;font-size:13px;font-weight:700;color:#1E22AA;text-decoration:underline;">← Back to Hub</a>';
+        document.body.appendChild(lock);
+        return;
+      }
+      db.collection('content').doc(CHAPTER_ID).get().then(function(cSnap) {
+        if (!cSnap.exists) return;
+        var cData = cSnap.data();
+        document.querySelectorAll('[data-editable]').forEach(function(el) {
+          var key = el.getAttribute('data-editable');
+          if (cData[key] !== undefined) el.innerHTML = cData[key];
+        });
+      });
+    });
+  });
+})();
+
+var currentMode = 'slide';
+function setMode(mode) {
+  currentMode = mode;
+  var isSlide = mode === 'slide';
+  document.getElementById('slide-mode').style.display = isSlide ? '' : 'none';
+  var readEl = document.getElementById('read-mode');
+  if (readEl) readEl.classList.toggle('hidden', isSlide);
+  document.body.style.overflow = 'auto';
+  document.getElementById('screenCounter').style.display = isSlide ? '' : 'none';
+  document.getElementById('dotNav').style.display = isSlide ? '' : 'none';
+  var keyHintEl = document.getElementById('keyHint'); if (keyHintEl) keyHintEl.style.display = isSlide ? '' : 'none';
+  var chapterLabelEl = document.getElementById('chapterLabel'); if (chapterLabelEl) chapterLabelEl.style.display = isSlide ? '' : 'none';
+  var btn = document.getElementById('btnRead');
+  if (isSlide) {
+    btn.innerHTML = '<i class="fa-solid fa-book-open"></i>&nbsp;Read Full Chapter';
+    btn.onclick = function() { setMode('read'); };
+  } else {
+    btn.innerHTML = '<i class="fa-solid fa-display"></i>&nbsp;Back to Slides';
+    btn.onclick = function() { setMode('slide'); };
+    window.scrollTo(0, 0);
+  }
+}
+
+var TOTAL = 0; var current = 0; var animating = false;
+function buildDots() {
+  var nav = document.getElementById('dotNav'); nav.innerHTML = '';
+  for (var i = 0; i < TOTAL; i++) {
+    var d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    (function(idx){ d.onclick = function(){ goTo(idx); }; })(i);
+    nav.appendChild(d);
+  }
+}
+function updateCounter() {
+  document.getElementById('screenCounter').textContent = (current + 1) + ' / ' + TOTAL;
+  var chap = document.getElementById('chapterLabel');
+  if (chap) chap.style.display = current === 0 ? '' : 'none';
+}
+
+/* ⚠⚠⚠ scaleSlides() — DO NOT EDIT ⚠⚠⚠ */
+var BASE_DPR = window.devicePixelRatio || 1;
+function scaleSlides() {
+  var REF_W = 1440, REF_H = 900; var wrap = document.getElementById('slides'); if (!wrap) return;
+  var topbar = document.querySelector('.topbar'); var topbarH = topbar ? topbar.offsetHeight : 52;
+  var vw = document.documentElement.clientWidth; var vh = document.documentElement.clientHeight - topbarH;
+  var zoom = (window.devicePixelRatio || 1) / BASE_DPR; var fit = Math.min(vw / REF_W, vh / REF_H); var scale = fit * zoom;
+  var scaledW = REF_W * scale, scaledH = REF_H * scale;
+  var offsetX = Math.max(0, Math.round((vw - scaledW) / 2)); var offsetY = Math.max(0, Math.round((vh - scaledH) / 2));
+  wrap.style.width = REF_W + 'px'; wrap.style.height = REF_H + 'px';
+  wrap.style.left = offsetX + 'px'; wrap.style.top = (topbarH + offsetY) + 'px';
+  wrap.style.right = 'auto'; wrap.style.bottom = 'auto';
+  wrap.style.transform = 'scale(' + scale + ')'; wrap.style.transformOrigin = 'top left';
+  document.body.style.minHeight = (topbarH + offsetY + scaledH) + 'px';
+  document.body.style.minWidth = (offsetX + scaledW) + 'px';
+}
+window.addEventListener('resize', scaleSlides);
+(function watchZoom() { var mq = window.matchMedia('(resolution: ' + window.devicePixelRatio + 'dppx)'); mq.addEventListener('change', function() { scaleSlides(); watchZoom(); }); })();
+/* ⚠ end scaleSlides ⚠ */
+
+function goTo(index) {
+  if (animating || index === current || index < 0 || index >= TOTAL) return;
+  animating = true;
+  var screens = document.querySelectorAll('.screen'); var dots = document.querySelectorAll('.dot'); var prev = current; current = index;
+  screens[prev].classList.add('exit-up'); screens[prev].classList.remove('active');
+  setTimeout(function(){ screens[prev].classList.remove('exit-up'); }, 500);
+  screens[current].classList.add('active'); dots[prev].classList.remove('active'); dots[current].classList.add('active');
+  updateCounter();
+  var keyHint = document.getElementById('keyHint'); if (keyHint) keyHint.classList.add('hidden');
+  setTimeout(function(){ animating = false; }, 520);
+}
+function next() { goTo(current + 1); }
+function prev() { goTo(current - 1); }
+document.addEventListener('keydown', function(e) {
+  if (currentMode !== 'slide') return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prev();
+});
+
+var tocLinks = document.querySelectorAll('.toc-link');
+var readSections = document.querySelectorAll('.section[id]');
+var tocObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      tocLinks.forEach(function(l){ l.classList.remove('active'); });
+      var a = document.querySelector('.toc-link[data-s="' + entry.target.id + '"]');
+      if (a) a.classList.add('active');
+    }
+  });
+}, { rootMargin: '-15% 0px -75% 0px', threshold: 0 });
+readSections.forEach(function(s){ tocObserver.observe(s); });
+
+window.addEventListener('DOMContentLoaded', function() {
+  TOTAL = document.querySelectorAll('#slides .screen').length;
+  scaleSlides(); buildDots();
+  var first = document.querySelectorAll('.screen')[0]; if (first) first.classList.add('active');
+  updateCounter();
+});
+
+var TOTAL_QUESTIONS = 5;
+var mcqSelections = { 1: [], 2: [], 3: [], 4: [], 5: [] };
+
+function selectOpt(el, qNum) {
+  var q = document.getElementById('mcq' + qNum);
+  if (q.classList.contains('revealed')) return;
+  var type = q.getAttribute('data-type');
+  var opts = q.querySelectorAll('.mcq-opt');
+  var idx = Array.prototype.indexOf.call(opts, el);
+  if (type === 'single') {
+    opts.forEach(function(o){ o.classList.remove('selected'); });
+    mcqSelections[qNum] = [idx];
+    el.classList.add('selected');
+  } else {
+    if (el.classList.contains('selected')) {
+      el.classList.remove('selected');
+      mcqSelections[qNum] = mcqSelections[qNum].filter(function(i){ return i !== idx; });
+    } else {
+      el.classList.add('selected');
+      mcqSelections[qNum].push(idx);
+    }
+  }
+  var answered = mcqSelections[qNum].length > 0;
+  q.classList.toggle('is-answered', answered);
+  var status = document.getElementById('mcq' + qNum + '-status');
+  status.textContent = answered ? '✓ Selected' : '';
+  if (answered) status.classList.add('done'); else status.classList.remove('done');
+  updateMCQTracker();
+}
+
+function updateMCQTracker() {
+  var count = 0;
+  for (var i = 1; i <= TOTAL_QUESTIONS; i++) { if (mcqSelections[i].length > 0) count++; }
+  document.getElementById('aqTrackerFill').style.width = (count / TOTAL_QUESTIONS * 100) + '%';
+  document.getElementById('aqTrackerLabel').textContent = count + ' / ' + TOTAL_QUESTIONS + ' answered';
+  var btn = document.getElementById('aqSubmitBtn');
+  btn.disabled = count < TOTAL_QUESTIONS;
+  document.getElementById('aqFooterNote').textContent = count === TOTAL_QUESTIONS ? 'All answered — ready to check.' : 'Answer all ' + TOTAL_QUESTIONS + ' questions to continue.';
+}
+
+function submitMCQ() {
+  var score = 0;
+  var results = {};
+  for (var i = 1; i <= TOTAL_QUESTIONS; i++) {
+    var q = document.getElementById('mcq' + i);
+    var correctAttr = q.getAttribute('data-correct');
+    var correctIdxs = correctAttr.split(',').map(function(x){ return parseInt(x.trim()); });
+    var selected = mcqSelections[i].slice().sort();
+    var correct = correctIdxs.slice().sort();
+    var isCorrect = selected.length === correct.length && selected.every(function(v, idx){ return v === correct[idx]; });
+    if (isCorrect) score++;
+    results[i] = { selected: selected, correct: correct, isCorrect: isCorrect };
+    var opts = q.querySelectorAll('.mcq-opt');
+    opts.forEach(function(opt, idx) {
+      opt.classList.add('revealed');
+      var isCorrectOpt = correctIdxs.indexOf(idx) !== -1;
+      var isSelected = selected.indexOf(idx) !== -1;
+      if (isCorrectOpt) { opt.classList.add('correct'); }
+      else if (isSelected) { opt.classList.add('wrong'); }
+    });
+    document.getElementById('mcq' + i + '-exp').classList.add('visible');
+    var status = document.getElementById('mcq' + i + '-status');
+    status.textContent = isCorrect ? '✓ Correct' : '✗ Review below';
+    status.style.color = isCorrect ? '#2e7d32' : 'var(--coral)';
+  }
+  var fbUser = DEV_PREVIEW ? null : (window.firebaseAuth && window.firebaseAuth.currentUser);
+  var name = (fbUser && fbUser.displayName) || '—';
+  var email = (fbUser && fbUser.email) || '—';
+  var answers = {};
+  for (var j = 1; j <= TOTAL_QUESTIONS; j++) {
+    var labels = ['A','B','C','D'];
+    answers['q' + j] = mcqSelections[j].map(function(i){ return labels[i]; }).join(', ') + (results[j].isCorrect ? ' ✓' : ' ✗');
+  }
+  if (fbUser) {
+    var prog = {}; prog['progress.' + CHAPTER_ID + '.completed'] = true;
+    prog['progress.' + CHAPTER_ID + '.score'] = score + '/' + TOTAL_QUESTIONS;
+    prog['progress.' + CHAPTER_ID + '.completedAt'] = firebase.firestore.FieldValue.serverTimestamp();
+    window.firebaseDB.collection('users').doc(fbUser.uid).update(prog);
+    if (NEXT_CHAPTER) { window.firebaseDB.collection('users').doc(fbUser.uid).set({ unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion(NEXT_CHAPTER) } }, { merge: true }); }
+  }
+  fetch(SHEET_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(Object.assign({ chapterName: CHAPTER_NAME, status: 'Completed', score: score + '/' + TOTAL_QUESTIONS, name: name, email: email, timestamp: new Date().toISOString() }, answers)) });
+  var tracker = document.getElementById('aqTracker'); if (tracker) tracker.style.display = 'none';
+  var footer = document.getElementById('aqFooter');
+  var scoreMsg = score === TOTAL_QUESTIONS ? '<i class="fa-solid fa-trophy"></i> Perfect score!' : score >= 3 ? '<i class="fa-solid fa-circle-check"></i> Good work — review any incorrect ones.' : '<i class="fa-solid fa-book-open"></i> Review the chapter and try again.';
+  footer.innerHTML = '<div style="width:100%;"><div class="mcq-score">' + score + ' / ' + TOTAL_QUESTIONS + ' correct &nbsp;·&nbsp; <span style="font-size:18px;font-weight:600;color:var(--body);">' + scoreMsg + '</span></div><div style="display:flex;justify-content:center;margin-top:12px;"><a href="hub.html" style="display:inline-flex;align-items:center;gap:10px;background:var(--blue);color:#fff;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;padding:14px 28px;">Back to Hub →</a></div></div>';
+}
+</script>
+</body>
+</html>
