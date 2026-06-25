@@ -22,6 +22,20 @@
   ║   4. Do NOT touch the Firebase auth gate or the submission code unless  ║
   ║      the guide tells you to (only CHAPTER_ID, title, folder path,       ║
   ║      and question/assessment config are yours to set).                  ║
+  ║   5. Inside any read-mode *-body / *-intro-body block, use ONLY this    ║
+  ║      markup so the admin editor shows it as clean editable text (not    ║
+  ║      raw HTML):                                                          ║
+  ║        <p class="section-body">…</p>      (paragraph)                    ║
+  ║        <h3 class="section-subhead">…</h3> (sub-heading)                  ║
+  ║        <ul class="section-list"><li>…</li></ul>  (bullets)              ║
+  ║        <strong>…</strong> / <em>…</em>    (inline emphasis)              ║
+  ║        <div class="minicard-grid"> <div class="minicard"> [<i…>]        ║
+  ║          <div class="mc-t">title</div><div class="mc-b">body</div>      ║
+  ║          </div>… </div>                   (icon / stat cards)            ║
+  ║      Any other markup inside a body (custom callout divs, inline-styled  ║
+  ║      spans, icon lists, etc.) makes that field fall back to RAW-HTML     ║
+  ║      editing in admin. If you need a special layout, give each text      ║
+  ║      leaf its OWN data-editable key instead of nesting it in a body.     ║
   ╚══════════════════════════════════════════════════════════════════════╝
 -->
 <head>
@@ -394,7 +408,11 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
         <div class="section-num">01</div>
         <h2 class="section-title" data-editable="{{ID}}-s01-title">{{READ_S01_TITLE}}</h2>
         <div data-editable="{{ID}}-s01-body">
-          <p class="section-body">{{READ_S01_BODY}}</p> <!-- POC SLOT: full prose for this section -->
+          <!-- POC SLOT: full prose for this section. Use ONLY the editor-safe
+               markup listed in HARD RULE 5 (section-body / section-subhead /
+               section-list / strong / em / minicard-grid) so it stays editable
+               as clean text in admin. Anything else → raw-HTML editing. -->
+          <p class="section-body">{{READ_S01_BODY}}</p>
         </div>
         <div class="takeaway" data-editable="{{ID}}-s01-takeaway">{{READ_S01_TAKEAWAY}}</div> <!-- POC SLOT: one-line takeaway (optional) -->
       </section>

@@ -294,8 +294,8 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
         <div class="twocol-panel">
           <h3 data-editable="ch3-sl2-c1t">Health, Life &amp; Savings</h3>
           <ul>
-            <li data-editable="ch3-sl2-c1l1"><strong>PLUM Health:</strong> ₹3L/year — self, spouse, kids, parents. Sign up within 3 days of joining.</li>
-            <li data-editable="ch3-sl2-c1l2"><strong>PLUM Life:</strong> 3x salary, min ₹15L, max ₹45L. In case of untimely death. Sign up within 3 days.</li>
+            <li data-editable="ch3-sl2-c1l1"><strong>PLUM Health:</strong> ₹3L/year — self, spouse, kids, parents. Sign up any time — no deadline.</li>
+            <li data-editable="ch3-sl2-c1l2"><strong>PLUM Life:</strong> 3x salary, min ₹15L, max ₹45L. In case of untimely death. Sign up any time.</li>
             <li data-editable="ch3-sl2-c1l3"><strong>HSBC Account:</strong> Issued on joining. 2–5% cashback + exclusive digital brand offers.</li>
             <li data-editable="ch3-sl2-c1l4"><strong>PF Options:</strong> ₹3,600/month (default) OR 12% of basic. 8–8.5% interest, tax-free up to ₹2.5L.</li>
           </ul>
@@ -332,13 +332,13 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
           <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:10px;">
             <div style="background:#F0F1FF;border-radius:6px;padding:18px 10px;text-align:center;">
               <i class="fa-solid fa-suitcase-medical" style="font-size:28px;margin-bottom:8px;color:var(--blue);"></i>
-              <div style="font-size:14px;font-weight:800;color:var(--blue);">SL</div>
-              <div style="font-size:12px;color:var(--muted);line-height:1.4;">Sick</div>
+              <div style="font-size:14px;font-weight:800;color:var(--blue);">WL</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.4;">Wellness</div>
             </div>
             <div style="background:#F0F1FF;border-radius:6px;padding:18px 10px;text-align:center;">
               <i class="fa-solid fa-umbrella-beach" style="font-size:28px;margin-bottom:8px;color:var(--blue);"></i>
               <div style="font-size:14px;font-weight:800;color:var(--blue);">PL</div>
-              <div style="font-size:12px;color:var(--muted);line-height:1.4;">Planned</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.4;">Paid (Privileged)</div>
             </div>
             <div style="background:#F0F1FF;border-radius:6px;padding:18px 10px;text-align:center;">
               <i class="fa-solid fa-mug-hot" style="font-size:28px;margin-bottom:8px;color:var(--blue);"></i>
@@ -381,7 +381,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
               <div style="font-size:12px;color:var(--muted);line-height:1.4;">Holiday work</div>
             </div>
           </div>
-          <p style="font-size:13px;color:var(--muted);margin-top:14px;border-top:1px solid var(--hairline);padding-top:12px;" data-editable="ch3-sl3-c1note">Accrual: quarterly · Cycle: Jan–Dec · PLs carry forward to Feb · Check Keka</p>
+          <p style="font-size:13px;color:var(--muted);margin-top:14px;border-top:1px solid var(--hairline);padding-top:12px;" data-editable="ch3-sl3-c1note">Accrual: quarterly · Cycle: Jan–Dec · PLs carry forward up to 60 days into the next year · Check Keka</p>
         </div>
         <div class="twocol-panel">
           <h3 data-editable="ch3-sl3-c2t">Attendance &amp; WFH</h3>
@@ -444,6 +444,11 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
           <h3 data-editable="ch3-sl4-k8t">Search Everything</h3>
           <p data-editable="ch3-sl4-k8b">Use the search bar to navigate any page, policy, or feature instantly.</p>
         </div>
+      </div>
+      <div style="margin-top:24px;">
+        <a href="https://app.keka.com" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:10px; background:var(--blue); color:#fff; font-size:16px; font-weight:700; text-decoration:none; padding:14px 28px; border-radius:10px;">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Keka
+        </a>
       </div>
     </div>
     <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
@@ -553,46 +558,20 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
         <div class="section-num">02</div>
         <h2 class="section-title" data-editable="ch3-s02-title">Benefits &amp; Pay Structure</h2>
         <div data-editable="ch3-s02-body">
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:4px;">
-            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
-              <i class="fa-solid fa-hospital" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
-              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">PLUM Health Insurance</div>
-              <div style="font-size:12px;color:var(--body);line-height:1.5;">₹3L/year. Covers self, spouse, children, parents/in-laws. Sign up within 3 days. Over and above CTC.</div>
-            </div>
-            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
-              <i class="fa-solid fa-shield-halved" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
-              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">PLUM Term Life</div>
-              <div style="font-size:12px;color:var(--body);line-height:1.5;">3x monthly salary (min ₹15L, max ₹45L). Sign up within 3 days. Also above CTC.</div>
-            </div>
-            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
-              <i class="fa-solid fa-building-columns" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
-              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">HSBC Banking</div>
-              <div style="font-size:12px;color:var(--body);line-height:1.5;">New account on joining. 2–5% cashback + exclusive offers (Swiggy, Amazon Prime, BookMyShow, Mokobara).</div>
-            </div>
-            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
-              <i class="fa-solid fa-briefcase" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
-              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">PF — Option 1</div>
-              <div style="font-size:12px;color:var(--body);line-height:1.5;">Default: ₹1,800 employee + ₹1,800 employer = ₹3,600/month total.</div>
-            </div>
-            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
-              <i class="fa-solid fa-chart-line" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
-              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">PF — Option 2</div>
-              <div style="font-size:12px;color:var(--body);line-height:1.5;">12% of basic (both sides). 8–8.5% compound interest. Up to ₹1.5L deductible under 80C.</div>
-            </div>
-            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
-              <i class="fa-solid fa-sack-dollar" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
-              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">Variable Pay</div>
-              <div style="font-size:12px;color:var(--body);line-height:1.5;">Annual variable post-appraisal (May/June). Sales incentives monthly. Appraisal cycle: Apr–Mar.</div>
-            </div>
-            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
-              <i class="fa-solid fa-car" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
-              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">Uber Corporate</div>
-              <div style="font-size:12px;color:var(--body);line-height:1.5;">AM team only. Official client visits. Cap: ₹5K–8K/month by role. See policy below.</div>
-            </div>
-          </div>
+          <p class="section-body">Your compensation is more than your monthly salary. Here is what myHQ provides, several items over and above your CTC:</p>
+          <ul class="section-list">
+            <li><strong>PLUM Health Insurance:</strong> ₹3L/year. Covers self, spouse, children, parents/in-laws. Sign up any time — no deadline. Over and above CTC.</li>
+            <li><strong>PLUM Term Life:</strong> 3x monthly salary (min ₹15L, max ₹45L). Sign up any time. Also above CTC.</li>
+            <li><strong>HSBC Banking:</strong> New account on joining. 2–5% cashback + exclusive offers (Swiggy, Amazon Prime, BookMyShow, Mokobara).</li>
+            <li><strong>Flexi Benefits:</strong> Tax-saving reimbursements on fuel, car, driver, phone, and food — structured into your pay to reduce taxable income.</li>
+            <li><strong>PF — Option 1 (default):</strong> ₹1,800 employee + ₹1,800 employer = ₹3,600/month total.</li>
+            <li><strong>PF — Option 2:</strong> 12% of basic (both sides). 8–8.5% compound interest. Up to ₹1.5L deductible under 80C.</li>
+            <li><strong>Variable Pay:</strong> Annual variable post-appraisal (May/June). Sales incentives monthly. Appraisal cycle: Apr–Mar.</li>
+            <li><strong>Uber Corporate:</strong> AM team only. Official client visits. Cap: ₹5K–8K/month by role. See policy below.</li>
+          </ul>
         </div>
 
-        <div class="takeaway" data-editable="ch3-s02-takeaway">Sign up for PLUM health and life insurance within 3 days of joining — they're above your CTC and lapse if you don't activate them.</div>
+        <div class="takeaway" data-editable="ch3-s02-takeaway">Activate PLUM health and life insurance via the invite link — they're above your CTC and you can sign up at any time, with no deadline. Do it early so you and your family are covered.</div>
 
         <div style="border:1px solid rgba(255,184,72,0.5);background:rgba(255,184,72,0.07);border-radius:var(--radius);padding:20px 24px;margin-top:24px;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
@@ -615,146 +594,70 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
         <div class="section-num">03</div>
         <h2 class="section-title" data-editable="ch3-s03-title">Leave &amp; Work Policy</h2>
         <div data-editable="ch3-s03-body">
-          <p class="section-body" style="margin-bottom:16px;font-weight:700;color:var(--ink);">Leave Types</p>
-          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:24px;">
-            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
-              <i class="fa-solid fa-suitcase-medical" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
-              <div style="font-size:12px;font-weight:800;color:var(--blue);">SL</div>
-              <div style="font-size:11px;color:var(--body);line-height:1.3;">Sick Leave</div>
-            </div>
-            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
-              <i class="fa-solid fa-umbrella-beach" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
-              <div style="font-size:12px;font-weight:800;color:var(--blue);">PL</div>
-              <div style="font-size:11px;color:var(--body);line-height:1.3;">Planned Leave</div>
-            </div>
-            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
-              <i class="fa-solid fa-mug-hot" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
-              <div style="font-size:12px;font-weight:800;color:var(--blue);">CL</div>
-              <div style="font-size:11px;color:var(--body);line-height:1.3;">Casual Leave</div>
-            </div>
-            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
-              <i class="fa-solid fa-cake-candles" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
-              <div style="font-size:12px;font-weight:800;color:var(--blue);">Special</div>
-              <div style="font-size:11px;color:var(--body);line-height:1.3;">B-day / Anniv</div>
-            </div>
-            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
-              <i class="fa-solid fa-baby" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
-              <div style="font-size:12px;font-weight:800;color:var(--blue);">Mat / Pat</div>
-              <div style="font-size:11px;color:var(--body);line-height:1.3;">Parenting</div>
-            </div>
-            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
-              <i class="fa-solid fa-heart" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
-              <div style="font-size:12px;font-weight:800;color:var(--blue);">Marriage</div>
-              <div style="font-size:11px;color:var(--body);line-height:1.3;">Own wedding</div>
-            </div>
-            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
-              <i class="fa-solid fa-paw" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
-              <div style="font-size:12px;font-weight:800;color:var(--blue);">Pet</div>
-              <div style="font-size:11px;color:var(--body);line-height:1.3;">Adoption</div>
-            </div>
-            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
-              <i class="fa-solid fa-arrows-rotate" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
-              <div style="font-size:12px;font-weight:800;color:var(--blue);">Floater</div>
-              <div style="font-size:11px;color:var(--body);line-height:1.3;">Flexible day</div>
-            </div>
-            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
-              <i class="fa-solid fa-dove" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
-              <div style="font-size:12px;font-weight:800;color:var(--blue);">Bereavmt</div>
-              <div style="font-size:11px;color:var(--body);line-height:1.3;">Family loss</div>
-            </div>
-            <div style="background:#F0F1FF;border-radius:8px;padding:12px 8px;text-align:center;">
-              <i class="fa-solid fa-rotate-left" style="font-size:22px;margin-bottom:4px;color:var(--blue);"></i>
-              <div style="font-size:12px;font-weight:800;color:var(--blue);">Comp Off</div>
-              <div style="font-size:11px;color:var(--body);line-height:1.3;">Holiday work</div>
-            </div>
-          </div>
+          <h3 class="section-subhead">Leave Types</h3>
+          <ul class="section-list">
+            <li><strong>WL</strong> — Wellness Leave</li>
+            <li><strong>PL</strong> — Paid (Privileged) Leave</li>
+            <li><strong>CL</strong> — Casual Leave</li>
+            <li><strong>Special</strong> — Birthday / Anniversary</li>
+            <li><strong>Mat / Pat</strong> — Maternity &amp; Paternity (parenting)</li>
+            <li><strong>Marriage</strong> — Your own wedding</li>
+            <li><strong>Pet</strong> — Pet adoption</li>
+            <li><strong>Floater</strong> — Flexible day</li>
+            <li><strong>Bereavement</strong> — Loss of immediate family</li>
+            <li><strong>Comp Off</strong> — For working on a holiday</li>
+          </ul>
 
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
-            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
-              <i class="fa-solid fa-calendar-days" style="font-size:20px;margin-bottom:8px;color:var(--blue);"></i>
-              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:6px;">How Leaves Work</div>
-              <ul class="section-list">
-                <li>Accrue quarterly based on tenure</li>
-                <li>Cycle: Jan–Dec, expire Dec 31st</li>
-                <li>PLs only carry forward to Feb end</li>
-                <li>Check Keka for exact balances</li>
-              </ul>
-            </div>
-            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
-              <i class="fa-solid fa-building" style="font-size:20px;margin-bottom:8px;color:var(--blue);"></i>
-              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:6px;">WFH Policy</div>
-              <ul class="section-list">
-                <li>WFO-first — in office is the default</li>
-                <li>Apply WFH via Keka portal</li>
-                <li>Manager/TL approves</li>
-                <li>Check with your TL if your team allows WFH before assuming</li>
-              </ul>
-            </div>
-            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
-              <i class="fa-solid fa-location-dot" style="font-size:20px;margin-bottom:8px;color:var(--blue);"></i>
-              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:6px;">Attendance</div>
-              <ul class="section-list">
-                <li>Tracked: VO, On-Demand, Lead Qualification</li>
-                <li>Mark via Keka app — geotagged, must be in building</li>
-                <li>Late arrivals → auto leave deduction after warnings</li>
-                <li>Corrections must be made within 2–3 days</li>
-              </ul>
-            </div>
-          </div>
+          <h3 class="section-subhead">How Leaves Work</h3>
+          <ul class="section-list">
+            <li>Accrue quarterly based on tenure</li>
+            <li>Cycle: Jan–Dec — most leave types expire Dec 31st</li>
+            <li>PLs are the exception: they carry forward up to 60 days into the next year</li>
+            <li>Check Keka for exact balances</li>
+          </ul>
+
+          <h3 class="section-subhead">WFH Policy</h3>
+          <ul class="section-list">
+            <li>WFO-first — in office is the default</li>
+            <li>Apply WFH via Keka portal</li>
+            <li>Manager/TL approves</li>
+            <li>Check with your TL if your team allows WFH before assuming</li>
+          </ul>
+
+          <h3 class="section-subhead">Attendance</h3>
+          <ul class="section-list">
+            <li>Tracked: VO, On-Demand, Lead Qualification</li>
+            <li>Mark via Keka app — geotagged, must be in building</li>
+            <li>Late arrivals → auto leave deduction after warnings</li>
+            <li>Corrections must be made within 2–3 days</li>
+          </ul>
         </div>
-        <div class="takeaway" data-editable="ch3-s03-takeaway">Know your leave types and apply on time via Keka. Don't wait — PLs are the only ones that carry forward, and the rest expire December 31st.</div>
+        <div class="takeaway" data-editable="ch3-s03-takeaway">Know your leave types and apply on time via Keka. PLs are the only ones that carry forward — up to 60 days into the next year — while the rest expire December 31st.</div>
       </section>
 
       <section class="section" id="r-s04">
         <div class="section-num">04</div>
         <h2 class="section-title" data-editable="ch3-s04-title">Keka HRMS</h2>
         <div data-editable="ch3-s04-body">
-          <p class="section-body" style="margin-bottom:20px;">Keka is myHQ's HRMS — the single platform for everything people-related. You will use it from day one, every day.</p>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:4px;">
-            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
-              <i class="fa-solid fa-calendar-check" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
-              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">Apply Leaves</div>
-              <div style="font-size:12px;color:var(--body);line-height:1.5;">All leave requests go through Keka. WhatsApp or email doesn't count.</div>
-            </div>
-            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
-              <i class="fa-solid fa-sack-dollar" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
-              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">Payslips &amp; Tax</div>
-              <div style="font-size:12px;color:var(--body);line-height:1.5;">Download payslips, submit investment declarations &amp; tax proofs.</div>
-            </div>
-            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
-              <i class="fa-solid fa-receipt" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
-              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">Expenses &amp; Claims</div>
-              <div style="font-size:12px;color:var(--body);line-height:1.5;">Submit travel and client reimbursements. Not on Keka = not processed.</div>
-            </div>
-            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
-              <i class="fa-solid fa-headset" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
-              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">HR &amp; IT Helpdesk</div>
-              <div style="font-size:12px;color:var(--body);line-height:1.5;">Raise tickets for laptop issues, ID cards, access requests, onboarding queries.</div>
-            </div>
-            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
-              <i class="fa-solid fa-handshake" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
-              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">Referrals</div>
-              <div style="font-size:12px;color:var(--body);line-height:1.5;">Only Keka referrals qualify for the bonus. Email referrals don't count.</div>
-            </div>
-            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
-              <i class="fa-solid fa-location-dot" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
-              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">Attendance</div>
-              <div style="font-size:12px;color:var(--body);line-height:1.5;">VO, On-Demand &amp; LQ teams: mark on Keka app (geotagged). Corrections within 2–3 days.</div>
-            </div>
-            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
-              <i class="fa-solid fa-calendar" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
-              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">Holiday Calendar</div>
-              <div style="font-size:12px;color:var(--body);line-height:1.5;">Official holiday list for the year lives on Keka. Check before planning.</div>
-            </div>
-            <div style="border:1px solid var(--hairline);border-radius:var(--radius);padding:18px 16px;background:#FAFBFF;">
-              <i class="fa-solid fa-magnifying-glass" style="font-size:22px;margin-bottom:8px;color:var(--blue);"></i>
-              <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:4px;">Search Everything</div>
-              <div style="font-size:12px;color:var(--body);line-height:1.5;">Find policies, org chart, colleagues &amp; team information all in one place.</div>
-            </div>
-          </div>
-          <figure style="margin:24px auto 0; max-width:760px; border-radius:var(--radius); overflow:hidden; border:1px solid var(--hairline); background:#FAFBFF;">
-            <img src="ch5_book_images/keka.png" alt="Keka HRMS dashboard" style="display:block; width:100%; height:auto; object-fit:contain;" onerror="this.parentElement.style.display='none';">
-          </figure>
+          <p class="section-body">Keka is myHQ's HRMS — the single platform for everything people-related. You will use it from day one, every day. Here's what you'll do on it:</p>
+          <ul class="section-list">
+            <li><strong>Apply Leaves:</strong> All leave requests go through Keka. WhatsApp or email doesn't count.</li>
+            <li><strong>Payslips &amp; Tax:</strong> Download payslips, submit investment declarations &amp; tax proofs.</li>
+            <li><strong>Expenses &amp; Claims:</strong> Submit travel and client reimbursements. Not on Keka = not processed.</li>
+            <li><strong>HR &amp; IT Helpdesk:</strong> Raise tickets for laptop issues, ID cards, access requests, onboarding queries.</li>
+            <li><strong>Referrals:</strong> Only Keka referrals qualify for the bonus. Email referrals don't count.</li>
+            <li><strong>Attendance:</strong> VO, On-Demand &amp; LQ teams mark on the Keka app (geotagged). Corrections within 2–3 days.</li>
+            <li><strong>Holiday Calendar:</strong> Official holiday list for the year lives on Keka. Check before planning.</li>
+            <li><strong>Search Everything:</strong> Find policies, org chart, colleagues &amp; team information all in one place.</li>
+          </ul>
+        </div>
+        <figure style="margin:24px auto 0; width:80%; overflow:hidden;">
+          <img src="ch5_book_images/keka.png" alt="Keka HRMS dashboard" style="display:block; width:100%; height:auto; object-fit:contain;" onerror="this.parentElement.style.display='none';">
+        </figure>
+        <div style="margin-top:20px;">
+          <a href="https://app.keka.com" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:10px; background:var(--blue); color:var(--white); font-size:14px; font-weight:700; text-decoration:none; padding:12px 22px; border-radius:var(--radius);">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Keka
+          </a>
         </div>
         <div class="takeaway" data-editable="ch3-s04-takeaway">Keka is not optional — it is the only official channel for leaves, payslips, expenses, referrals, and helpdesk. If it's not on Keka, it doesn't exist.</div>
       </section>
@@ -787,17 +690,17 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
         </div>
 
         <!-- Q1 -->
-        <div class="mcq-q" id="mcq1" data-type="single" data-correct="2">
+        <div class="mcq-q" id="mcq1" data-type="single" data-correct="1">
           <div class="aq-q-header"><span class="aq-q-num">Q1</span><span class="aq-q-status" id="mcq1-status"></span></div>
           <p class="aq-q-text">You joined 5 days ago and still haven't activated your PLUM health insurance. What happens?</p>
           <div class="mcq-hint">Select one</div>
           <div class="mcq-options">
             <label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="q1"><span class="mcq-badge">A</span><span class="mcq-opt-text">HR will automatically enroll you before the end of the month.</span></label>
             <label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="q1"><span class="mcq-badge">B</span><span class="mcq-opt-text">You can sign up any time — there's no deadline for insurance.</span></label>
-            <label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="q1"><span class="mcq-badge">C</span><span class="mcq-opt-text">The insurance lapses — you lose the benefit entirely, as it's above your CTC and must be activated within 3 days.</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="q1"><span class="mcq-badge">C</span><span class="mcq-opt-text">The insurance lapses permanently and you lose the benefit entirely.</span></label>
             <label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="q1"><span class="mcq-badge">D</span><span class="mcq-opt-text">You'll be charged a penalty to reactivate it later.</span></label>
           </div>
-          <div class="mcq-explain" id="mcq1-exp">PLUM health and life insurance are over and above your CTC. They require you to sign up via an invite link within 3 days of joining. If you miss this window, the benefit lapses — HR won't chase you.</div>
+          <div class="mcq-explain" id="mcq1-exp">PLUM health and life insurance are over and above your CTC. You can sign up for them at any time via the invite link — there's no deadline and the benefit doesn't lapse. The sooner you activate, the sooner you and your family are covered.</div>
         </div>
 
         <!-- Q2 -->
@@ -834,12 +737,12 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
           <p class="aq-q-text">You want to take a 5-day trip in March and have planned it 3 weeks in advance. Which leave type should you apply for?</p>
           <div class="mcq-hint">Select one</div>
           <div class="mcq-options">
-            <label class="mcq-opt" onclick="selectOpt(this,4)"><input type="radio" name="q4"><span class="mcq-badge">A</span><span class="mcq-opt-text">Casual Leave — it's flexible and can be used for anything.</span></label>
-            <label class="mcq-opt" onclick="selectOpt(this,4)"><input type="radio" name="q4"><span class="mcq-badge">B</span><span class="mcq-opt-text">Floater Leave — designed for full-day breaks.</span></label>
-            <label class="mcq-opt" onclick="selectOpt(this,4)"><input type="radio" name="q4"><span class="mcq-badge">C</span><span class="mcq-opt-text">Paid Leave — designed for planned trips and breaks, and is the only type that carries forward.</span></label>
-            <label class="mcq-opt" onclick="selectOpt(this,4)"><input type="radio" name="q4"><span class="mcq-badge">D</span><span class="mcq-opt-text">Sick Leave — just say you were unwell.</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,4)"><input type="radio" name="q4"><span class="mcq-badge">A</span><span class="mcq-opt-text">Casual Leave</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,4)"><input type="radio" name="q4"><span class="mcq-badge">B</span><span class="mcq-opt-text">Floater Leave</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,4)"><input type="radio" name="q4"><span class="mcq-badge">C</span><span class="mcq-opt-text">Paid (Privileged) Leave</span></label>
+            <label class="mcq-opt" onclick="selectOpt(this,4)"><input type="radio" name="q4"><span class="mcq-badge">D</span><span class="mcq-opt-text">Wellness Leave</span></label>
           </div>
-          <div class="mcq-explain" id="mcq4-exp">Paid Leave (PL) is for planned time off — trips, personal breaks. It's the only leave type that carries forward (to February end). Casual Leave is for urgent, short-notice needs. Always apply for the correct type.</div>
+          <div class="mcq-explain" id="mcq4-exp">Paid (Privileged) Leave (PL) is for planned time off — trips, personal breaks. It's the only leave type that carries forward — up to 60 days into the next year. Casual Leave is for urgent, short-notice needs. Always apply for the correct type.</div>
         </div>
 
         <!-- Q5 -->
@@ -858,7 +761,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 
         <div class="aq-footer" id="aqFooter">
           <span class="aq-footer-note" id="aqFooterNote">Answer all 5 questions to submit.</span>
-          <button class="aq-submit-btn" id="aqSubmitBtn" onclick="submitMCQ()" disabled>Check Answers</button>
+          <button class="aq-submit-btn" id="aqSubmitBtn" onclick="submitMCQ()" disabled>Submit</button>
         </div>
         <div class="aq-error" id="aqError" style="display:none;"></div>
       </section>
@@ -1051,7 +954,7 @@ function updateMCQTracker() {
   document.getElementById('aqTrackerLabel').textContent = count + ' / ' + TOTAL_QUESTIONS + ' answered';
   var btn = document.getElementById('aqSubmitBtn');
   btn.disabled = count < TOTAL_QUESTIONS;
-  document.getElementById('aqFooterNote').textContent = count === TOTAL_QUESTIONS ? 'All answered — ready to check.' : 'Answer all ' + TOTAL_QUESTIONS + ' questions to continue.';
+  document.getElementById('aqFooterNote').textContent = count === TOTAL_QUESTIONS ? 'All answered — ready to submit.' : 'Answer all ' + TOTAL_QUESTIONS + ' questions to continue.';
 }
 
 function submitMCQ(isRestore) {
