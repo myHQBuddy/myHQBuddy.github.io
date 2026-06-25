@@ -1093,8 +1093,8 @@ h3.section-subhead {
             <span class="aq-q-num">Task 1</span>
             <span class="aq-q-status" id="aq1-status"></span>
           </div>
-          <p class="aq-q-text">Have a mock call with 2 people from the list below and upload both recordings.</p>
-          <p class="aq-q-sub">Call any 2: J (+91 98999 43672) · Himanshu (+91 86558 30454) · Yugandhra (+91 92666 07111) · Akram (+91 96661 81312) · Karshit (+91 86558 30461) · Amrith (+91 86557 82708)</p>
+          <p class="aq-q-text" data-editable="amch3-assess-q1">Have a mock call with 2 people from the list below and upload both recordings.</p>
+          <p class="aq-q-sub" data-editable="amch3-assess-q1-people">Call any 2: J (+91 98999 43672) · Himanshu (+91 86558 30454) · Yugandhra (+91 92666 07111) · Akram (+91 96661 81312) · Karshit (+91 86558 30461) · Amrith (+91 86557 82708)</p>
 
           <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px;">
             <div>
@@ -1126,7 +1126,7 @@ h3.section-subhead {
             <span class="aq-q-num">Task 2</span>
             <span class="aq-q-status" id="aq2-status"></span>
           </div>
-          <p class="aq-q-text">Call old leads and document 2 case studies where you followed this structure.</p>
+          <p class="aq-q-text" data-editable="amch3-assess-q2">Call old leads and document 2 case studies where you followed this structure.</p>
           <p class="aq-q-sub">Write up 2 real calls — what you found out at each stage (Situation / End User / Location / Configuration) and what happened next. Upload as a single document.</p>
 
           <div class="aq-upload-zone" id="aq2-zone">
@@ -1281,10 +1281,29 @@ function getLoggedInFirstName() {
   return 'User';
 }
 
+// Chapter id — matches the admin CMS keys (data-editable="amch3-...").
+var CHAPTER_ID = 'amch3';
+
+// Pull any admin-edited content for this chapter from Firestore and inject it
+// into the matching [data-editable] elements (questions, options, body text…).
+function applyChapterContent() {
+  var db = window.firebaseDB;
+  if (!db) return;
+  db.collection('content').doc(CHAPTER_ID).get().then(function(cSnap) {
+    if (!cSnap.exists) return;
+    var cData = cSnap.data();
+    document.querySelectorAll('[data-editable]').forEach(function(el) {
+      var key = el.getAttribute('data-editable');
+      if (cData[key] !== undefined) el.innerHTML = cData[key];
+    });
+  }).catch(function(){});
+}
+
 // Redirect to login if not authenticated
 if (window.firebaseAuth) {
   window.firebaseAuth.onAuthStateChanged(function(user) {
     if (!user) { window.location.href = 'landing.html'; return; }
+    applyChapterContent();
     restoreAssessment();
   });
 }
