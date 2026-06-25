@@ -248,6 +248,12 @@ body { font-family: var(--sans); background: var(--blue-wash); color: var(--blue
 .chapter-pill.active { background: var(--blue); color: var(--white); border-color: var(--blue); }
 .chapter-pill:disabled { opacity: 0.4; cursor: default; }
 .pill-wrap { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.chapter-section { display: flex; flex-direction: column; gap: 10px; }
+.chapter-section-label {
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue-soft);
+}
+.chapter-section-pills { display: flex; flex-wrap: wrap; gap: 8px; }
 .chapter-pill.has-pending { border-color: #f59e0b; color: #92400e; background: #fffbeb; }
 .chapter-pill.has-pending.active { background: var(--blue); color: var(--white); border-color: var(--blue); }
 .course-pill.has-pending { border-color: #f59e0b; color: #92400e; }
@@ -350,7 +356,7 @@ body { font-family: var(--sans); background: var(--blue-wash); color: var(--blue
     <!-- Step 2: Chapter picker -->
     <div class="card" id="edit-chapter-card">
       <div class="card-title">Select Chapter</div>
-      <div id="edit-chapter-pills" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+      <div id="edit-chapter-pills" style="display:flex;flex-direction:column;gap:20px;"></div>
     </div>
 
     <!-- Step 3a: Editor view -->
@@ -1091,6 +1097,304 @@ const CHAPTER_DEFS = {
     assessFields: []
   },
 
+  wwd_am: {
+    label: 'What We Do — Assisted Marketplace',
+    course: 'beginner',
+    slideFields: [
+      { id: 'ch4-title', label: 'Chapter Title (Topbar)', type: 'input', group: 'Cover', default: 'What We Do — Assisted Marketplace' },
+      { id: 'ch4-cover-headline', label: 'Cover Headline', type: 'input', group: 'Cover', default: 'Find the right office.<br><em>We\'ll get you there.</em>' },
+      { id: 'ch4-cover-sub', label: 'Cover Subtext', type: 'textarea', group: 'Cover', default: 'Fixed desks, managed office, conventional leasing — our consultants assist clients at every step in finding the perfect office solution, tailored to their unique needs.' },
+      { id: 'ch4-sl1-eyebrow', label: 'Eyebrow', type: 'input', group: 'Slide 1', default: 'Introduction' },
+      { id: 'ch4-sl1-headline', label: 'Headline', type: 'input', group: 'Slide 1', default: 'A marketplace, <span>not a listing site.</span>' },
+      { id: 'ch4-sl1-c1t', label: 'Card 1 Title', type: 'input', group: 'Slide 1', default: 'Key Benefits of myHQ' },
+      { id: 'ch4-sl1-c1b', label: 'Card 1 Body', type: 'textarea', group: 'Slide 1', default: 'Our consultants assist the client in finding the perfect office solution tailored to their unique needs.' },
+      { id: 'ch4-sl1-c1l1', label: 'Card 1 List Item 1', type: 'textarea', group: 'Slide 1', default: '<strong>End to End Office Consultant:</strong> one point of contact, start to finish' },
+      { id: 'ch4-sl1-c1l3', label: 'Card 1 List Item 3', type: 'textarea', group: 'Slide 1', default: '<strong>Faster Decisions, Smooth Move-ins</strong>' },
+      { id: 'ch4-sl1-c1l4', label: 'Card 1 List Item 4', type: 'textarea', group: 'Slide 1', default: '<strong>Best Negotiated Prices</strong>' },
+      { id: 'ch4-sl1-c2t', label: 'Card 2 Title', type: 'input', group: 'Slide 1', default: 'Target Audience' },
+      { id: 'ch4-sl1-c2l1', label: 'Card 2 List Item 1', type: 'textarea', group: 'Slide 1', default: '<strong>Startups:</strong> Early and growth stage companies' },
+      { id: 'ch4-sl1-c2l2', label: 'Card 2 List Item 2', type: 'textarea', group: 'Slide 1', default: '<strong>Mid-Size Companies:</strong> Growing businesses, 20–100 employees' },
+      { id: 'ch4-sl1-c2l3', label: 'Card 2 List Item 3', type: 'textarea', group: 'Slide 1', default: '<strong>Large Businesses:</strong> Larger businesses with stable headcount' },
+      { id: 'ch4-sl2-eyebrow', label: 'Eyebrow', type: 'input', group: 'Slide 2', default: 'AM Solutions for Clients' },
+      { id: 'ch4-sl2-headline', label: 'Headline', type: 'input', group: 'Slide 2', default: 'Three solutions. <span>One team.</span>' },
+      { id: 'ch4-sl2-c1t', label: 'Card 1 Title', type: 'input', group: 'Slide 2', default: 'Coworking Spaces' },
+      { id: 'ch4-sl2-c1b', label: 'Card 1 Body', type: 'textarea', group: 'Slide 2', default: 'Your own reserved desk for your team — in a shared, vibrant coworking environment. Can be open desks (1–100) or cabins (4–100 seater). Dealing in # of seats.' },
+      { id: 'ch4-sl2-c2t', label: 'Card 2 Title', type: 'input', group: 'Slide 2', default: 'Managed Office' },
+      { id: 'ch4-sl2-c2b', label: 'Card 2 Body', type: 'textarea', group: 'Slide 2', default: 'A fully serviced, custom-built office — designed, furnished, and run for you so your team moves in faster. Generally for 50+ team size. Dealing in # of seats/sqft.' },
+      { id: 'ch4-sl2-c3t', label: 'Card 3 Title', type: 'input', group: 'Slide 2', default: 'Conventional Leasing' },
+      { id: 'ch4-sl2-c3b', label: 'Card 3 Body', type: 'textarea', group: 'Slide 2', default: 'Long-term leased spaces for companies needing full control &amp; flexibility. Generally for 150+ team size (5,000 sqft or more). Dealing in sqft.' },
+      { id: 'ch4-sl3-eyebrow', label: 'Eyebrow', type: 'input', group: 'Slide 3', default: 'How It Works' },
+      { id: 'ch4-sl3-headline', label: 'Headline', type: 'input', group: 'Slide 3', default: 'End to end consulting, <span>in 6 steps.</span>' },
+      { id: 'ch4-sl3-t1y', label: 'Step 1 Label', type: 'input', group: 'Slide 3', default: 'Discovery' },
+      { id: 'ch4-sl3-t1t', label: 'Step 1 Title', type: 'input', group: 'Slide 3', default: 'Strategic Discovery' },
+      { id: 'ch4-sl3-t1s', label: 'Step 1 Description', type: 'textarea', group: 'Slide 3', default: 'Identify potential office space via city &amp; micro-market analysis — talent pool, competitors, traffic, cost of living.' },
+      { id: 'ch4-sl3-t2y', label: 'Step 2 Label', type: 'input', group: 'Slide 3', default: 'Shortlist' },
+      { id: 'ch4-sl3-t2t', label: 'Step 2 Title', type: 'input', group: 'Slide 3', default: 'Curated Shortlist' },
+      { id: 'ch4-sl3-t2s', label: 'Step 2 Description', type: 'textarea', group: 'Slide 3', default: 'Evaluate &amp; benchmark options on budget, connectivity, asset type, and centre experience — create a visit-ready shortlist.' },
+      { id: 'ch4-sl3-t3y', label: 'Step 3 Label', type: 'input', group: 'Slide 3', default: 'Negotiate' },
+      { id: 'ch4-sl3-t3t', label: 'Step 3 Title', type: 'input', group: 'Slide 3', default: 'Commercial Structuring' },
+      { id: 'ch4-sl3-t3s', label: 'Step 3 Description', type: 'textarea', group: 'Slide 3', default: 'Negotiate cost/sqft, deposit, lock-in &amp; notice period, upfront/opex cost, and annual escalation.' },
+      { id: 'ch4-sl3-t4y', label: 'Step 4 Label', type: 'input', group: 'Slide 3', default: 'Compliance' },
+      { id: 'ch4-sl3-t4t', label: 'Step 4 Title', type: 'input', group: 'Slide 3', default: 'Compliance, Interiors, Legal' },
+      { id: 'ch4-sl3-t4s', label: 'Step 4 Description', type: 'textarea', group: 'Slide 3', default: 'Check fire norms, security compliance, property ownership, layout design, and agreement registration.' },
+      { id: 'ch4-sl3-t5y', label: 'Step 5 Label', type: 'input', group: 'Slide 3', default: 'Transition' },
+      { id: 'ch4-sl3-t5t', label: 'Step 5 Title', type: 'input', group: 'Slide 3', default: 'Transition Period Mgmt' },
+      { id: 'ch4-sl3-t5s', label: 'Step 5 Description', type: 'textarea', group: 'Slide 3', default: 'Support the client through any wait for the new office — temporary solutions, ongoing project-pace check-ins.' },
+      { id: 'ch4-sl3-t6y', label: 'Step 6 Label', type: 'input', group: 'Slide 3', default: 'Move-in' },
+      { id: 'ch4-sl3-t6t', label: 'Step 6 Title', type: 'input', group: 'Slide 3', default: 'Move-in Date &amp; Month' },
+      { id: 'ch4-sl3-t6s', label: 'Step 6 Description', type: 'textarea', group: 'Slide 3', default: 'Inauguration setup, office/building branding, and resolving minor interiors or infra issues in the first 1–2 weeks.' },
+      { id: 'ch4-sl4-headline', label: 'Headline', type: 'input', group: 'Slide 4', default: 'Client journey. <span>Lead to booking.</span>' },
+      { id: 'ch4-sl4-f1t', label: 'Item 1 Title', type: 'input', group: 'Slide 4', default: 'Lead Posted' },
+      { id: 'ch4-sl4-f1s', label: 'Item 1 Description', type: 'input', group: 'Slide 4', default: 'A new lead is posted into the system.' },
+      { id: 'ch4-sl4-f2t', label: 'Item 2 Title', type: 'input', group: 'Slide 4', default: 'Lead Qualified' },
+      { id: 'ch4-sl4-f2s', label: 'Item 2 Description', type: 'input', group: 'Slide 4', default: 'The qualification team reviews and qualifies the lead.' },
+      { id: 'ch4-sl4-f3t', label: 'Item 3 Title', type: 'input', group: 'Slide 4', default: 'Options Shared' },
+      { id: 'ch4-sl4-f3s', label: 'Item 3 Description', type: 'input', group: 'Slide 4', default: 'The sales point of contact shares workspace options.' },
+      { id: 'ch4-sl4-f4t', label: 'Item 4 Title', type: 'input', group: 'Slide 4', default: 'Visit Scheduled' },
+      { id: 'ch4-sl4-f4s', label: 'Item 4 Description', type: 'input', group: 'Slide 4', default: 'The client schedules a visit to the workspace.' },
+      { id: 'ch4-sl4-f5t', label: 'Item 5 Title', type: 'input', group: 'Slide 4', default: 'Contract + Booking Done' },
+      { id: 'ch4-sl4-f5s', label: 'Item 5 Description', type: 'input', group: 'Slide 4', default: 'The workspace is successfully booked by the client.' },
+      { id: 'ch4-sl5-eyebrow', label: 'Eyebrow', type: 'input', group: 'Slide 5', default: 'Our Tools &amp; Partnership' },
+      { id: 'ch4-sl5-headline', label: 'Headline', type: 'textarea', group: 'Slide 5', default: 'Internal + Zoho CRM. <span style="color:#BEE5C2;">Lead to close.</span>' },
+      { id: 'ch4-sl5-c1', label: 'Column 1', type: 'textarea', group: 'Slide 5', default: 'For the team to manage leads &amp; track progress — proposals can be shared straight from the CRM.' },
+      { id: 'ch4-sl5-c2', label: 'Column 2', type: 'textarea', group: 'Slide 5', default: 'Our internal CRM works in tandem with Zoho CRM.' },
+      { id: 'ch4-sl5-c3', label: 'Column 3', type: 'textarea', group: 'Slide 5', default: 'myHQ Website is our lead generation channel — 5,000+ clients served and counting.' },
+      { id: 'ch4-sl6-eyebrow', label: 'Eyebrow', type: 'input', group: 'Slide 6', default: 'Current Scale' },
+      { id: 'ch4-sl6-num', label: 'Stat Number', type: 'input', group: 'Slide 6', default: '₹35<span>Cr</span>' },
+      { id: 'ch4-sl6-caption', label: 'Caption', type: 'textarea', group: 'Slide 6', default: 'our take rate per year — the highest revenue driver of the firm' },
+      { id: 'ch4-sl6-f1n', label: 'Stat 1 Number', type: 'input', group: 'Slide 6', default: '100' },
+      { id: 'ch4-sl6-f1l', label: 'Stat 1 Label', type: 'input', group: 'Slide 6', default: 'Consultants across 10 cities' },
+      { id: 'ch4-sl6-f2n', label: 'Stat 2 Number', type: 'input', group: 'Slide 6', default: '40K+' },
+      { id: 'ch4-sl6-f2l', label: 'Stat 2 Label', type: 'input', group: 'Slide 6', default: 'Seats leased annually' },
+      { id: 'ch4-sl6-f3n', label: 'Stat 3 Number', type: 'input', group: 'Slide 6', default: '1M sqft' },
+      { id: 'ch4-sl6-f3l', label: 'Stat 3 Label', type: 'input', group: 'Slide 6', default: 'Conventional leasing (our newest product line)' },
+      { id: 'ch4-sl6-f4n', label: 'Stat 4 Number', type: 'input', group: 'Slide 6', default: '₹300Cr' },
+      { id: 'ch4-sl6-f4l', label: 'Stat 4 Label', type: 'input', group: 'Slide 6', default: 'Annual transaction value (GMV)' },
+    ],
+    contentFields: [
+      { id: 'ch4-intro-body', label: 'Body', type: 'textarea', group: 'Read Mode — Intro', default: '<p class="section-body" style="margin-bottom:0;">Assisted Marketplace (AM) is myHQ\'s consultative office-finding service — covering fixed desks/area, managed office, and conventional leasing. Our consultants work with companies to identify, shortlist, visit, negotiate, and close the right office, end to end. It is myHQ\'s largest revenue-driving vertical.</p>' },
+      { id: 'ch4-s01-outcome', label: 'Learning Outcome', type: 'textarea', group: 'Read Mode — S01', default: 'Understand what Assisted Marketplace is, its key benefits, and which client segments it targets.' },
+      { id: 'ch4-s01-title', label: 'Title', type: 'input', group: 'Read Mode — S01', default: 'What is Assisted Marketplace?' },
+      { id: 'ch4-s01-body', label: 'Body', type: 'textarea', group: 'Read Mode — S01', default: '<p class="section-body">Assisted Marketplace is myHQ\'s consultative solution for companies looking for office space. Most companies looking for an office have never done it before, don\'t know the market, and don\'t have the time to visit dozens of properties. Our consultants assist the client in finding the perfect office solution tailored to their unique needs — across coworking, managed office, or conventional leasing — instead of leaving them to navigate a fragmented, broker-driven market alone.</p> <p class="section-body"><strong>Key benefits of myHQ:</strong></p> <ul class="section-list"> <li><strong>End to End Office Consultant:</strong> one dedicated point of contact owns the search from brief to move-in — the client isn\'t bounced between a broker for the space, a lawyer for the agreement, and an interior team for the fit-out.</li> <li><strong>Zero Brokerage:</strong> clients don\'t pay us a brokerage fee. This removes the single biggest reason companies are wary of going through an intermediary in the first place.</li> <li><strong>Faster Decisions, Smooth Move-ins:</strong> a structured process compresses decision time and de-risks the move — clients aren\'t second-guessing themselves three weeks into a search because they have no benchmark for what "a good deal" looks like.</li> <li><strong>Best Negotiated Prices:</strong> our scale and market knowledge get clients better commercial terms than they\'d get alone, since we run this volume of transactions across the same set of landlords and operators repeatedly.</li> </ul> <p class="section-body"><strong>Target audience</strong> spans three segments, each with different urgency and decision-making style:</p> <ul class="section-list"> <li><strong>Startups:</strong> early and growth stage companies. These clients move fast, often need flexibility built into the deal (shorter lock-ins), and are usually choosing coworking.</li> <li><strong>Mid-Size Companies:</strong> growing businesses, typically 20–100 employees. These clients are often deciding between coworking and a managed office as headcount stabilises.</li> <li><strong>Large Businesses:</strong> larger businesses with a stable headcount. These clients have the scale and predictability to justify a managed office or a full conventional lease.</li> </ul>' },
+      { id: 'ch4-s01-takeaway', label: 'Takeaway', type: 'textarea', group: 'Read Mode — S01', default: 'AM = expert consultant + zero brokerage + best negotiated prices. The client doesn\'t need to know the market — that\'s what we\'re here for.' },
+      { id: 'ch4-s02-outcome', label: 'Learning Outcome', type: 'textarea', group: 'Read Mode — S02', default: 'Know the three office solutions AM offers, how each is priced, and when to recommend each.' },
+      { id: 'ch4-s02-title', label: 'Title', type: 'input', group: 'Read Mode — S02', default: 'AM Solutions for Clients' },
+      { id: 'ch4-s02-body', label: 'Body', type: 'textarea', group: 'Read Mode — S02', default: '<p class="section-body">AM offers three distinct office products, each suited to a different stage and style of company:</p> <div class="minicard-grid"> <div class="minicard"> <i class="fa-solid fa-people-roof"></i> <div class="mc-t">Coworking Spaces</div> <div class="mc-b">Your own reserved desk in a shared, vibrant coworking environment. Open desks (1–100) or cabins (4–100 seater). <strong>Dealing in # of seats.</strong></div> </div> <div class="minicard"> <i class="fa-solid fa-building"></i> <div class="mc-t">Managed Office</div> <div class="mc-b">A fully serviced, custom-built office — designed, furnished, and run for you so your team moves in faster. Generally for 50+ team size. <strong>Dealing in # of seats/sqft.</strong></div> </div> <div class="minicard"> <i class="fa-solid fa-file-contract"></i> <div class="mc-t">Conventional Leasing</div> <div class="mc-b">Long-term leased spaces for companies needing full control &amp; flexibility. Generally for 150+ team size (5,000 sqft+). <strong>Dealing in sqft.</strong></div> </div> </div> <p class="section-body">The three products sit on a spectrum of control versus convenience. <strong>Coworking</strong> trades the lowest control for the highest convenience — the client doesn\'t manage facilities, security, or interiors at all, they just occupy seats. <strong>Managed Office</strong> sits in the middle — the client gets a space built and run to their brand and layout, but myHQ\'s operator still handles the day-to-day running of it. <strong>Conventional Leasing</strong> gives the client full control of the space (their own fit-out, their own facilities management) in exchange for taking on more of the operational and compliance burden themselves.</p> <p class="section-body">This is also why the pricing unit changes as you move along that spectrum: coworking is priced per seat because the operator is selling occupancy, not square footage; managed office blends seats and sqft because the build is customised to headcount; and conventional leasing is priced purely in sqft because the client is taking the whole floor or building, regardless of how many seats they eventually fit into it.</p>' },
+      { id: 'ch4-s02-takeaway', label: 'Takeaway', type: 'textarea', group: 'Read Mode — S02', default: 'Know your client\'s stage and headcount — that tells you which solution fits before you even show them options. Coworking = seats, Managed = seats/sqft, Leasing = sqft.' },
+      { id: 'ch4-s03-outcome', label: 'Learning Outcome', type: 'textarea', group: 'Read Mode — S03', default: 'Walk through the six-step consulting process from discovery to move-in, knowing what to evaluate at each stage.' },
+      { id: 'ch4-s03-title', label: 'Title', type: 'input', group: 'Read Mode — S03', default: 'End-to-End Consulting in 6 Steps' },
+      { id: 'ch4-s03-body', label: 'Body', type: 'textarea', group: 'Read Mode — S03', default: '<p class="section-body">We provide end-to-end consulting at each step, in ALL transactions. Each step has its own checklist of factors a consultant must evaluate before moving the client forward:</p> <ul class="section-list"> <li><strong>1. Strategic Discovery:</strong> Identify potential office space through city and micro-market analysis. Factors: talent pool, competitors, traffic, cost of living. This is where you narrow down the right city and even the right neighbourhood before a single property is shown — getting this wrong means every later step has to be redone.</li> <li><strong>2. Curated Shortlist:</strong> Evaluate and benchmark office space to create a shortlist that can be visited. Factors: budget, connectivity, kind of assets, experience at the centre. The goal is a tight shortlist the client can actually visit in a day or two, not an overwhelming list of every available property.</li> <li><strong>3. Commercial Structuring:</strong> Negotiate and structure commercial terms for the shortlisted options. Factors: cost per sqft/seat, security deposit, lock-in &amp; notice period, upfront cost, regular opex cost, annual escalation. This is the step where myHQ\'s scale and relationships with landlords/operators directly translate into a better deal than the client could get on their own.</li> <li><strong>4. Compliance, Interiors, Legal Advisory:</strong> Double-check all key compliance requirements and consult on interiors efficiency. Factors: fire norms, security compliances, ownership of property, office layout design, registration of office agreement. Skipping this step is how clients end up signing for a space that later fails a fire-safety audit or has an ownership dispute.</li> <li><strong>5. Transition Period Management:</strong> If the new office will take time, support the client through that period. Factors: current office terms, temporary office solution (if needed), regular check-ups on project pace and timeline. A managed office or lease build-out can take weeks to months — this step keeps the client operational in the gap.</li> <li><strong>6. Move-in Date &amp; Month:</strong> Help with the inauguration and any minor issues that come up in the first 1–2 weeks. Factors: inauguration setup, branding in office/building, minor setup issues (interiors/infrastructure). Our job isn\'t done at signing — we stay involved until the client is actually settled in.</li> </ul>' },
+      { id: 'ch4-s03-takeaway', label: 'Takeaway', type: 'textarea', group: 'Read Mode — S03', default: 'Discovery → Shortlist → Structuring → Compliance → Transition → Move-in. Know this process cold — every AM transaction follows it.' },
+      { id: 'ch4-s04-outcome', label: 'Learning Outcome', type: 'textarea', group: 'Read Mode — S04', default: 'Know the AM client journey stages in the CRM and the tools you\'ll use day to day.' },
+      { id: 'ch4-s04-title', label: 'Title', type: 'input', group: 'Read Mode — S04', default: 'Client Journey &amp; Tools' },
+      { id: 'ch4-s04-body', label: 'Body', type: 'textarea', group: 'Read Mode — S04', default: '<p class="section-body">Every AM lead moves through five stages in the CRM, and a consultant should always know exactly which stage each of their leads is sitting in:</p> <ul class="section-list"> <li><strong>Lead Posted:</strong> A new lead is posted into the system — from the myHQ website (our lead generation channel) or other inbound/outbound sources. Nothing happens to a lead until it\'s logged here; an enquiry that isn\'t posted into the system effectively doesn\'t exist for tracking purposes.</li> <li><strong>Lead Qualified:</strong> The qualification team reviews and qualifies the lead — checking that the requirement (city, team size, budget, timeline) is real and specific enough to act on, before it\'s handed to a sales consultant.</li> <li><strong>Options Shared:</strong> The sales point of contact shares workspace options — this is effectively the output of the Strategic Discovery and Curated Shortlist steps from the consulting process.</li> <li><strong>Visit Scheduled:</strong> The client schedules a visit to the workspace. This is the moment a lead becomes a serious prospect rather than a browsing enquiry.</li> <li><strong>Contract + Booking Done:</strong> The workspace is successfully booked by the client — at this point the Commercial Structuring and Compliance steps have already closed out.</li> </ul> <p class="section-body">The AM tech product has two parts: the <strong>myHQ Website</strong> (desktop + mobile), which is our lead generation channel — it has served 5,000+ clients and counting — and our <strong>Internal CRM, which works in tandem with Zoho CRM.</strong> The team manages leads and tracks progress here, and can share proposals directly from the CRM. Keeping the CRM up to date isn\'t optional admin work — it\'s how the qualification team, the sales consultant, and management all stay aligned on where every single deal stands.</p>' },
+      { id: 'ch4-s04-takeaway', label: 'Takeaway', type: 'textarea', group: 'Read Mode — S04', default: 'Lead → Qualify → Options → Visit → Book. The myHQ Website brings leads in; the Internal + Zoho CRM is where you move them through to close.' },
+      { id: 'ch4-s05-outcome', label: 'Learning Outcome', type: 'textarea', group: 'Read Mode — S05', default: 'Know the AM scale numbers — AM is the largest revenue driver in the firm.' },
+      { id: 'ch4-s05-title', label: 'Title', type: 'input', group: 'Read Mode — S05', default: 'Current Scale (Assisted Marketplace)' },
+      { id: 'ch4-s05-body', label: 'Body', type: 'textarea', group: 'Read Mode — S05', default: '<p class="section-body">AM is myHQ\'s largest revenue product. Key scale numbers:</p> <div class="minicard-grid" style="grid-template-columns:repeat(3,1fr);"> <div class="minicard"> <div class="mc-t" style="font-size:22px;color:var(--blue);">10 cities</div> <div class="mc-b">On-ground teams — we service Pan-India (30+ cities), with on-ground support concentrated in 10.</div> </div> <div class="minicard"> <div class="mc-t" style="font-size:22px;color:var(--blue);">100 consultants</div> <div class="mc-b">Working with clients on their requirements, end to end.</div> </div> <div class="minicard"> <div class="mc-t" style="font-size:22px;color:var(--blue);">40,000+ seats</div> <div class="mc-b">Leased annually in the flex/coworking industry.</div> </div> <div class="minicard"> <div class="mc-t" style="font-size:22px;color:var(--blue);">1M sqft</div> <div class="mc-b">Conventional leasing — our newest product line, already at 1M sqft.</div> </div> <div class="minicard"> <div class="mc-t" style="font-size:22px;color:var(--blue);">₹35 Cr</div> <div class="mc-b">Our take rate per year — AM is a profitable vertical and the highest revenue driver of the firm.</div> </div> <div class="minicard"> <div class="mc-t" style="font-size:22px;color:var(--blue);">₹300 Cr</div> <div class="mc-b">Annual transaction value — the GMV of space sold.</div> </div> </div>' },
+      { id: 'ch4-s05-takeaway', label: 'Takeaway', type: 'textarea', group: 'Read Mode — S05', default: '₹35Cr take rate, ₹300Cr GMV, 100 consultants, 10 cities. You\'re joining the largest and most profitable vertical in the firm.' },
+    ],
+    assessFields: []
+  },
+  wwd_vo: {
+    label: 'What We Do — Virtual Office',
+    course: 'beginner',
+    slideFields: [
+      { id: 'ch5-title', label: 'Chapter Title (Topbar)', type: 'input', group: 'Cover', default: 'What We Do — Virtual Office' },
+      { id: 'ch5-cover-headline', label: 'Cover Headline', type: 'input', group: 'Cover', default: 'A professional address.<br><em>No office needed.</em>' },
+      { id: 'ch5-cover-sub', label: 'Cover Subtext', type: 'textarea', group: 'Cover', default: 'Mailing address, GST registration, company registration — Virtual Office helps businesses launch and scale at a fraction of the cost, with government-compliant documents and mail handling.' },
+      { id: 'ch5-sl1-eyebrow', label: 'Eyebrow', type: 'input', group: 'Slide 1', default: 'The Product' },
+      { id: 'ch5-sl1-headline', label: 'Headline', type: 'input', group: 'Slide 1', default: 'A real address. <span>Zero rent.</span>' },
+      { id: 'ch5-sl1-sub', label: 'Sub-heading', type: 'textarea', group: 'Slide 1', default: 'Virtual office gives individuals and companies access to a professional business address without actually renting physical office space.' },
+      { id: 'ch5-sl1-c1t', label: 'Card 1 Title', type: 'input', group: 'Slide 1', default: 'What You Get' },
+      { id: 'ch5-sl1-c1l1', label: 'Card 1 List Item 1', type: 'textarea', group: 'Slide 1', default: 'Professional business address' },
+      { id: 'ch5-sl1-c1l2', label: 'Card 1 List Item 2', type: 'textarea', group: 'Slide 1', default: 'Government-compliant documents' },
+      { id: 'ch5-sl1-c1l3', label: 'Card 1 List Item 3', type: 'textarea', group: 'Slide 1', default: 'Support for GST Registration' },
+      { id: 'ch5-sl1-c1l4', label: 'Card 1 List Item 4', type: 'textarea', group: 'Slide 1', default: 'Support for Company Registration' },
+      { id: 'ch5-sl1-c1l5', label: 'Card 1 List Item 5', type: 'textarea', group: 'Slide 1', default: 'Mail &amp; package handling services' },
+      { id: 'ch5-sl1-c2t', label: 'Card 2 Title', type: 'input', group: 'Slide 1', default: 'Why Choose myHQ' },
+      { id: 'ch5-sl1-c2l1', label: 'Card 2 List Item 1', type: 'textarea', group: 'Slide 1', default: 'Hassle free — 100% digital process' },
+      { id: 'ch5-sl1-c2l2', label: 'Card 2 List Item 2', type: 'textarea', group: 'Slide 1', default: 'Super fast documentation' },
+      { id: 'ch5-sl1-c2l3', label: 'Card 2 List Item 3', type: 'textarea', group: 'Slide 1', default: 'Verified partners and full transparency' },
+      { id: 'ch5-sl1-c2l4', label: 'Card 2 List Item 4', type: 'textarea', group: 'Slide 1', default: '300+ premium addresses across 25+ cities; we cover 20 states' },
+      { id: 'ch5-sl1-c2l5', label: 'Card 2 List Item 5', type: 'textarea', group: 'Slide 1', default: 'Money back guarantee' },
+      { id: 'ch5-sl2-eyebrow', label: 'Eyebrow', type: 'input', group: 'Slide 2', default: 'VO Product' },
+      { id: 'ch5-sl2-headline', label: 'Headline', type: 'input', group: 'Slide 2', default: 'Pre-purchase journey. <span>4 steps.</span>' },
+      { id: 'ch5-sl2-t1y', label: 'Step 1 Label', type: 'input', group: 'Slide 2', default: 'Discovery' },
+      { id: 'ch5-sl2-t1t', label: 'Step 1 Title', type: 'input', group: 'Slide 2', default: 'Find VO Across the Country' },
+      { id: 'ch5-sl2-t1s', label: 'Step 1 Description', type: 'input', group: 'Slide 2', default: 'Filter by criteria: state, location, price, plan.' },
+      { id: 'ch5-sl2-t2y', label: 'Step 2 Label', type: 'input', group: 'Slide 2', default: 'Compare' },
+      { id: 'ch5-sl2-t2t', label: 'Step 2 Title', type: 'input', group: 'Slide 2', default: 'Choose a Workspace' },
+      { id: 'ch5-sl2-t2s', label: 'Step 2 Description', type: 'input', group: 'Slide 2', default: 'Compare and choose a space based on your preferences.' },
+      { id: 'ch5-sl2-t3y', label: 'Step 3 Label', type: 'input', group: 'Slide 2', default: 'Select Plan' },
+      { id: 'ch5-sl2-t3t', label: 'Step 3 Title', type: 'input', group: 'Slide 2', default: 'Select a Plan and Tenure' },
+      { id: 'ch5-sl2-t3s', label: 'Step 3 Description', type: 'input', group: 'Slide 2', default: 'Plans and tenures according to user needs.' },
+      { id: 'ch5-sl2-t4y', label: 'Step 4 Label', type: 'input', group: 'Slide 2', default: 'Checkout' },
+      { id: 'ch5-sl2-t4t', label: 'Step 4 Title', type: 'input', group: 'Slide 2', default: 'Checkout' },
+      { id: 'ch5-sl2-t4s', label: 'Step 4 Description', type: 'input', group: 'Slide 2', default: 'Complete payment and start post-purchase KYC.' },
+      { id: 'ch5-sl3-eyebrow', label: 'Eyebrow', type: 'input', group: 'Slide 3', default: 'VO Product' },
+      { id: 'ch5-sl3-headline', label: 'Headline', type: 'input', group: 'Slide 3', default: 'Post-purchase journey. <span>4 steps.</span>' },
+      { id: 'ch5-sl3-t1y', label: 'Step 1 Label', type: 'input', group: 'Slide 3', default: 'Track' },
+      { id: 'ch5-sl3-t1t', label: 'Step 1 Title', type: 'input', group: 'Slide 3', default: 'Client Dashboard' },
+      { id: 'ch5-sl3-t1s', label: 'Step 1 Description', type: 'textarea', group: 'Slide 3', default: 'Keep track of the subscription — complete digital KYC and signature.' },
+      { id: 'ch5-sl3-t2y', label: 'Step 2 Label', type: 'input', group: 'Slide 3', default: 'Generate' },
+      { id: 'ch5-sl3-t2t', label: 'Step 2 Title', type: 'input', group: 'Slide 3', default: 'Supply Dashboard' },
+      { id: 'ch5-sl3-t2s', label: 'Step 2 Description', type: 'textarea', group: 'Slide 3', default: 'Auto-generation of documents to reduce ops bandwidth, with real-time updates.' },
+      { id: 'ch5-sl3-t3y', label: 'Step 3 Label', type: 'input', group: 'Slide 3', default: 'Fulfil' },
+      { id: 'ch5-sl3-t3t', label: 'Step 3 Title', type: 'input', group: 'Slide 3', default: 'Subscription Fulfillment' },
+      { id: 'ch5-sl3-t3s', label: 'Step 3 Description', type: 'input', group: 'Slide 3', default: 'All documents shared in minimum TAT on the dashboard.' },
+      { id: 'ch5-sl3-t4y', label: 'Step 4 Label', type: 'input', group: 'Slide 3', default: 'Renew' },
+      { id: 'ch5-sl3-t4t', label: 'Step 4 Title', type: 'input', group: 'Slide 3', default: 'Renewal Management' },
+      { id: 'ch5-sl3-t4s', label: 'Step 4 Description', type: 'input', group: 'Slide 3', default: 'Renewal of client subscriptions before they lapse.' },
+      { id: 'ch5-sl4-eyebrow', label: 'Eyebrow', type: 'input', group: 'Slide 4', default: 'All Types of Businesses Need VO' },
+      { id: 'ch5-sl4-headline', label: 'Headline', type: 'input', group: 'Slide 4', default: 'Every kind of business. <span>Every city.</span>' },
+      { id: 'ch5-sl4-c1t', label: 'Card 1 Title', type: 'input', group: 'Slide 4', default: 'Startups' },
+      { id: 'ch5-sl4-c1b', label: 'Card 1 Body', type: 'textarea', group: 'Slide 4', default: 'Launch in a new city with a credible address before committing to physical office space.' },
+      { id: 'ch5-sl4-c2t', label: 'Card 2 Title', type: 'input', group: 'Slide 4', default: 'Corporates' },
+      { id: 'ch5-sl4-c2b', label: 'Card 2 Body', type: 'textarea', group: 'Slide 4', default: 'Establish a regional entity or satellite presence in a new city as they expand — without hiring a local team.' },
+      { id: 'ch5-sl4-c3t', label: 'Card 3 Title', type: 'input', group: 'Slide 4', default: 'E-Commerce &amp; Freelancers' },
+      { id: 'ch5-sl4-c3b', label: 'Card 3 Body', type: 'textarea', group: 'Slide 4', default: 'Platforms require a GST number per operating state. Freelancers keep personal &amp; professional addresses separate.' },
+      { id: 'ch5-sl6-eyebrow', label: 'Eyebrow', type: 'input', group: 'Slide 6', default: 'Exclusive Partnership' },
+      { id: 'ch5-sl6-headline', label: 'Headline', type: 'textarea', group: 'Slide 6', default: 'We have exclusive rights of <span style="color:#BEE5C2;">WeWork India.</span>' },
+      { id: 'ch5-sl6-c1', label: 'Column 1', type: 'textarea', group: 'Slide 6', default: 'Exclusive partner for all virtual office &amp; on-demand business' },
+      { id: 'ch5-sl6-c2', label: 'Column 2', type: 'textarea', group: 'Slide 6', default: 'Managing the entire tech backend for WeWork India to fulfil this business' },
+      { id: 'ch5-sl6-c3', label: 'Column 3', type: 'textarea', group: 'Slide 6', default: 'All bookings, even the ones on WW India website / app, are managed by us' },
+      { id: 'ch5-sl7-eyebrow', label: 'Eyebrow', type: 'input', group: 'Slide 7', default: 'Current Scale' },
+      { id: 'ch5-sl7-num', label: 'Stat Number', type: 'input', group: 'Slide 7', default: '30<span>K+</span>' },
+      { id: 'ch5-sl7-caption', label: 'Caption', type: 'textarea', group: 'Slide 7', default: 'companies serviced — virtual offices sold every month' },
+      { id: 'ch5-sl7-f1n', label: 'Stat 1 Number', type: 'input', group: 'Slide 7', default: '2.5K' },
+      { id: 'ch5-sl7-f1l', label: 'Stat 1 Label', type: 'input', group: 'Slide 7', default: 'VOs sold every month' },
+      { id: 'ch5-sl7-f2n', label: 'Stat 2 Number', type: 'input', group: 'Slide 7', default: '₹4.2Cr' },
+      { id: 'ch5-sl7-f2l', label: 'Stat 2 Label', type: 'input', group: 'Slide 7', default: 'Worth of VOs sold / month' },
+      { id: 'ch5-sl7-f3n', label: 'Stat 3 Number', type: 'input', group: 'Slide 7', default: '25+ cities' },
+      { id: 'ch5-sl7-f3l', label: 'Stat 3 Label', type: 'input', group: 'Slide 7', default: '300+ addresses, 20 states' },
+      { id: 'ch5-sl7-f4n', label: 'Stat 4 Number', type: 'input', group: 'Slide 7', default: '100%' },
+      { id: 'ch5-sl7-f4l', label: 'Stat 4 Label', type: 'input', group: 'Slide 7', default: 'Digital KYC &amp; e-sign' },
+    ],
+    contentFields: [
+      { id: 'ch5-intro-body', label: 'Body', type: 'textarea', group: 'Read Mode — Intro', default: '<p class="section-body" style="margin-bottom:0;">Virtual Office (VO) is myHQ\'s address-as-a-service product — covering mailing address, GST registration, and company registration. It gives individuals and companies access to a professional business address without actually renting a physical office, helping businesses launch and scale at a fraction of the cost. The entire process — discovery, plan selection, KYC, renewals — is digital, and it is myHQ\'s highest-volume product.</p>' },
+      { id: 'ch5-s01-outcome', label: 'Learning Outcome', type: 'textarea', group: 'Read Mode — S01', default: 'Understand what Virtual Office is, what it includes, and why myHQ over a competitor.' },
+      { id: 'ch5-s01-title', label: 'Title', type: 'input', group: 'Read Mode — S01', default: 'What is a Virtual Office?' },
+      { id: 'ch5-s01-body', label: 'Body', type: 'textarea', group: 'Read Mode — S01', default: '<p class="section-body">Virtual office is a service offering that gives individuals and companies access to a professional business address without actually renting a physical office space. We help businesses launch and scale at a fraction of the cost. Clients get government-compliant documents along with mail &amp; package handling services.</p> <p class="section-body">In India, you can\'t get a GST number, register a company, or even open certain bank accounts without a registered business address in the relevant state. That address requirement used to force businesses to either lease real space they didn\'t need yet, or use a friend\'s or relative\'s address informally (which creates compliance risk down the line). VO solves this directly — it\'s the address requirement, sold as a service, without the office attached to it.</p> <p class="section-body">A Virtual Office from myHQ can include:</p> <ul class="section-list"> <li><strong>Professional business address</strong> — at a branded workspace location, so the business has a credible address on its invoices, website, and registrations rather than a residential one.</li> <li><strong>Support for GST Registration</strong> — register for GST in any state using the address. This is the single most common reason a client buys a VO.</li> <li><strong>Support for Company Registration</strong> — use the address as your registered office for MCA/ROC filings.</li> <li><strong>Mail &amp; package handling</strong> — receive and forward business correspondence, so the client doesn\'t need anyone physically present at the address.</li> </ul> <p class="section-body"><strong>Why choose myHQ?</strong> Hassle-free, 100% digital process — no branch visits at any stage. Super fast documentation, so a client isn\'t stuck waiting weeks for a registration that\'s blocking their business launch. Verified partners and full transparency, which matters because a VO address that fails verification can get a client\'s GST registration rejected. 300+ premium addresses across 25+ cities, covering 20 states. And a money-back guarantee, which removes the risk for a client buying a service they\'ve likely never bought before.</p>' },
+      { id: 'ch5-s01-takeaway', label: 'Takeaway', type: 'textarea', group: 'Read Mode — S01', default: 'VO = real address, real registration, no physical space — 100% digital, with a money-back guarantee. Perfect for businesses that need credibility before they need a desk.' },
+      { id: 'ch5-s02-outcome', label: 'Learning Outcome', type: 'textarea', group: 'Read Mode — S02', default: 'Walk through the 4-step pre-purchase journey a client follows to buy a Virtual Office on myHQ.' },
+      { id: 'ch5-s02-title', label: 'Title', type: 'input', group: 'Read Mode — S02', default: 'Pre-Purchase Journey' },
+      { id: 'ch5-s02-body', label: 'Body', type: 'textarea', group: 'Read Mode — S02', default: '<p class="section-body">Buying a Virtual Office on myHQ is a fully digital, four-step process:</p> <div class="minicard-grid"> <div class="minicard"> <i class="fa-solid fa-magnifying-glass"></i> <div class="mc-t">1. Discovery</div> <div class="mc-b">Find VO across the country based on criteria: state, location, price, plan.</div> </div> <div class="minicard"> <i class="fa-solid fa-building"></i> <div class="mc-t">2. Choose a Workspace</div> <div class="mc-b">Compare and choose a space you like based on your preferences.</div> </div> <div class="minicard"> <i class="fa-solid fa-list-check"></i> <div class="mc-t">3. Select a Plan &amp; Tenure</div> <div class="mc-b">Plans and tenures according to user needs — GST, registration, address-only.</div> </div> <div class="minicard"> <i class="fa-solid fa-credit-card"></i> <div class="mc-t">4. Checkout</div> <div class="mc-b">Complete payment and start post-purchase KYC.</div> </div> </div> <p class="section-body">The state and city selected in Discovery isn\'t a preference — it\'s usually fixed by where the client needs to register for GST or incorporate, so this step is really about finding the right address within a constraint, not browsing for the nicest option. The plan selected in step 3 also determines which documents the client will need to provide at KYC, which is why getting the plan right upfront avoids back-and-forth later — a GST-only plan needs different paperwork than a full company registration plan.</p>' },
+      { id: 'ch5-s02-takeaway', label: 'Takeaway', type: 'textarea', group: 'Read Mode — S02', default: 'Discovery → Choose → Select Plan → Checkout. Fully digital, no branch visits — the client can complete this end to end on the app or website.' },
+      { id: 'ch5-s03-outcome', label: 'Learning Outcome', type: 'textarea', group: 'Read Mode — S03', default: 'Know what happens after a client buys — the dashboards and processes that keep the subscription running.' },
+      { id: 'ch5-s03-title', label: 'Title', type: 'input', group: 'Read Mode — S03', default: 'Post-Purchase Journey' },
+      { id: 'ch5-s03-body', label: 'Body', type: 'textarea', group: 'Read Mode — S03', default: '<p class="section-body">Once a client purchases, the relationship is managed through four ongoing processes:</p> <div class="minicard-grid"> <div class="minicard"> <i class="fa-solid fa-gauge"></i> <div class="mc-t">1. Client Dashboard</div> <div class="mc-b">Client dashboard to keep track of the subscription — complete digital KYC and signature.</div> </div> <div class="minicard"> <i class="fa-solid fa-server"></i> <div class="mc-t">2. Supply Dashboard</div> <div class="mc-b">Auto-generation of documents to reduce operational bandwidth, plus real-time updates and a data overview of all subscriptions.</div> </div> <div class="minicard"> <i class="fa-solid fa-file-circle-check"></i> <div class="mc-t">3. Subscription Fulfillment</div> <div class="mc-b">All documents shared in minimum TAT on the dashboard.</div> </div> <div class="minicard"> <i class="fa-solid fa-rotate"></i> <div class="mc-t">4. Renewal Management</div> <div class="mc-b">Renewal of client subscriptions before the plan expires.</div> </div> </div> <p class="section-body">The subscription status moves through stages visible to both the client and the supply partner: <strong>KYC Verification → Agreement Signature → Processing Documents → Active → Expired.</strong></p> <p class="section-body">This matters operationally because VO isn\'t a one-time sale — it\'s a subscription that needs to stay valid for as long as the client\'s GST registration or company registration depends on it. If a client\'s VO lapses because a renewal was missed, their registered address effectively stops being valid, which can put their GST compliance at risk. That\'s why the Supply Dashboard auto-generates documents (utility bills, NOCs, agreements) on a recurring basis instead of relying on someone remembering to regenerate them manually, and why Renewal Management exists as its own dedicated step rather than being left to the client to notice.</p>' },
+      { id: 'ch5-s03-takeaway', label: 'Takeaway', type: 'textarea', group: 'Read Mode — S03', default: 'VO doesn\'t end at checkout — the supply dashboard auto-generates documents and the client dashboard tracks KYC, agreement, and renewal status in real time.' },
+      { id: 'ch5-s04-outcome', label: 'Learning Outcome', type: 'textarea', group: 'Read Mode — S04', default: 'Know the different types of businesses that need Virtual Office and why, so you can identify potential clients.' },
+      { id: 'ch5-s04-title', label: 'Title', type: 'input', group: 'Read Mode — S04', default: 'Who Needs Virtual Office' },
+      { id: 'ch5-s04-body', label: 'Body', type: 'textarea', group: 'Read Mode — S04', default: '<p class="section-body">All types of businesses need Virtual Office — demand cuts across industries and business sizes:</p> <ul class="section-list"> <li><strong>Startups:</strong> Launch in a new city with a credible address before committing to physical office space. A founder can register a company and get GST sorted in days, then decide on real office space only once the business actually needs it.</li> <li><strong>Corporates:</strong> Establish a regional entity or satellite presence in a new city as they expand — without hiring a local team or signing a long lease. A lot of corporates need this as they expand to different cities, especially when entering a new state purely to be GST-compliant for sales there, not because they need headcount on the ground.</li> <li><strong>E-commerce sellers &amp; Freelancers:</strong> Many platforms require a GST number and registered address in the state where the seller operates. An e-commerce seller shipping from a warehouse in one state but selling pan-India may need GST registrations in several states — VO makes that scalable instead of requiring a real office in each one. Freelancers use VO to keep personal and professional addresses separate, which also looks more credible to clients on invoices.</li> </ul> <p class="section-body">Clients myHQ has served include FLiX, Hitachi, YourStory, Dolby, Bombay Shaving Company, NOTO, Lion Air, Unicorn (Apple Premium Reseller), Mahindra Business Solutions, Dream11, Swiggy, Spigen, TEQO by Mahindra, BookMyShow, CBRE, and Ford — spanning new-age D2C brands, large enterprises, and everything in between, which is the clearest signal that VO demand isn\'t tied to company size or industry, only to the need for a compliant address.</p>' },
+      { id: 'ch5-s04-takeaway', label: 'Takeaway', type: 'textarea', group: 'Read Mode — S04', default: 'If a business is expanding to a new city or needs a GST address, they need Virtual Office — that covers most growing businesses, from early-stage startups to large corporates like Ford and CBRE.' },
+      { id: 'ch5-s05-outcome', label: 'Learning Outcome', type: 'textarea', group: 'Read Mode — S05', default: 'Know the VO scale numbers and the growth trend over the last three years.' },
+      { id: 'ch5-s05-title', label: 'Title', type: 'input', group: 'Read Mode — S05', default: 'Scale &amp; Growth' },
+      { id: 'ch5-s05-body', label: 'Body', type: 'textarea', group: 'Read Mode — S05', default: '<p class="section-body">Virtual Office is myHQ\'s highest-volume product by number of companies serviced. Key numbers:</p> <div class="minicard-grid" style="grid-template-columns:repeat(4,1fr);"> <div class="minicard"> <div class="mc-t" style="font-size:22px;color:var(--blue);">30,000+</div> <div class="mc-b">Companies serviced.</div> </div> <div class="minicard"> <div class="mc-t" style="font-size:22px;color:var(--blue);">2,500</div> <div class="mc-b">VOs sold every month.</div> </div> <div class="minicard"> <div class="mc-t" style="font-size:22px;color:var(--blue);">₹4.2 Cr</div> <div class="mc-b">Worth of VOs sold per month.</div> </div> <div class="minicard"> <div class="mc-t" style="font-size:22px;color:var(--blue);">300+ addresses</div> <div class="mc-b">Across 25+ cities, covering 20 states.</div> </div> </div> <p class="section-body">Revenue grew from ₹3.1Cr (2023-24) to ₹14Cr (2025-26) — over 4.5x in two years — while GMV grew from ₹10Cr to ₹50Cr in the same period.</p> <p class="section-body"><strong>We have exclusive rights of WeWork India</strong> for all virtual office and on-demand business. We manage the entire tech backend for WeWork India, and all bookings — even the ones placed on WeWork India\'s own website or app — are managed by us.</p>' },
+      { id: 'ch5-s05-takeaway', label: 'Takeaway', type: 'textarea', group: 'Read Mode — S05', default: 'Revenue 4.5x\'d in two years (₹3.1Cr → ₹14Cr), GMV 5x\'d (₹10Cr → ₹50Cr). Plus exclusive WeWork India rights — myHQ is the largest Virtual Office provider in India.' },
+    ],
+    assessFields: []
+  },
+  wwd_od: {
+    label: 'What We Do — On-Demand',
+    course: 'beginner',
+    slideFields: [
+      { id: 'ch3-title', label: 'Chapter Title (Topbar)', type: 'input', group: 'Cover', default: 'What We Do — On-Demand' },
+      { id: 'ch3-cover-headline', label: 'Cover Headline', type: 'input', group: 'Cover', default: 'Book a desk.<br><em>No commitments.</em>' },
+      { id: 'ch3-cover-sub', label: 'Cover Subtext', type: 'textarea', group: 'Cover', default: 'FlexiPass, meeting rooms, training rooms &amp; event spaces — On-Demand lets anyone book premium workspace by the day, with zero long-term commitment.' },
+      { id: 'ch3-sl1-eyebrow', label: 'Eyebrow', type: 'input', group: 'Slide 1', default: 'The Product' },
+      { id: 'ch3-sl1-headline', label: 'Headline', type: 'input', group: 'Slide 1', default: 'Pay by the day. <span>Skip the lease.</span>' },
+      { id: 'ch3-sl1-c1t', label: 'Card 1 Title', type: 'input', group: 'Slide 1', default: 'What is On-Demand?' },
+      { id: 'ch3-sl1-c1b', label: 'Card 1 Body', type: 'textarea', group: 'Slide 1', default: 'On-Demand enables users to book workspaces by the day without any long-term commitments — across a wide network of premium coworking brands and cities.' },
+      { id: 'ch3-sl1-c1l1', label: 'Card 1 List Item 1', type: 'textarea', group: 'Slide 1', default: '<strong>Pay-per-day usage:</strong> Only pay for the days you use the service' },
+      { id: 'ch3-sl1-c1l2', label: 'Card 1 List Item 2', type: 'textarea', group: 'Slide 1', default: '<strong>Flexible locations:</strong> Access a wide range of brands and cities' },
+      { id: 'ch3-sl1-c1l3', label: 'Card 1 List Item 3', type: 'textarea', group: 'Slide 1', default: '<strong>Instant booking:</strong> Book quickly and easily through the app or web' },
+      { id: 'ch3-sl1-c1l4', label: 'Card 1 List Item 4', type: 'textarea', group: 'Slide 1', default: '<strong>Best pricing:</strong> Get the best deal since this inventory is perishable' },
+      { id: 'ch3-sl1-c2t', label: 'Card 2 Title', type: 'input', group: 'Slide 1', default: 'Target Audience' },
+      { id: 'ch3-sl1-c2l1', label: 'Card 2 List Item 1', type: 'textarea', group: 'Slide 1', default: '<span class="il-icon"><i class="fa-solid fa-user"></i></span><span><strong>Individuals:</strong> Freelancers &amp; solo workers</span>' },
+      { id: 'ch3-sl1-c2l2', label: 'Card 2 List Item 2', type: 'textarea', group: 'Slide 1', default: '<span class="il-icon"><i class="fa-solid fa-people-group"></i></span><span><strong>Small Teams:</strong> Groups collaborating on projects</span>' },
+      { id: 'ch3-sl1-c2l3', label: 'Card 2 List Item 3', type: 'textarea', group: 'Slide 1', default: '<span class="il-icon"><i class="fa-solid fa-rocket"></i></span><span><strong>Startups:</strong> New businesses needing flexible space</span>' },
+      { id: 'ch3-sl1-c2l4', label: 'Card 2 List Item 4', type: 'textarea', group: 'Slide 1', default: '<span class="il-icon"><i class="fa-solid fa-bolt"></i></span><span><strong>Ad-hoc Work:</strong> Temporary or occasional tasks</span>' },
+      { id: 'ch3-sl1-c2l5', label: 'Card 2 List Item 5', type: 'textarea', group: 'Slide 1', default: '<span class="il-icon"><i class="fa-solid fa-handshake"></i></span><span><strong>Meetings:</strong> Professional spaces for client interactions</span>' },
+      { id: 'ch3-sl1-c2l6', label: 'Card 2 List Item 6', type: 'textarea', group: 'Slide 1', default: '<span class="il-icon"><i class="fa-solid fa-chalkboard-user"></i></span><span><strong>Training &amp; Events:</strong> Workshops, seminars, gatherings</span>' },
+      { id: 'ch3-sl2-eyebrow', label: 'Eyebrow', type: 'input', group: 'Slide 2', default: 'OD Products' },
+      { id: 'ch3-sl2-headline', label: 'Headline', type: 'input', group: 'Slide 2', default: 'Five products. <span>Every use-case.</span>' },
+      { id: 'ch3-sl2-sub', label: 'Sub-heading', type: 'textarea', group: 'Slide 2', default: 'From solo workdays to large team events, across premium coworking spaces.' },
+      { id: 'ch3-sl2-c1t', label: 'Card 1 Title', type: 'input', group: 'Slide 2', default: 'Day Passes &amp; Exec Day Passes' },
+      { id: 'ch3-sl2-c1b', label: 'Card 1 Body', type: 'textarea', group: 'Slide 2', default: 'Working moms, hybrid teams, professionals without an office. Book by the day.' },
+      { id: 'ch3-sl2-c2t', label: 'Card 2 Title', type: 'input', group: 'Slide 2', default: 'Private Cabins' },
+      { id: 'ch3-sl2-c2b', label: 'Card 2 Body', type: 'textarea', group: 'Slide 2', default: 'Hybrid/sales team catch-ups, brainstorming sessions, teams without an office. Book by the day.' },
+      { id: 'ch3-sl2-c3t', label: 'Card 3 Title', type: 'input', group: 'Slide 2', default: 'Meeting Rooms / Board Rooms' },
+      { id: 'ch3-sl2-c3b', label: 'Card 3 Body', type: 'textarea', group: 'Slide 2', default: 'Interviews, board meetings, client presentations. Book by the hour.' },
+      { id: 'ch3-sl2-c4t', label: 'Card 4 Title', type: 'input', group: 'Slide 2', default: 'Training Rooms' },
+      { id: 'ch3-sl2-c4b', label: 'Card 4 Body', type: 'textarea', group: 'Slide 2', default: 'Upskilling, recruitment drives, on-ground sales team training. Book by the hour.' },
+      { id: 'ch3-sl2-c5t', label: 'Card 5 Title', type: 'input', group: 'Slide 2', default: 'Event Spaces' },
+      { id: 'ch3-sl2-c5b', label: 'Card 5 Body', type: 'textarea', group: 'Slide 2', default: 'Video shoots, event launches, meetups, conferences. Book by the day.' },
+      { id: 'ch3-sl3-eyebrow', label: 'Eyebrow', type: 'input', group: 'Slide 3', default: 'Who We Serve' },
+      { id: 'ch3-sl3-headline', label: 'Headline', type: 'input', group: 'Slide 3', default: 'Two models. <span>Same network.</span>' },
+      { id: 'ch3-sl3-sub', label: 'Sub-heading', type: 'textarea', group: 'Slide 3', default: 'On-Demand serves both B2C and B2B2C users, using the same supply network but with tailored pricing, services, and different workflows.' },
+      { id: 'ch3-sl3-c1t', label: 'Card 1 Title', type: 'input', group: 'Slide 3', default: 'B2C Has' },
+      { id: 'ch3-sl3-c1l1', label: 'Card 1 List Item 1', type: 'textarea', group: 'Slide 3', default: 'Instant booking' },
+      { id: 'ch3-sl3-c1l2', label: 'Card 1 List Item 2', type: 'textarea', group: 'Slide 3', default: 'Flexible usage' },
+      { id: 'ch3-sl3-c1l3', label: 'Card 1 List Item 3', type: 'textarea', group: 'Slide 3', default: 'Pay per go payment option' },
+      { id: 'ch3-sl3-c1l4', label: 'Card 1 List Item 4', type: 'textarea', group: 'Slide 3', default: 'App-focused experience' },
+      { id: 'ch3-sl3-c2t', label: 'Card 2 Title', type: 'input', group: 'Slide 3', default: 'B2B2C Has' },
+      { id: 'ch3-sl3-c2l1', label: 'Card 2 List Item 1', type: 'textarea', group: 'Slide 3', default: 'Wallet credits' },
+      { id: 'ch3-sl3-c2l2', label: 'Card 2 List Item 2', type: 'textarea', group: 'Slide 3', default: 'Centralized billing' },
+      { id: 'ch3-sl3-c2l3', label: 'Card 2 List Item 3', type: 'textarea', group: 'Slide 3', default: 'Admin controls on employee usage' },
+      { id: 'ch3-sl3-c2l4', label: 'Card 2 List Item 4', type: 'textarea', group: 'Slide 3', default: 'Employee leaderboards' },
+      { id: 'ch3-sl4-eyebrow', label: 'Eyebrow', type: 'input', group: 'Slide 4', default: 'OD Platforms' },
+      { id: 'ch3-sl4-headline', label: 'Headline', type: 'input', group: 'Slide 4', default: 'Three platforms. <span>One booking engine.</span>' },
+      { id: 'ch3-sl4-c1t', label: 'Card 1 Title', type: 'input', group: 'Slide 4', default: 'myHQ Mobile App' },
+      { id: 'ch3-sl4-c1b', label: 'Card 1 Body', type: 'textarea', group: 'Slide 4', default: 'Day Pass, Meeting Rooms, Event Space booking — discovery, payment and bookings history in one app.' },
+      { id: 'ch3-sl4-c2t', label: 'Card 2 Title', type: 'input', group: 'Slide 4', default: 'myHQ Website' },
+      { id: 'ch3-sl4-c2b', label: 'Card 2 Body', type: 'textarea', group: 'Slide 4', default: 'Filter by product, city, brand, price range. Compare offers and get the best price before booking.' },
+      { id: 'ch3-sl4-c3t', label: 'Card 3 Title', type: 'input', group: 'Slide 4', default: 'Team Flexi Dashboard' },
+      { id: 'ch3-sl4-c3b', label: 'Card 3 Body', type: 'textarea', group: 'Slide 4', default: 'Invite users, create groups, purchase plans, and track credits — all from one corporate dashboard.' },
+      { id: 'ch3-sl5-eyebrow', label: 'Eyebrow', type: 'input', group: 'Slide 5', default: 'Exclusive Partnership' },
+      { id: 'ch3-sl5-headline', label: 'Headline', type: 'textarea', group: 'Slide 5', default: 'We have exclusive rights of <span style="color:#BEE5C2;">WeWork India.</span>' },
+      { id: 'ch3-sl5-c1', label: 'Column 1', type: 'textarea', group: 'Slide 5', default: 'Exclusive partner for all on-demand &amp; virtual office business' },
+      { id: 'ch3-sl5-c2', label: 'Column 2', type: 'textarea', group: 'Slide 5', default: 'Managing the entire tech backend for WeWork India to fulfil this business' },
+      { id: 'ch3-sl5-c3', label: 'Column 3', type: 'textarea', group: 'Slide 5', default: 'All bookings, even the ones on WW India website / app, are managed by us' },
+      { id: 'ch3-sl6-eyebrow', label: 'Eyebrow', type: 'input', group: 'Slide 6', default: 'Current Scale' },
+      { id: 'ch3-sl6-num', label: 'Stat Number', type: 'input', group: 'Slide 6', default: '35<span>K</span>' },
+      { id: 'ch3-sl6-caption', label: 'Caption', type: 'textarea', group: 'Slide 6', default: 'monthly bookings across premium coworking spaces' },
+      { id: 'ch3-sl6-f1n', label: 'Stat 1 Number', type: 'input', group: 'Slide 6', default: '1,500' },
+      { id: 'ch3-sl6-f1l', label: 'Stat 1 Label', type: 'input', group: 'Slide 6', default: 'Daily active users' },
+      { id: 'ch3-sl6-f2n', label: 'Stat 2 Number', type: 'input', group: 'Slide 6', default: '₹30L' },
+      { id: 'ch3-sl6-f2l', label: 'Stat 2 Label', type: 'input', group: 'Slide 6', default: 'Monthly marketing spend' },
+      { id: 'ch3-sl6-f3n', label: 'Stat 3 Number', type: 'input', group: 'Slide 6', default: '₹8–9Cr' },
+      { id: 'ch3-sl6-f3l', label: 'Stat 3 Label', type: 'input', group: 'Slide 6', default: 'Our take rate / year' },
+      { id: 'ch3-sl6-f4n', label: 'Stat 4 Number', type: 'input', group: 'Slide 6', default: '₹30Cr' },
+      { id: 'ch3-sl6-f4l', label: 'Stat 4 Label', type: 'input', group: 'Slide 6', default: 'Annual transaction value' },
+    ],
+    contentFields: [
+      { id: 'ch3-intro-body', label: 'Body', type: 'textarea', group: 'Read Mode — Intro', default: '<p class="section-body" style="margin-bottom:0;">On-Demand is myHQ\'s pay-per-use workspace product — FlexiPass, meeting/training rooms, private cabins and event spaces. It lets anyone, from a freelancer needing a focus day to a company running a recruitment drive, book premium coworking space by the day or by the hour, with no long-term lease. It is myHQ\'s highest-volume, highest-frequency product.</p>' },
+      { id: 'ch3-s01-outcome', label: 'Learning Outcome', type: 'textarea', group: 'Read Mode — S01', default: 'Understand what On-Demand is, the four key benefits it offers, and who typically uses it.' },
+      { id: 'ch3-s01-title', label: 'Title', type: 'input', group: 'Read Mode — S01', default: 'What is On-Demand (OD)?' },
+      { id: 'ch3-s01-body', label: 'Body', type: 'textarea', group: 'Read Mode — S01', default: '<p class="section-body">On-Demand enables users to book workspaces by the day without any long-term commitments. There\'s no lease, no security deposit, no notice period — just book and show up.</p> <p class="section-body"><strong>Key benefits:</strong></p> <ul class="section-list"> <li><strong>Pay-per-day usage:</strong> Only pay for the days you actually use the service.</li> <li><strong>Flexible locations:</strong> Access a wide range of brands and cities through one network.</li> <li><strong>Instant booking:</strong> Book quickly and easily through the app or web.</li> <li><strong>Best pricing:</strong> Get the best deal since this inventory is perishable.</li> </ul> <p class="section-body"><strong>Target audience:</strong></p> <ul class="section-list"> <li><strong>Individuals:</strong> Freelancers and solo workers.</li> <li><strong>Small Teams:</strong> Groups collaborating on a project.</li> <li><strong>Startups:</strong> New businesses needing flexible space.</li> <li><strong>Ad-hoc Work:</strong> Temporary or occasional tasks.</li> <li><strong>Meetings:</strong> Professional spaces for client interactions.</li> <li><strong>Training &amp; Events:</strong> Workshops, seminars, and gatherings.</li> </ul>' },
+      { id: 'ch3-s01-takeaway', label: 'Takeaway', type: 'textarea', group: 'Read Mode — S01', default: 'On-Demand = flexible workspace, booked by the day or hour, at the best price because the inventory is perishable. No commitment, no lease.' },
+      { id: 'ch3-s02-outcome', label: 'Learning Outcome', type: 'textarea', group: 'Read Mode — S02', default: 'Know the five OD products, who each is built for, and the booking unit (day vs. hour) for each.' },
+      { id: 'ch3-s02-title', label: 'Title', type: 'input', group: 'Read Mode — S02', default: 'OD Products' },
+      { id: 'ch3-s02-body', label: 'Body', type: 'textarea', group: 'Read Mode — S02', default: '<p class="section-body">The On-Demand product covers a wide range of use-cases — from solo workdays to large team events — across premium coworking spaces. There are five distinct products:</p> <div class="minicard-grid"> <div class="minicard"> <i class="fa-solid fa-chair"></i> <div class="mc-t">Day Passes &amp; Executive Day Passes</div> <div class="mc-b">Working moms, hybrid teams, professionals without an office. <strong>Book by the day.</strong></div> </div> <div class="minicard"> <i class="fa-solid fa-door-closed"></i> <div class="mc-t">Private Cabins</div> <div class="mc-b">Hybrid/sales team catch-ups, brainstorming sessions, teams without an office. <strong>Book by the day.</strong></div> </div> <div class="minicard"> <i class="fa-solid fa-people-roof"></i> <div class="mc-t">Meeting Rooms / Board Rooms</div> <div class="mc-b">Interviews, board meetings, client presentations. <strong>Book by the hour.</strong></div> </div> <div class="minicard"> <i class="fa-solid fa-chalkboard-user"></i> <div class="mc-t">Training Rooms</div> <div class="mc-b">Upskilling, recruitment drives, on-ground sales team training. <strong>Book by the hour.</strong></div> </div> </div> <div class="minicard-grid" style="grid-template-columns:repeat(4,1fr);"> <div class="minicard"> <i class="fa-solid fa-clapperboard"></i> <div class="mc-t">Event Spaces</div> <div class="mc-b">Video shoots, event launches, meetups, conferences. <strong>Book by the day.</strong></div> </div> </div>' },
+      { id: 'ch3-s02-takeaway', label: 'Takeaway', type: 'textarea', group: 'Read Mode — S02', default: 'Day-rate products (passes, cabins, events) suit longer occupancy; hour-rate products (meeting &amp; training rooms) suit short, high-intensity use. Match the product to how long the client will actually be in the room.' },
+      { id: 'ch3-s03-outcome', label: 'Learning Outcome', type: 'textarea', group: 'Read Mode — S03', default: 'Explain the difference between B2C and B2B2C access, and why both run on the same supply.' },
+      { id: 'ch3-s03-title', label: 'Title', type: 'input', group: 'Read Mode — S03', default: 'B2C &amp; B2B2C Offerings' },
+      { id: 'ch3-s03-body', label: 'Body', type: 'textarea', group: 'Read Mode — S03', default: '<p class="section-body">On-Demand is built for both individuals and corporate users. It serves both B2C and B2B2C users on the same supply network, but with tailored pricing, services, and different workflows.</p> <p class="section-body"><strong>B2C has:</strong></p> <ul class="section-list"> <li>Instant booking</li> <li>Flexible usage</li> <li>Pay per go payment option</li> <li>App-focused experience</li> </ul> <p class="section-body"><strong>B2B2C has:</strong></p> <ul class="section-list"> <li>Wallet credits</li> <li>Centralized billing</li> <li>Admin controls on employee usage</li> <li>Employee leaderboards</li> </ul>' },
+      { id: 'ch3-s03-takeaway', label: 'Takeaway', type: 'textarea', group: 'Read Mode — S03', default: 'Same spaces, same supply network — but B2C is self-serve and pay-as-you-go, while B2B2C runs on company-purchased credits with admin controls and central billing.' },
+      { id: 'ch3-s04-outcome', label: 'Learning Outcome', type: 'textarea', group: 'Read Mode — S04', default: 'Know the three OD platforms, which user type each serves, and the scope of the WeWork India partnership.' },
+      { id: 'ch3-s04-title', label: 'Title', type: 'input', group: 'Read Mode — S04', default: 'Platforms &amp; the WeWork Partnership' },
+      { id: 'ch3-s04-body', label: 'Body', type: 'textarea', group: 'Read Mode — S04', default: '<p class="section-body">myHQ operates On-Demand across three platforms:</p> <ul class="section-list"> <li><strong>myHQ Mobile App:</strong> Day Pass, Meeting Room, and Event Space booking — discovery, booking and payments, and bookings history in one app.</li> <li><strong>myHQ Website:</strong> Filter by product, city, brand, and price range. Compare offers and get the best price before booking.</li> <li><strong>Team Flexi Dashboard:</strong> Invite users, create groups, purchase plans, and track credits — all from one corporate dashboard.</li> </ul> <p class="section-body"><strong>We have exclusive rights of WeWork India.</strong> myHQ is the exclusive partner for all of WeWork India\'s on-demand and virtual office business. We manage the entire tech backend for WeWork India to fulfil this business — and all bookings, even the ones placed directly on the WeWork India website or app, are managed by us.</p>' },
+      { id: 'ch3-s04-takeaway', label: 'Takeaway', type: 'textarea', group: 'Read Mode — S04', default: 'Three platforms, one supply network. And every WeWork India on-demand/VO booking — wherever it\'s placed — runs through myHQ\'s backend.' },
+      { id: 'ch3-s05-outcome', label: 'Learning Outcome', type: 'textarea', group: 'Read Mode — S05', default: 'Know the OD scale numbers cold — they come up in client conversations and internal reviews.' },
+      { id: 'ch3-s05-title', label: 'Title', type: 'input', group: 'Read Mode — S05', default: 'Current Scale (OD)' },
+      { id: 'ch3-s05-body', label: 'Body', type: 'textarea', group: 'Read Mode — S05', default: '<p class="section-body">On-Demand is myHQ\'s highest-frequency, fastest-turnaround product. Key numbers:</p> <div class="minicard-grid" style="grid-template-columns:repeat(3,1fr);"> <div class="minicard"> <div class="mc-t" style="font-size:22px;color:var(--blue);">1,500</div> <div class="mc-b">Daily active users.</div> </div> <div class="minicard"> <div class="mc-t" style="font-size:22px;color:var(--blue);">35,000</div> <div class="mc-b">Monthly bookings.</div> </div> <div class="minicard"> <div class="mc-t" style="font-size:22px;color:var(--blue);">₹30L</div> <div class="mc-b">Monthly marketing spend.</div> </div> <div class="minicard"> <div class="mc-t" style="font-size:22px;color:var(--blue);">₹8–9 Cr</div> <div class="mc-b">Our take rate per year.</div> </div> <div class="minicard"> <div class="mc-t" style="font-size:22px;color:var(--blue);">₹30 Cr</div> <div class="mc-b">Annual transaction value.</div> </div> </div>' },
+      { id: 'ch3-s05-takeaway', label: 'Takeaway', type: 'textarea', group: 'Read Mode — S05', default: '35,000 bookings a month, ₹30Cr in annual transaction value — On-Demand is the highest-volume, highest-frequency product in the myHQ portfolio.' },
+    ],
+    assessFields: []
+  },
+
 };
 
 const COURSES = {
@@ -1424,12 +1728,15 @@ function renderCoursePills() {
 function renderChapterPills() {
   const pillsEl = document.getElementById('edit-chapter-pills');
   const groups  = COURSES[currentEditCourse] || [];
-  const available = groups.flatMap(g => g.chapters.filter(c => c.available));
-  if (available.length === 0) {
+  // Only sections that actually have editable chapters.
+  const sections = groups
+    .map(g => ({ section: g.section, chapters: g.chapters.filter(c => c.available) }))
+    .filter(g => g.chapters.length > 0);
+  if (sections.length === 0) {
     pillsEl.innerHTML = '<span style="font-size:12px;color:var(--blue-soft);">No chapters available yet.</span>';
     return;
   }
-  pillsEl.innerHTML = available.map(ch => {
+  const pill = ch => {
     const s = pillStatuses[ch.id] || {};
     const isPending = isMasterAdmin && s.hasDraft && s.draftStatus === 'pending';
     const callout = isPending ? `<span class="pill-callout status-pending">Pending review</span>` : '';
@@ -1437,7 +1744,12 @@ function renderChapterPills() {
       <button class="chapter-pill${isPending ? ' has-pending' : ''}" id="pill-${ch.id}" onclick="loadChapter('${ch.id}', this)">${ch.name}</button>
       <span id="callout-${ch.id}">${callout}</span>
     </div>`;
-  }).join('');
+  };
+  pillsEl.innerHTML = sections.map(g => `
+    <div class="chapter-section">
+      <div class="chapter-section-label">${g.section}</div>
+      <div class="chapter-section-pills">${g.chapters.map(pill).join('')}</div>
+    </div>`).join('');
 }
 
 async function refreshPillStatuses() {
@@ -1598,16 +1910,112 @@ function isBodyFieldId(id) {
 
 // Returns true only if the HTML uses solely the supported vocabulary, so the
 // text↔HTML round-trip is safe. Anything else → keep raw HTML editing.
+// Per-field cache of the original minicard-grid markup, so icons, grid column
+// styles, and card classes survive the text↔HTML round-trip untouched. Keyed by
+// field id; each entry holds the grid's opening tag plus each card's template
+// (icon + wrapper), captured on load and re-applied on save by card position.
+const richGridCache = {};
+
+// Pull every minicard-grid block out of a body, returning {stripped, grids}.
+// `stripped` is the body with each grid replaced by a placeholder token so the
+// rest can be validated/converted with the normal p/h3/ul vocabulary.
+function extractGrids(html) {
+  const grids = [];
+  const stripped = String(html).replace(
+    /<div\b[^>]*\bclass="minicard-grid"[^>]*>[\s\S]*?<\/div>\s*<\/div>/gi,
+    function (block) {
+      // The greedy-then-backtrack above can over/under-match nested divs, so
+      // re-balance precisely from the matched start.
+      grids.push(block);
+      return ' GRID' + (grids.length - 1) + ' ';
+    }
+  );
+  return { stripped, grids };
+}
+
+// Depth-aware: given html and the index just after a grid's opening '>', return
+// the inner content up to the matching </div>. Used to parse cards safely.
+function balancedDivInner(html, fromIdx) {
+  const re = /<(\/?)div\b[^>]*?(\/?)>/gi;
+  re.lastIndex = fromIdx;
+  let depth = 1, m;
+  while ((m = re.exec(html)) !== null) {
+    if (m[2] === '/') continue;
+    if (m[1] === '') depth++;
+    else { depth--; if (depth === 0) return html.slice(fromIdx, m.index); }
+  }
+  return html.slice(fromIdx);
+}
+
+// Re-extract grids with correct nesting (the regex in extractGrids is a coarse
+// finder; this returns precise grid spans). Returns array of {open, inner}.
+function findGrids(html) {
+  const s = String(html);
+  const out = [];
+  const open = /<div\b([^>]*)\bclass="minicard-grid"([^>]*)>/gi;
+  let m;
+  while ((m = open.exec(s)) !== null) {
+    const innerStart = m.index + m[0].length;
+    const inner = balancedDivInner(s, innerStart);
+    out.push({ openTag: m[0], inner, start: m.index, end: innerStart + inner.length + 6 /* </div> */ });
+  }
+  return out;
+}
+
+// Parse the cards inside a grid's inner HTML. Each card: optional <i> icon,
+// a <div class="mc-t">title</div>, a <div class="mc-b">body</div>.
+function parseCards(inner) {
+  const cards = [];
+  const cardRe = /<div\b[^>]*\bclass="minicard"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/gi;
+  // Walk cards depth-aware instead, to be safe with the trailing </div></div>.
+  const openRe = /<div\b([^>]*)\bclass="minicard"([^>]*)>/gi;
+  let m;
+  while ((m = openRe.exec(inner)) !== null) {
+    const cardInner = balancedDivInner(inner, m.index + m[0].length);
+    const iconM = cardInner.match(/<i\b[^>]*><\/i>/i);
+    const tM = cardInner.match(/<div\b[^>]*\bclass="mc-t"[^>]*>([\s\S]*?)<\/div>/i);
+    const bM = cardInner.match(/<div\b[^>]*\bclass="mc-b"[^>]*>([\s\S]*?)<\/div>/i);
+    cards.push({
+      openTag: m[0],
+      icon: iconM ? iconM[0] : '',
+      titleOpen: (cardInner.match(/<div\b[^>]*\bclass="mc-t"[^>]*>/i) || ['<div class="mc-t">'])[0],
+      bodyOpen:  (cardInner.match(/<div\b[^>]*\bclass="mc-b"[^>]*>/i) || ['<div class="mc-b">'])[0],
+      title: tM ? tM[1].trim() : '',
+      body:  bM ? bM[1].trim() : ''
+    });
+    openRe.lastIndex = m.index + m[0].length;
+  }
+  return cards;
+}
+
 function isRichConvertible(html) {
   const s = String(html);
   if (s.trim() === '') return true;
-  // Must look like our block markup at all.
-  if (!/<(p|h3|ul)\b/i.test(s)) return false;
+  // Pull minicard grids aside first — they're a supported rich block whose
+  // structure we preserve verbatim.
+  const grids = findGrids(s);
+  let body = s;
+  // Replace each grid span with nothing for the structural check below.
+  if (grids.length) {
+    // Rebuild body without the grid spans (back-to-front to keep indices valid).
+    for (let i = grids.length - 1; i >= 0; i--) {
+      body = body.slice(0, grids[i].start) + ' ' + body.slice(grids[i].end);
+    }
+    // Every grid must parse into well-formed cards, else fall back to raw HTML.
+    for (const g of grids) {
+      const cards = parseCards(g.inner);
+      if (!cards.length || cards.some(c => c.title === '' && c.body === '')) return false;
+    }
+  }
+  // Must look like our block markup at all (or be only grids).
+  if (body.trim() !== '' && !/<(p|h3|ul)\b/i.test(body) && !grids.length) return false;
   // Strip the block/inline tags we understand, then check nothing structural is left.
-  let rest = s
-    .replace(/<p class="section-body">/gi, '')
-    .replace(/<h3 class="section-subhead">/gi, '')
-    .replace(/<ul class="section-list">/gi, '')
+  // The opening block tags may carry extra attributes (e.g. inline style) beyond
+  // the required class — we ignore those so the field still converts to plain text.
+  let rest = body
+    .replace(/<p\b[^>]*\bclass="section-body"[^>]*>/gi, '')
+    .replace(/<h3\b[^>]*\bclass="section-subhead"[^>]*>/gi, '')
+    .replace(/<ul\b[^>]*\bclass="section-list"[^>]*>/gi, '')
     .replace(/<\/(p|h3|ul|li)>/gi, '')
     .replace(/<li>/gi, '')
     .replace(/<\/?(strong|em)>/gi, '');
@@ -1638,11 +2046,31 @@ function inlineTextToHtml(s) {
 }
 
 // HTML → editor text. Caller must have checked isRichConvertible first.
-function htmlToEditText(html) {
-  const s = String(html);
-  if (s.trim() === '') return '';
+// `fieldId` (optional) lets us cache minicard-grid structure so icons/styles
+// survive the round-trip; pass it whenever the result will be edited & saved.
+function htmlToEditText(html, fieldId) {
+  let s = String(html);
+  if (s.trim() === '') { if (fieldId) delete richGridCache[fieldId]; return ''; }
+
+  // Lift minicard grids out first, replacing each with a unique marker so the
+  // surrounding paragraphs/lists convert normally and grid order is preserved.
+  const grids = findGrids(s);
+  const gridTemplates = [];
+  if (grids.length) {
+    for (let i = grids.length - 1; i >= 0; i--) {
+      const g = grids[i];
+      const cards = parseCards(g.inner);
+      gridTemplates[i] = { openTag: g.openTag, cards };
+      s = s.slice(0, g.start) + ' GRID' + i + ' ' + s.slice(g.end);
+    }
+  }
+  if (fieldId) {
+    if (gridTemplates.length) richGridCache[fieldId] = gridTemplates;
+    else delete richGridCache[fieldId];
+  }
+
   const blocks = [];
-  const re = /<p class="section-body">([\s\S]*?)<\/p>|<h3 class="section-subhead">([\s\S]*?)<\/h3>|<ul class="section-list">([\s\S]*?)<\/ul>/gi;
+  const re = /<p\b[^>]*\bclass="section-body"[^>]*>([\s\S]*?)<\/p>|<h3\b[^>]*\bclass="section-subhead"[^>]*>([\s\S]*?)<\/h3>|<ul\b[^>]*\bclass="section-list"[^>]*>([\s\S]*?)<\/ul>| GRID(\d+) /gi;
   let m;
   while ((m = re.exec(s)) !== null) {
     if (m[1] !== undefined) {
@@ -1655,15 +2083,45 @@ function htmlToEditText(html) {
       let lm;
       while ((lm = li.exec(m[3])) !== null) items.push('- ' + inlineHtmlToText(lm[1].trim()));
       if (items.length) blocks.push(items.join('\n'));
+    } else if (m[4] !== undefined) {
+      const tpl = gridTemplates[+m[4]];
+      const lines = tpl.cards.map(c =>
+        ':: ' + inlineHtmlToText(c.title) + ' | ' + inlineHtmlToText(c.body));
+      blocks.push(lines.join('\n'));
     }
   }
   return blocks.join('\n\n');
 }
 
-// Editor text → HTML, mirroring the front-end markup.
-function editTextToHtml(text) {
+// Rebuild one minicard-grid from the editor's ":: title | body" lines, reusing
+// the cached template (grid opening tag, each card's icon + wrapper tags) so the
+// layout is preserved byte-for-byte except the edited text. Extra lines beyond
+// the template get plain cards; missing lines simply drop their card.
+function cardLinesToGrid(cardLines, tpl) {
+  const openTag = tpl ? tpl.openTag : '<div class="minicard-grid">';
+  const cardsHtml = cardLines.map((line, i) => {
+    const sep = line.indexOf('|');
+    const title = sep === -1 ? line.trim() : line.slice(0, sep).trim();
+    const body  = sep === -1 ? ''         : line.slice(sep + 1).trim();
+    const t = tpl && tpl.cards[i] ? tpl.cards[i] : null;
+    const cardOpen  = t ? t.openTag   : '<div class="minicard">';
+    const icon      = t ? t.icon      : '';
+    const titleOpen = t ? t.titleOpen : '<div class="mc-t">';
+    const bodyOpen  = t ? t.bodyOpen  : '<div class="mc-b">';
+    return cardOpen + (icon ? ' ' + icon + ' ' : ' ')
+      + titleOpen + inlineTextToHtml(title) + '</div> '
+      + bodyOpen  + inlineTextToHtml(body)  + '</div> </div>';
+  }).join(' ');
+  return openTag + ' ' + cardsHtml + ' </div>';
+}
+
+// Editor text → HTML, mirroring the front-end markup. `fieldId` (optional) is
+// used to look up cached minicard-grid templates so icons/styles are preserved.
+function editTextToHtml(text, fieldId) {
   const t = String(text).replace(/\r\n/g, '\n').trim();
   if (t === '') return '';
+  const tpls = (fieldId && richGridCache[fieldId]) || [];
+  let gridIdx = 0;
   const out = [];
   let listBuf = [];
   const flushList = () => {
@@ -1674,6 +2132,13 @@ function editTextToHtml(text) {
   };
   t.split(/\n{2,}/).forEach(block => {
     const lines = block.split('\n').map(l => l.trim()).filter(l => l !== '');
+    // A block made entirely of ":: " lines becomes a minicard grid.
+    if (lines.length && lines.every(l => l.startsWith(':: '))) {
+      flushList();
+      const cardLines = lines.map(l => l.slice(3));
+      out.push(cardLinesToGrid(cardLines, tpls[gridIdx++]));
+      return;
+    }
     // A block made entirely of "- " lines becomes a list.
     if (lines.length && lines.every(l => l.startsWith('- '))) {
       lines.forEach(l => listBuf.push(l.slice(2)));
@@ -1685,6 +2150,8 @@ function editTextToHtml(text) {
         out.push('<h3 class="section-subhead">' + inlineTextToHtml(line.slice(3)) + '</h3>');
       } else if (line.startsWith('- ')) {
         listBuf.push(line.slice(2));
+      } else if (line.startsWith(':: ')) {
+        out.push(cardLinesToGrid([line.slice(3)], tpls[gridIdx++]));
       } else {
         out.push('<p class="section-body">' + inlineTextToHtml(line) + '</p>');
       }
@@ -1731,9 +2198,11 @@ function renderEditFields() {
     }
     if (f.type === 'textarea') {
       const rich = fieldUsesRichText(f, val);
-      const display = rich ? htmlToEditText(val) : val;
+      const display = rich ? htmlToEditText(val, f.id) : val;
       const richAttr = rich ? ' data-rich="1"' : '';
-      const hint = rich ? `<div style="font-family:var(--mono);font-size:9px;color:var(--blue-soft);margin:-6px 0 8px;">Plain text · blank line = new paragraph · "## " = sub-heading · "- " = bullet · **bold**</div>` : '';
+      const hasGrid = rich && richGridCache[f.id];
+      const gridHint = hasGrid ? ' · ":: Title | text" = a card in the grid' : '';
+      const hint = rich ? `<div style="font-family:var(--mono);font-size:9px;color:var(--blue-soft);margin:-6px 0 8px;">Plain text · blank line = new paragraph · "## " = sub-heading · "- " = bullet · **bold**${gridHint}</div>` : '';
       html += `<div class="edit-field">
         <label class="edit-label" for="field-${f.id}">${f.label}</label>
         ${hint}
@@ -1764,7 +2233,11 @@ function scheduleDraftSave() {
 // body fields, raw value otherwise).
 function readFieldValue(el) {
   const raw = el.value !== undefined ? el.value : el.textContent;
-  return el.getAttribute && el.getAttribute('data-rich') === '1' ? editTextToHtml(raw) : raw;
+  if (!(el.getAttribute && el.getAttribute('data-rich') === '1')) return raw;
+  // Editor element ids are "field-<fieldId>"; strip the prefix so editTextToHtml
+  // can reuse the cached minicard-grid template for this field.
+  const fieldId = el.id && el.id.indexOf('field-') === 0 ? el.id.slice(6) : undefined;
+  return editTextToHtml(raw, fieldId);
 }
 
 async function saveDraft() {
@@ -1811,8 +2284,10 @@ function showDiff() {
     // Rich body fields are stored as HTML but shown/edited as plain text in
     // the review view too, to stay consistent with the editor.
     const rich = fieldUsesRichText(f, draft) || fieldUsesRichText(f, live);
-    const liveText  = rich ? htmlToEditText(live)  : live;
-    const draftText = rich ? htmlToEditText(draft) : draft;
+    // Convert live without caching, then draft WITH caching last, so the cached
+    // grid template reflects the draft — that's what the inline Edit box saves.
+    const liveText  = rich ? htmlToEditText(live)      : live;
+    const draftText = rich ? htmlToEditText(draft, f.id) : draft;
     const liveDisplay  = f.html ? live  : escHtml(liveText);
     const draftDisplay = f.html ? draft : escHtml(draftText);
     const richAttr = rich ? ' data-rich="1"' : '';
@@ -1869,7 +2344,7 @@ function toggleDraftEdit(fieldId) {
     btnEl.textContent = 'Edit';
     // if field was already accepted, re-evaluate against live
     const live = liveData[fieldId] !== undefined ? liveData[fieldId] : '';
-    const newStored = isRich ? editTextToHtml(newVal) : newVal;
+    const newStored = isRich ? editTextToHtml(newVal, fieldId) : newVal;
     if (newStored === live) {
       // no longer different — remove from changedFields
       changedFields.delete(fieldId);
@@ -1977,7 +2452,7 @@ async function pushLive() {
       const isRich  = inputEl && inputEl.getAttribute('data-rich') === '1';
       let val = (inputEl && inputEl.style.display === 'block') ? inputEl.value : (textEl ? textEl.textContent : (draftData[f.id] || ''));
       // Rich body fields are shown as text in the diff; store them back as HTML.
-      if (isRich) val = editTextToHtml(val);
+      if (isRich) val = editTextToHtml(val, f.id);
       toWrite[f.id] = val;
       acceptedIds.add(f.id);
     } else if (fieldAccepted[f.id] === false) {
