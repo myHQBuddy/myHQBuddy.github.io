@@ -510,6 +510,16 @@ var DEV_PREVIEW = window.location.hostname === 'localhost' || window.location.ho
           if (cData[key] !== undefined) el.innerHTML = cData[key];
         });
       });
+
+      // ── Restore this user's saved answers/submission from Firestore (cross-device) ──
+      var prog = (data.progress && data.progress[CHAPTER_ID]) || {};
+      if (prog.answers) {
+        for (var i = 1; i <= TOTAL_QUESTIONS; i++) {
+          var ta = document.getElementById('aq' + i + '-ans');
+          if (ta && prog.answers['q' + i]) { ta.value = prog.answers['q' + i]; onAnsInput(i); }
+        }
+      }
+      if (prog.submitted || prog.completed) { showSubmittedState(); }
     });
   });
 })();
@@ -695,16 +705,17 @@ function submitAssessment(e) {
   var answers = {};
   for (var i = 1; i <= TOTAL_QUESTIONS; i++) answers['q' + i] = document.getElementById('aq' + i + '-ans').value.trim();
 
-  // 1) Mark complete + unlock next chapter in Firestore.
+  // 1) Save answers + mark complete + unlock next chapter in Firestore (per-uid, cross-device).
   if (fbUser) {
-    var prog = {}; prog['progress.' + CHAPTER_ID + '.completed'] = true;
-    prog['progress.' + CHAPTER_ID + '.completedAt'] = firebase.firestore.FieldValue.serverTimestamp();
-    window.firebaseDB.collection('users').doc(fbUser.uid).update(prog);
-    if (NEXT_CHAPTER) {
-      window.firebaseDB.collection('users').doc(fbUser.uid).set({
-        unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion(NEXT_CHAPTER) }
-      }, { merge: true });
-    }
+    var progDoc = { progress: {} };
+    progDoc.progress[CHAPTER_ID] = {
+      completed: true,
+      submitted: true,
+      answers: answers,
+      completedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    if (NEXT_CHAPTER) { progDoc.unlockedChapters = { beginner: firebase.firestore.FieldValue.arrayUnion(NEXT_CHAPTER) }; }
+    window.firebaseDB.collection('users').doc(fbUser.uid).set(progDoc, { merge: true });
   }
 
   // 2) Append answers row to the response Sheet.

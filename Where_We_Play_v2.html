@@ -2198,6 +2198,16 @@ h2.section-title { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.03em;
           el.innerHTML = val;
         });
       });
+
+      // ── Restore this user's saved answers/submission from Firestore (cross-device) ──
+      var prog = (data.progress && data.progress.ch1) || {};
+      if (prog.answers) {
+        for (var i = 1; i <= TOTAL_QUESTIONS; i++) {
+          var ta = document.getElementById('aq' + i + '-ans');
+          if (ta && prog.answers['q' + i]) { ta.value = prog.answers['q' + i]; onAnsInput(i); }
+        }
+      }
+      if (prog.submitted || prog.completed) { showSubmittedState(); }
     });
   });
 })();
@@ -2868,11 +2878,13 @@ function submitAssessment(e) {
   localStorage.setItem('myhq_ch2_unlocked', 'true');
   showSubmittedState();
   if (fbUser) {
-    window.firebaseDB.collection('users').doc(fbUser.uid).update({
-      'progress.ch1.completed': true,
-      'progress.ch1.completedAt': firebase.firestore.FieldValue.serverTimestamp()
-    });
     window.firebaseDB.collection('users').doc(fbUser.uid).set({
+      progress: { ch1: {
+        completed: true,
+        submitted: true,
+        answers: answers,
+        completedAt: firebase.firestore.FieldValue.serverTimestamp()
+      } },
       unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion('ch2') }
     }, { merge: true });
   }

@@ -1411,6 +1411,18 @@ function markAssessmentDone() {
 function restoreAssessment() {
   if (localStorage.getItem(LS_KEY) === 'true') {
     markAssessmentDone();
+    return;
+  }
+  // Fall back to Firestore (covers cross-device logins)
+  var auth = window.firebaseAuth;
+  var db   = window.firebaseDB;
+  if (auth && auth.currentUser && db) {
+    db.collection('users').doc(auth.currentUser.uid).get().then(function(doc) {
+      if (doc.exists && (doc.data().amch3_submitted || (doc.data().progress && doc.data().progress.amch3 && doc.data().progress.amch3.completed))) {
+        localStorage.setItem(LS_KEY, 'true');
+        markAssessmentDone();
+      }
+    }).catch(function() {});
   }
 }
 

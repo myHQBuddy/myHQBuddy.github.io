@@ -902,6 +902,16 @@ var DEV_PREVIEW = window.location.hostname === 'localhost' || window.location.ho
           if (cData[key] !== undefined) el.innerHTML = cData[key];
         });
       });
+
+      // ── Restore this user's submitted quiz from Firestore (cross-device) ──
+      var prog = (data.progress && data.progress[CHAPTER_ID]) || {};
+      if (prog.submitted && prog.selections) {
+        try {
+          var saved = JSON.parse(prog.selections);
+          for (var qn in saved) { if (saved.hasOwnProperty(qn)) mcqSelections[qn] = saved[qn]; }
+          if (typeof submitMCQ === 'function') submitMCQ(true);
+        } catch (e) {}
+      }
     });
   });
 })();
@@ -1044,7 +1054,7 @@ function updateMCQTracker() {
   document.getElementById('aqFooterNote').textContent = count === TOTAL_QUESTIONS ? 'All answered — ready to check.' : 'Answer all ' + TOTAL_QUESTIONS + ' questions to continue.';
 }
 
-function submitMCQ() {
+function submitMCQ(isRestore) {
   var score = 0;
   var results = {};
   for (var i = 1; i <= TOTAL_QUESTIONS; i++) {
@@ -1077,14 +1087,19 @@ function submitMCQ() {
     var labels = ['A','B','C','D'];
     answers['q' + j] = mcqSelections[j].map(function(i){ return labels[i]; }).join(', ') + (results[j].isCorrect ? ' ✓' : ' ✗');
   }
-  if (fbUser) {
-    var prog = {}; prog['progress.' + CHAPTER_ID + '.completed'] = true;
-    prog['progress.' + CHAPTER_ID + '.score'] = score + '/' + TOTAL_QUESTIONS;
-    prog['progress.' + CHAPTER_ID + '.completedAt'] = firebase.firestore.FieldValue.serverTimestamp();
-    window.firebaseDB.collection('users').doc(fbUser.uid).update(prog);
-    if (NEXT_CHAPTER) { window.firebaseDB.collection('users').doc(fbUser.uid).set({ unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion(NEXT_CHAPTER) } }, { merge: true }); }
+  if (fbUser && !isRestore) {
+    var progDoc = { progress: {} };
+    progDoc.progress[CHAPTER_ID] = {
+      completed: true,
+      submitted: true,
+      score: score + '/' + TOTAL_QUESTIONS,
+      selections: JSON.stringify(mcqSelections),
+      completedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    if (NEXT_CHAPTER) { progDoc.unlockedChapters = { beginner: firebase.firestore.FieldValue.arrayUnion(NEXT_CHAPTER) }; }
+    window.firebaseDB.collection('users').doc(fbUser.uid).set(progDoc, { merge: true });
   }
-  fetch(SHEET_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(Object.assign({ chapterName: CHAPTER_NAME, status: 'Completed', score: score + '/' + TOTAL_QUESTIONS, name: name, email: email, timestamp: new Date().toISOString() }, answers)) });
+  if (!isRestore) { fetch(SHEET_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(Object.assign({ chapterName: CHAPTER_NAME, status: 'Completed', score: score + '/' + TOTAL_QUESTIONS, name: name, email: email, timestamp: new Date().toISOString() }, answers)) }); }
   var tracker = document.getElementById('aqTracker'); if (tracker) tracker.style.display = 'none';
   var footer = document.getElementById('aqFooter');
   var scoreMsg = score === TOTAL_QUESTIONS ? '<i class="fa-solid fa-trophy"></i> Perfect score!' : score >= 3 ? '<i class="fa-solid fa-circle-check"></i> Good work — review any incorrect ones.' : '<i class="fa-solid fa-book-open"></i> Review the chapter and try again.';
