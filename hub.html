@@ -780,6 +780,9 @@ auth.onAuthStateChanged(function(user) {
     var data     = snap.exists ? snap.data() : {};
     var unlocked = (data.unlockedChapters && data.unlockedChapters.beginner) || [];
     var progress = data.progress || {};
+    // Chapters an admin has explicitly re-locked — completion-based
+    // auto-unlock below must not override these.
+    var adminLocked = (data.lockedChapters && data.lockedChapters.beginner) || [];
 
     // Admin portal row
     if (data.isAdmin || data.masterAdmin) {
@@ -828,14 +831,15 @@ auth.onAuthStateChanged(function(user) {
 
     // ── Chapter 3 — How We Support You ──
     var adminUnlockedCh3 = unlocked.indexOf('ch3') !== -1;
-    var ch3Unlocked      = ch2Completed || adminUnlockedCh3;
+    var ch3LockedByAdmin = adminLocked.indexOf('ch3') !== -1;
+    var ch3Unlocked      = (ch2Completed && !ch3LockedByAdmin) || adminUnlockedCh3;
     var ch3Completed     = progress.ch3 && progress.ch3.completed;
     var card3        = document.getElementById('card-ch3');
     var footer3      = document.getElementById('footer-ch3');
     var unlockSec3   = document.getElementById('unlock-section-ch3');
     var status3      = document.getElementById('status-ch3');
 
-    if (ch2Completed && !adminUnlockedCh3) {
+    if (ch2Completed && !adminUnlockedCh3 && !ch3LockedByAdmin) {
       db.collection('users').doc(user.uid).set({
         unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion('ch3') }
       }, { merge: true });
@@ -865,10 +869,10 @@ auth.onAuthStateChanged(function(user) {
       { domId: 'wwdod', key: 'wwd_od', href: 'what_we_do/What_We_Do_OnDemand.html' }
     ];
     var wwdKeys = wwdChapters.map(function(c) { return c.key; });
-    var wwdToUnlock = wwdKeys.filter(function(key) { return unlocked.indexOf(key) === -1; });
+    var wwdToUnlock = wwdKeys.filter(function(key) { return unlocked.indexOf(key) === -1 && adminLocked.indexOf(key) === -1; });
     if (ch3Completed && wwdToUnlock.length) {
       db.collection('users').doc(user.uid).set({
-        unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion.apply(null, wwdKeys) }
+        unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion.apply(null, wwdToUnlock) }
       }, { merge: true });
     }
     wwdChapters.forEach(function(c) {
@@ -876,7 +880,8 @@ auth.onAuthStateChanged(function(user) {
       var status     = document.getElementById('status-' + c.domId);
       var footer     = document.getElementById('footer-' + c.domId);
       var unlockSecW = document.getElementById('unlock-section-' + c.domId);
-      var wUnlocked  = ch3Completed || unlocked.indexOf(c.key) !== -1;
+      var wLockedByAdmin = adminLocked.indexOf(c.key) !== -1;
+      var wUnlocked  = (ch3Completed && !wLockedByAdmin) || unlocked.indexOf(c.key) !== -1;
       var wCompleted = progress[c.key] && progress[c.key].completed;
 
       if (wUnlocked) {
@@ -905,11 +910,12 @@ auth.onAuthStateChanged(function(user) {
     // Unlock condition: both org chapters completed OR admin manually unlocked
     var bothOrgDone    = ch1Completed && ch2Completed;
     var adminUnlocked  = unlocked.indexOf('amch1') !== -1;
-    var amch1Unlocked  = bothOrgDone || adminUnlocked;
+    var amch1LockedByAdmin = adminLocked.indexOf('amch1') !== -1;
+    var amch1Unlocked  = (bothOrgDone && !amch1LockedByAdmin) || adminUnlocked;
     var amch1Completed = progress.amch1 && progress.amch1.completed;
 
     // Auto-unlock in Firestore if both org chapters done and not already unlocked
-    if (bothOrgDone && !adminUnlocked) {
+    if (bothOrgDone && !adminUnlocked && !amch1LockedByAdmin) {
       db.collection('users').doc(user.uid).set({
         unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion('amch1') }
       }, { merge: true });
@@ -939,10 +945,11 @@ auth.onAuthStateChanged(function(user) {
     var amch2Title     = document.getElementById('title-amch2');
 
     var adminUnlockedAmch2 = unlocked.indexOf('amch2') !== -1;
-    var amch2Unlocked      = bothOrgDone || adminUnlockedAmch2;
+    var amch2LockedByAdmin = adminLocked.indexOf('amch2') !== -1;
+    var amch2Unlocked      = (bothOrgDone && !amch2LockedByAdmin) || adminUnlockedAmch2;
     var amch2Completed     = progress.amch2 && progress.amch2.completed;
 
-    if (bothOrgDone && !adminUnlockedAmch2) {
+    if (bothOrgDone && !adminUnlockedAmch2 && !amch2LockedByAdmin) {
       db.collection('users').doc(user.uid).set({
         unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion('amch2') }
       }, { merge: true });
@@ -971,10 +978,11 @@ auth.onAuthStateChanged(function(user) {
     var amch3Title     = document.getElementById('title-amch3');
 
     var adminUnlockedAmch3 = unlocked.indexOf('amch3') !== -1;
-    var amch3Unlocked      = bothOrgDone || adminUnlockedAmch3;
+    var amch3LockedByAdmin = adminLocked.indexOf('amch3') !== -1;
+    var amch3Unlocked      = (bothOrgDone && !amch3LockedByAdmin) || adminUnlockedAmch3;
     var amch3Completed     = progress.amch3 && progress.amch3.completed;
 
-    if (bothOrgDone && !adminUnlockedAmch3) {
+    if (bothOrgDone && !adminUnlockedAmch3 && !amch3LockedByAdmin) {
       db.collection('users').doc(user.uid).set({
         unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion('amch3') }
       }, { merge: true });

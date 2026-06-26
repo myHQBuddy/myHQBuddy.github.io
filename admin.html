@@ -1616,16 +1616,28 @@ async function toggleChapter(chId, pill) {
 
   const ref  = db.collection('users').doc(currentUser);
   const snap = await ref.get();
-  const existing = snap.data()?.unlockedChapters?.[selectedCourse] || [];
-  let updated;
-  if (existing.includes(chId)) {
-    updated = existing.filter(id => id !== chId);
+  const data = snap.data() || {};
+  const existingUnlocked = data.unlockedChapters?.[selectedCourse] || [];
+  const existingLocked   = data.lockedChapters?.[selectedCourse] || [];
+  let updatedUnlocked, updatedLocked;
+  if (existingUnlocked.includes(chId)) {
+    // Locking: remove from unlocked, and record an explicit admin lock so
+    // hub.html's auto-unlock-on-completion logic doesn't silently re-add it.
+    updatedUnlocked = existingUnlocked.filter(id => id !== chId);
+    updatedLocked   = existingLocked.includes(chId) ? existingLocked : [...existingLocked, chId];
   } else {
-    updated = [...existing, chId];
+    // Unlocking: add to unlocked, clear any admin lock override.
+    updatedUnlocked = [...existingUnlocked, chId];
+    updatedLocked   = existingLocked.filter(id => id !== chId);
   }
-  await ref.set({ unlockedChapters: { [selectedCourse]: updated } }, { merge: true });
+  await ref.set({
+    unlockedChapters: { [selectedCourse]: updatedUnlocked },
+    lockedChapters:   { [selectedCourse]: updatedLocked }
+  }, { merge: true });
   if (!currentUserDoc.unlockedChapters) currentUserDoc.unlockedChapters = {};
-  currentUserDoc.unlockedChapters[selectedCourse] = updated;
+  if (!currentUserDoc.lockedChapters)   currentUserDoc.lockedChapters   = {};
+  currentUserDoc.unlockedChapters[selectedCourse] = updatedUnlocked;
+  currentUserDoc.lockedChapters[selectedCourse]   = updatedLocked;
   renderChapterList();
 }
 
