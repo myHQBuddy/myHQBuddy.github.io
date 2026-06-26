@@ -159,9 +159,7 @@ body {
 .courses-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  border: 1px solid var(--border);
-  background: var(--border);
+  gap: 24px;
 }
 
 /* ── Course card ── */
@@ -169,6 +167,9 @@ body {
   background: var(--white);
   display: flex; flex-direction: column;
   position: relative;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
   transition: background 0.18s var(--ease);
 }
 .course-card.locked { background: var(--blue-wash); }
@@ -181,15 +182,15 @@ body {
 .course-card.completed .card-top-bar { background: var(--mint); }
 .course-card.unlocked:not(.completed) .card-top-bar { background: var(--blue); }
 
-.card-inner { padding: 20px 32px 16px; flex: 1; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; text-align: left; }
+.card-inner { padding: 23px 37px 18px; flex: 1; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; text-align: left; }
 
 /* Backdrop card variant */
 .card-backdrop {
   position: relative;
-  min-height: 220px;
+  min-height: 253px;
   background-size: cover; background-position: center;
   display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start;
-  padding: 24px 28px 20px;
+  padding: 28px 32px 23px;
 }
 .card-backdrop::after {
   content: '';
@@ -464,7 +465,7 @@ body {
     <!-- CHAPTER 3 -->
     <div class="course-card locked has-backdrop" id="card-ch3">
       <div class="card-top-bar"></div>
-      <div class="card-backdrop" style="background-image:url('ch5_book_images/how_we_support_you_backdrop.png'); background-size:cover; background-position:center;">
+      <div class="card-backdrop" style="background-image:url('cover_life_benefits.jpg'); background-size:cover; background-position:center;">
         <div class="card-head">
           <div class="card-num">Chapter 03</div>
           <div class="card-title">Life and Benefits at myHQ</div>
