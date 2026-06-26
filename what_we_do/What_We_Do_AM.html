@@ -617,8 +617,15 @@ var DEV_PREVIEW = window.location.hostname === 'localhost' || window.location.ho
       db.collection('content').doc(CHAPTER_ID).get().then(function(cSnap) {
         if (!cSnap.exists) return;
         var cData = cSnap.data();
+        // These fields are maintained directly in this HTML file. Older values
+        // may still sit in the CMS, so we ignore the stored copies and always
+        // render from the file (keeps the "100+" consultant count correct).
+        var FILE_SOURCE_OF_TRUTH = {
+          'ch4-sl6-f1n': 1, 'ch4-s05-body': 1, 'ch4-s05-takeaway': 1
+        };
         document.querySelectorAll('[data-editable]').forEach(function(el) {
           var key = el.getAttribute('data-editable');
+          if (FILE_SOURCE_OF_TRUTH[key]) return;
           if (cData[key] !== undefined) el.innerHTML = cData[key];
         });
       });
