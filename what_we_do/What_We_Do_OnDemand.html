@@ -601,7 +601,7 @@ var DRIVE_FOLDER = 'Beginner Chapters/What We Do On-Demand';
 
 var SHEET_URL = 'https://script.google.com/macros/s/AKfycbwX0Z5vx6DSwdwZwK26pKZL3V3U9XwEyWgPa9Ek_cFEH1_tpULnWNcn7RlgE-wT8M9M/exec';
 
-var DEV_PREVIEW = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || typeof window.firebaseAuth === 'undefined';
+var DEV_PREVIEW = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 (function() {
   if (DEV_PREVIEW) return;
   window.firebaseAuth.onAuthStateChanged(function(user) {
