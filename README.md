@@ -37,7 +37,7 @@ Firestore is the source of truth for **access control and content**. Apps Script
 | `Coworking_And_Flex.html` | **amch2** — Coworking and Flex: operators, inventory, brand analysis (self-read AM chapter). |
 | `admin.html` | Admin dashboard — lock/unlock chapters per user, edit chapter content, view all users. |
 
-> Note: `chapter-2.html`, `Coworking & Flex.html`, `index.html` are legacy/standalone and not part of the live flow.
+> Note: `index.html` is the standalone entry point (redirects to `landing.html`); `chapter-shell.html` is the template for building new chapters. Neither is a chapter in the live flow.
 
 ---
 
