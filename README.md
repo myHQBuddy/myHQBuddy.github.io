@@ -31,10 +31,10 @@ Firestore is the source of truth for **access control and content**. Apps Script
 |------|-------------|
 | `landing.html` | Sign-in page (Google SSO). Ensures `ch1` is unlocked for every user. |
 | `hub.html` | Course hub — shows each chapter's lock / unlocked / completed state and handles the auto-unlock chain. |
-| `Where_We_Play_v2.html` | **ch1** — Where We Play: India's commercial real estate market. |
-| `Who_We_Are_v2.html` | **ch2** — Who We Are: myHQ's story, team & ambition. |
+| `Where_We_Play.html` | **ch1** — Where We Play: India's commercial real estate market. |
+| `Who_We_Are.html` | **ch2** — Who We Are: myHQ's story, team & ambition. |
 | `Know_Your_City.html` | **amch1** — Know Your City: geography, micromarkets, local expertise (AM track). |
-| `Know_Your_Spaces.html` | **amch2** — Coworking and Flex: operators, inventory, brand analysis (self-read AM chapter). |
+| `Coworking_And_Flex.html` | **amch2** — Coworking and Flex: operators, inventory, brand analysis (self-read AM chapter). |
 | `admin.html` | Admin dashboard — lock/unlock chapters per user, edit chapter content, view all users. |
 
 > Note: `chapter-2.html`, `Coworking & Flex.html`, `index.html` are legacy/standalone and not part of the live flow.
@@ -219,7 +219,7 @@ Apply this exact `scaleSlides()` pattern to every new slide-deck chapter. (Cowor
 
 ## Adding a new chapter
 
-1. **Build the chapter HTML** — copy an existing chapter (e.g. `Who_We_Are_v2.html`) so you inherit the auth gate, the `scaleSlides()` zoom logic, and the submission scaffold.
+1. **Build the chapter HTML** — copy an existing chapter (e.g. `Who_We_Are.html`) so you inherit the auth gate, the `scaleSlides()` zoom logic, and the submission scaffold.
 2. **Set the chapter ID** — `var CHAPTER_ID = 'amch3';` (matching the ID used everywhere below). The page gates access on `unlockedChapters.beginner` containing this ID.
 3. **Tag editable copy** — add `data-editable="amch3-…"` attributes to any element admins should be able to edit.
 4. **On submit, write Firestore:**

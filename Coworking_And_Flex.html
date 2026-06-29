@@ -668,9 +668,9 @@ const MAX_FILE_MB  = 35;
 const UPLOAD_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwX0Z5vx6DSwdwZwK26pKZL3V3U9XwEyWgPa9Ek_cFEH1_tpULnWNcn7RlgE-wT8M9M/exec';
 
 const QUESTION_CONFIG = {
-  1: { folderPath: '02 - Know Your Spaces/City Micromarket Map', fileSuffix: 'City_Micromarket_Map'  },
-  2: { folderPath: '02 - Know Your Spaces/Inventory Tracker',    fileSuffix: 'Inventory_Tracker'     },
-  3: { folderPath: '02 - Know Your Spaces/Brand Analysis',       fileSuffix: 'Brand_Analysis'        }
+  1: { folderPath: '02 - Coworking and Flex/City Micromarket Map', fileSuffix: 'City_Micromarket_Map'  },
+  2: { folderPath: '02 - Coworking and Flex/Inventory Tracker',    fileSuffix: 'Inventory_Tracker'     },
+  3: { folderPath: '02 - Coworking and Flex/Brand Analysis',       fileSuffix: 'Brand_Analysis'        }
 };
 
 function getLoggedInFirstName() {
@@ -683,11 +683,33 @@ function getLoggedInFirstName() {
   return 'User';
 }
 
-// Redirect to login if not authenticated
+// Chapter id — matches the admin CMS / hub unlock key for Coworking and Flex.
+var CHAPTER_ID = 'amch2';
+
+// Show a full-screen lock overlay (matches the other chapters' lock screen).
+function showChapterLock() {
+  document.querySelectorAll('body > *').forEach(function(el) {
+    if (el.tagName !== 'SCRIPT') el.style.display = 'none';
+  });
+  var lock = document.createElement('div');
+  lock.style.cssText = 'position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;font-family:Manrope,sans-serif;z-index:9999;';
+  lock.innerHTML = '<i class="fa-solid fa-lock" style="font-size:2.5rem;color:#1E22AA;"></i><div style="font-size:1.2rem;font-weight:800;color:#1E22AA;">This chapter is locked.</div><div style="font-size:14px;color:#7B7FE8;max-width:340px;text-align:center;">Ask your admin to unlock it.</div><a href="hub.html" style="margin-top:8px;font-size:13px;font-weight:700;color:#1E22AA;text-decoration:underline;">← Back to Hub</a>';
+  document.body.appendChild(lock);
+}
+
+// Redirect to login if not authenticated; lock the page if this chapter
+// isn't unlocked for the user (prevents opening the URL directly).
+var DEV_PREVIEW = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 if (window.firebaseAuth) {
   window.firebaseAuth.onAuthStateChanged(function(user) {
     if (!user) { window.location.href = 'landing.html'; return; }
-    restoreAssessment();
+    if (DEV_PREVIEW) { restoreAssessment(); return; }
+    window.firebaseDB.collection('users').doc(user.uid).get().then(function(snap) {
+      var data = snap.exists ? snap.data() : {};
+      var unlocked = (data.unlockedChapters && data.unlockedChapters.beginner) || [];
+      if (unlocked.indexOf(CHAPTER_ID) === -1) { showChapterLock(); return; }
+      restoreAssessment();
+    });
   });
 }
 

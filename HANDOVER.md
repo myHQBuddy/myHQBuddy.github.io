@@ -67,7 +67,7 @@ Config lives in [`firebase-config.js`](firebase-config.js) (loaded by every page
 | `content` | The live CMS content per chapter (`content/<chapterId>`). Each `data-editable` key on a page can be overridden here. Injected into pages at runtime via `el.innerHTML = cData[key]`. |
 | `content-drafts` | Pending admin edits awaiting master-admin review before they go live into `content`. |
 
-> **Important CMS behavior:** chapter pages overlay `content/<chapterId>` values on top of the HTML. If a stored value is stale, it overrides the file on the **live site** (localhost skips this — see `DEV_PREVIEW`). Some fields are intentionally pinned to the file via a `FILE_SOURCE_OF_TRUTH` map in the page so the CMS can't override them (currently used in `policies_benefits.html` for ch3 bodies and `what_we_do/What_We_Do_AM.html` for the consultant count). See [`MEMORY` note: ch3-body-file-source-of-truth] / commit history for context.
+> **Important CMS behavior:** chapter pages overlay `content/<chapterId>` values on top of the HTML. If a stored value is stale, it overrides the file on the **live site** (localhost skips this — see `DEV_PREVIEW`). Some fields are intentionally pinned to the file via a `FILE_SOURCE_OF_TRUTH` map in the page so the CMS can't override them (currently used in `Life_And_Benefits.html` for ch3 bodies and `what_we_do/What_We_Do_AM.html` for the consultant count). See [`MEMORY` note: ch3-body-file-source-of-truth] / commit history for context.
 - Firestore security rules: `firestore.rules` (in repo). Confirm the deployed rules in the Firebase Console match intent (the local file has been minimal at times).
 - **Note:** `.firebaserc` currently points `default` at an unrelated project (`bingo-live-app-ca416`). The **real** project is `myhq-td-fcf03` (from `firebase-config.js`). Use `--project myhq-td-fcf03` with the Firebase CLI, or fix `.firebaserc`.
 
@@ -105,7 +105,7 @@ Config lives in [`firebase-config.js`](firebase-config.js) (loaded by every page
 | `chapter-shell.html` | Reusable template for building new chapters (read its HARD RULES before editing). |
 | `landing.html` / `hub.html` / `index.html` | Login, chapter hub, entry point. |
 | `Code.gs` | Mirror of the Google Apps Script backend (submissions/uploads). |
-| `*.html` (per chapter) | Each training chapter (e.g. `policies_benefits.html`, `First_Impression.html`, `what_we_do/*`). |
+| `*.html` (per chapter) | Each training chapter (e.g. `Life_And_Benefits.html`, `First_Impression.html`, `what_we_do/*`). |
 | `README.md`, `SUBMISSION_FLOW.md`, `poc-guide.md` | Existing supporting docs. |
 
 ---

@@ -182,7 +182,7 @@ var UPLOAD_CHAPTERS = {
     }
   },
   'know_your_spaces': {
-    label: '02 - Know Your Spaces',
+    label: '02 - Coworking and Flex',
     folderId: 'FOLDER_ID_COWORKING',
     questions: {
       'micromarket_map':    { subfolderName: 'Q1 - City Micromarket Map', fileSuffix: 'City_Micromarket_Map' },
