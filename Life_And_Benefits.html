@@ -1008,6 +1008,7 @@ function submitMCQ(isRestore) {
       submitted: true,
       score: score + '/' + TOTAL_QUESTIONS,
       selections: JSON.stringify(mcqSelections),
+      answers: answers,
       completedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
     if (NEXT_CHAPTER) { progDoc.unlockedChapters = { beginner: firebase.firestore.FieldValue.arrayUnion(NEXT_CHAPTER) }; }
