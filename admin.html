@@ -317,6 +317,15 @@ body { font-family: var(--sans); background: var(--blue-wash); color: var(--blue
       <div class="chapters-note">⚡ Click Unlocked / Locked to toggle. Updates in real-time — no Save button.</div>
     </div>
 
+    <!-- Submitted answers (from Firestore — reliable even if the response Sheet write failed) -->
+    <div class="card" id="answers-card" style="display:none;">
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>Submitted Answers</span>
+        <span style="font-family:var(--mono);font-size:9px;font-weight:600;color:var(--blue-pale);letter-spacing:0.08em;">FROM FIRESTORE</span>
+      </div>
+      <div id="answers-body"></div>
+    </div>
+
     <!-- All users list -->
     <div class="card">
       <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
@@ -1501,6 +1510,7 @@ function clearSearch() {
   document.getElementById('search-input').value = '';
   document.getElementById('user-result').classList.remove('visible');
   document.getElementById('unlock-card').style.display = 'none';
+  document.getElementById('answers-card').style.display = 'none';
   currentUser = null;
   currentUserDoc = null;
 }
@@ -1547,6 +1557,58 @@ function loadUserResult(doc) {
   resultEl.classList.add('visible');
   document.getElementById('unlock-card').style.display = '';
   selectCourse('beginner', document.querySelector('.course-pill'));
+  renderSubmittedAnswers();
+}
+
+// Chapter labels for the answers view. Firestore is the reliable source of
+// truth — answers land here even when the response Sheet write is dropped.
+const ANSWER_CHAPTER_LABELS = {
+  ch1: 'Where We Play', ch2: 'Who We Are',
+  amch1: 'Know Your City', amch2: 'Coworking and Flex', amch3: 'First Impression',
+  wwd_am: 'What We Do — AM', wwd_vo: 'What We Do — VO', wwd_od: 'What We Do — On Demand'
+};
+
+function escAnswerHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderSubmittedAnswers() {
+  const card = document.getElementById('answers-card');
+  const body = document.getElementById('answers-body');
+  const progress = currentUserDoc?.progress || {};
+
+  // Any chapter that stored an answers object
+  const chaptersWithAnswers = Object.keys(progress).filter(chId => {
+    const a = progress[chId] && progress[chId].answers;
+    return a && Object.keys(a).length > 0;
+  });
+
+  if (!chaptersWithAnswers.length) {
+    card.style.display = 'none';
+    return;
+  }
+
+  body.innerHTML = chaptersWithAnswers.map(chId => {
+    const label   = ANSWER_CHAPTER_LABELS[chId] || chId;
+    const answers = progress[chId].answers;
+    const submittedAt = progress[chId].completedAt
+      ? new Date(progress[chId].completedAt.seconds * 1000).toLocaleString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
+      : '—';
+    const rows = Object.keys(answers).sort().map(qKey => {
+      return `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
+        <div style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--blue-soft);margin-bottom:4px;">${qKey}</div>
+        <div style="font-size:13px;line-height:1.5;color:var(--blue);white-space:pre-wrap;">${escAnswerHtml(answers[qKey]) || '<span style="color:var(--blue-pale);">(blank)</span>'}</div>
+      </div>`;
+    }).join('');
+    return `<div style="margin-bottom:18px;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:2px solid var(--border-md);">
+        <span style="font-size:14px;font-weight:800;color:var(--blue);">${label}</span>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--blue-pale);">${submittedAt}</span>
+      </div>
+      ${rows}
+    </div>`;
+  }).join('');
+  card.style.display = '';
 }
 
 async function toggleAdmin(checked) {
