@@ -193,6 +193,28 @@ var UPLOAD_CHAPTERS = {
   // ── Add future chapters below ──
 };
 
+// Root Drive folder that holds all uploads & answer docs.
+var UPLOAD_ROOT_FOLDER_ID = '1rtaqTqSJlRJ7HmOrlObgjKxmmomHO_8b';
+
+// Admins who should always be able to see uploaded files. The root folder is
+// shared with these on each upload, so access never depends on the script
+// owner manually sharing. Sharing is inherited by all subfolders/files.
+var UPLOAD_ADMIN_EMAILS = ['rohit.bagga@myhq.in'];
+
+// Share the upload root folder with the admin emails (idempotent — adding an
+// existing editor is a no-op). Wrapped so a sharing hiccup never fails an upload.
+function shareUploadRootWithAdmins() {
+  try {
+    var folder = DriveApp.getFolderById(UPLOAD_ROOT_FOLDER_ID);
+    for (var i = 0; i < UPLOAD_ADMIN_EMAILS.length; i++) {
+      folder.addEditor(UPLOAD_ADMIN_EMAILS[i]);
+    }
+  } catch (shareErr) {
+    // Non-fatal: log and continue so the upload itself still succeeds.
+    Logger.log('shareUploadRootWithAdmins failed: ' + shareErr.message);
+  }
+}
+
 // Log sheet lives in the same spreadsheet as everything else
 
 
@@ -233,6 +255,9 @@ function doPost(e) {
 
       var blob = Utilities.newBlob(Utilities.base64Decode(fileData), mimeType, fileName);
       var file = subfolder.createFile(blob);
+
+      // Ensure admins can access uploaded files (root sharing is inherited).
+      shareUploadRootWithAdmins();
 
       logUpload(parts[0], userName, fileSuffix, fileName, file.getUrl());
 
