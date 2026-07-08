@@ -1560,6 +1560,9 @@ function loadUserResult(doc) {
   renderSubmittedAnswers();
 }
 
+// Apps Script web app endpoint (same one chapter submissions post to).
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwX0Z5vx6DSwdwZwK26pKZL3V3U9XwEyWgPa9Ek_cFEH1_tpULnWNcn7RlgE-wT8M9M/exec';
+
 // Chapter labels for the answers view. Firestore is the reliable source of
 // truth — answers land here even when the response Sheet write is dropped.
 const ANSWER_CHAPTER_LABELS = {
@@ -1567,6 +1570,50 @@ const ANSWER_CHAPTER_LABELS = {
   amch1: 'Know Your City', amch2: 'Coworking and Flex', amch3: 'First Impression',
   wwd_am: 'What We Do — AM', wwd_vo: 'What We Do — VO', wwd_od: 'What We Do — On Demand'
 };
+
+// Response-sheet chapter name (the "[name] Responses" sheet). Matches what each
+// chapter posts on real submission, so sync rows land in the same sheet.
+const ANSWER_SHEET_CHAPTER = {
+  ch1: 'Where We Play', ch2: 'Who We Are',
+  amch1: 'Know Your City', amch2: 'Coworking and Flex', amch3: 'First Impression',
+  wwd_am: 'What We Do', wwd_vo: 'What We Do', wwd_od: 'What We Do'
+};
+
+// Push a chapter's Firestore answers into its Google Sheet. The Apps Script
+// syncAnswers route skips rows that already exist, so this is safe to re-run.
+async function syncAnswersToSheet(chId, btn) {
+  const prog = currentUserDoc?.progress?.[chId];
+  if (!prog || !prog.answers) return;
+  const chapterName = ANSWER_SHEET_CHAPTER[chId] || chId;
+  const origLabel = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Syncing…';
+
+  const payload = {
+    action: 'syncAnswers',
+    chapterName: chapterName,
+    status: 'Completed',
+    name: currentUserDoc.name || '—',
+    email: currentUserDoc.email || '—',
+    timestamp: prog.completedAt ? new Date(prog.completedAt.seconds * 1000).toISOString() : new Date().toISOString()
+  };
+  // answers is { q1: '...', q2: '...' } — pass through as q1..qN.
+  Object.keys(prog.answers).forEach(k => { payload[k] = prog.answers[k]; });
+
+  try {
+    await fetch(SHEET_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    });
+    // no-cors can't read the response; assume success if no network error.
+    btn.textContent = 'Synced ✓';
+    btn.style.background = 'var(--mint-dim)';
+    btn.style.color = '#2e7d36';
+  } catch (err) {
+    btn.disabled = false; btn.textContent = origLabel;
+    alert('Sync failed: ' + err.message);
+  }
+}
 
 function escAnswerHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -1601,9 +1648,12 @@ function renderSubmittedAnswers() {
       </div>`;
     }).join('');
     return `<div style="margin-bottom:18px;">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:2px solid var(--border-md);">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:2px solid var(--border-md);gap:12px;">
         <span style="font-size:14px;font-weight:800;color:var(--blue);">${label}</span>
-        <span style="font-family:var(--mono);font-size:9px;color:var(--blue-pale);">${submittedAt}</span>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-family:var(--mono);font-size:9px;color:var(--blue-pale);">${submittedAt}</span>
+          <button onclick="syncAnswersToSheet('${chId}', this)" style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:5px 10px;border:1px solid var(--border-md);background:var(--white);color:var(--blue);cursor:pointer;">Sync to Sheet</button>
+        </div>
       </div>
       ${rows}
     </div>`;

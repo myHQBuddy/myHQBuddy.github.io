@@ -245,6 +245,28 @@ function doPost(e) {
       return ContentService.createTextOutput('OK');
     }
 
+    // ── SYNC ANSWERS route (admin backfill from Firestore) ─────
+    // Same as a normal text submission, but skips writing if this email
+    // already has a row in the chapter's Responses sheet — so it is safe
+    // to re-run without creating duplicate rows.
+    if (data.action === 'syncAnswers') {
+      var syncSs      = SpreadsheetApp.getActiveSpreadsheet();
+      var syncChapter = data.chapterName || 'Unknown Chapter';
+      var syncSheetNm = syncChapter + ' Responses';
+      var syncSheet   = syncSs.getSheetByName(syncSheetNm);
+      var syncEmail   = String(data.email || '').toLowerCase().trim();
+
+      if (syncSheet && syncEmail) {
+        var syncRows = syncSheet.getDataRange().getValues();
+        for (var s = 1; s < syncRows.length; s++) {
+          if (String(syncRows[s][2]).toLowerCase().trim() === syncEmail) {
+            return ContentService.createTextOutput('SKIPPED: already present');
+          }
+        }
+      }
+      // Not present — fall through to the normal TEXT RESPONSE write below.
+    }
+
     // ── TEXT RESPONSE route (existing logic below) ─────────────
     var ss = SpreadsheetApp.getActiveSpreadsheet();
 
