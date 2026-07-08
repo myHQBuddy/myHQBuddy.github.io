@@ -197,6 +197,15 @@ var UPLOAD_CHAPTERS = {
 
 
 function doPost(e) {
+  // Serialize concurrent submissions. Apps Script runs web-app requests in
+  // parallel, so simultaneous sheet writes (appendRow / insertSheet) can
+  // collide and silently drop rows. A script lock makes them queue instead.
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(30000); // wait up to 30s for other submissions to finish
+  } catch (lockErr) {
+    return ContentService.createTextOutput('Error: could not acquire lock');
+  }
   try {
     var data = JSON.parse(e.postData.contents);
 
@@ -286,6 +295,8 @@ function doPost(e) {
     return ContentService.createTextOutput('OK');
   } catch(err) {
     return ContentService.createTextOutput('Error: ' + err.message);
+  } finally {
+    lock.releaseLock();
   }
 }
 
