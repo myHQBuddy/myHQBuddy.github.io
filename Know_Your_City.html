@@ -1995,12 +1995,8 @@ async function submitAssessment(e) {
         fileExt:    ext
       };
 
-      const res = await fetch(UPLOAD_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify(payload)
-      });
-      // no-cors means we can't read the response — trust the execution log
+      btn.textContent = 'Uploading ' + i + '/' + TOTAL_Q + '…';
+      await uploadWithVerify(payload, firstName, cfg);
     }
 
     localStorage.setItem(LS_SUBMITTED, 'true');
@@ -2042,6 +2038,41 @@ function toBase64(file) {
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
+}
+
+// Verify a file landed in Drive via the checkFile GET action (readable
+// cross-origin, unlike the no-cors upload POST).
+async function verifyUploaded(userName, cfg) {
+  const url = UPLOAD_SCRIPT_URL
+    + '?action=checkFile'
+    + '&folderPath=' + encodeURIComponent(cfg.folderPath)
+    + '&userName='   + encodeURIComponent(userName)
+    + '&fileSuffix=' + encodeURIComponent(cfg.fileSuffix);
+  try {
+    const r = await fetch(url);
+    const j = await r.json();
+    return !!j.exists;
+  } catch (e) {
+    return false;
+  }
+}
+
+// Upload a file and confirm it actually landed, retrying on failure. Throws if
+// the file can't be verified after all attempts, so the caller shows a real
+// error instead of silently marking the chapter complete.
+async function uploadWithVerify(payload, userName, cfg, attempts) {
+  attempts = attempts || 3;
+  for (let a = 1; a <= attempts; a++) {
+    await fetch(UPLOAD_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify(payload)
+    });
+    // Give Apps Script a moment to finish writing, then verify.
+    await new Promise(res => setTimeout(res, 2500));
+    if (await verifyUploaded(userName, cfg)) return;
+  }
+  throw new Error('Could not confirm "' + cfg.fileSuffix.replace(/_/g, ' ') + '" uploaded. Please check your connection and try again.');
 }
 
 function showError(msg) {

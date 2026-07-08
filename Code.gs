@@ -8,6 +8,37 @@ function doGet(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 
+  // Verify an uploaded file actually landed. Called by the chapter frontends
+  // after a no-cors upload POST (whose response they can't read) so they can
+  // confirm success and retry on failure instead of silently marking complete.
+  if (action === 'checkFile') {
+    var chkFolderPath = e.parameter.folderPath || '';
+    var chkUserName   = e.parameter.userName   || '';
+    var chkFileSuffix = e.parameter.fileSuffix || '';
+    var exists = false;
+    try {
+      var chkRoot  = DriveApp.getFolderById(UPLOAD_ROOT_FOLDER_ID);
+      var chkParts = chkFolderPath.split('/');
+      var chkFolder = chkRoot;
+      var chkOk = true;
+      for (var c = 0; c < chkParts.length; c++) {
+        var it = chkFolder.getFoldersByName(chkParts[c].trim());
+        if (!it.hasNext()) { chkOk = false; break; }
+        chkFolder = it.next();
+      }
+      if (chkOk) {
+        var wantPrefix = (chkUserName + '_' + chkFileSuffix).toLowerCase();
+        var files = chkFolder.getFiles();
+        while (files.hasNext()) {
+          var fn = files.next().getName().toLowerCase();
+          if (fn.indexOf(wantPrefix) === 0) { exists = true; break; }
+        }
+      }
+    } catch (chkErr) { exists = false; }
+    return ContentService.createTextOutput(JSON.stringify({ exists: exists }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
   if (action === 'login') {
     var username = e.parameter.username;
     var password = e.parameter.password;
