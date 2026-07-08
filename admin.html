@@ -1583,7 +1583,8 @@ const ANSWER_SHEET_CHAPTER = {
 // syncAnswers route skips rows that already exist, so this is safe to re-run.
 async function syncAnswersToSheet(chId, btn) {
   const prog = currentUserDoc?.progress?.[chId];
-  if (!prog || !prog.answers) return;
+  const answers = prog ? getAnswersFor(prog) : null;
+  if (!answers) return;
   const chapterName = ANSWER_SHEET_CHAPTER[chId] || chId;
   const origLabel = btn.textContent;
   btn.disabled = true; btn.textContent = 'Syncing…';
@@ -1597,7 +1598,7 @@ async function syncAnswersToSheet(chId, btn) {
     timestamp: prog.completedAt ? new Date(prog.completedAt.seconds * 1000).toISOString() : new Date().toISOString()
   };
   // answers is { q1: '...', q2: '...' } — pass through as q1..qN.
-  Object.keys(prog.answers).forEach(k => { payload[k] = prog.answers[k]; });
+  Object.keys(answers).forEach(k => { payload[k] = answers[k]; });
 
   try {
     await fetch(SHEET_URL, {
@@ -1619,15 +1620,35 @@ function escAnswerHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+// Returns a { q1, q2, ... } answers object for a chapter's progress entry.
+// Prefers the stored `answers`; falls back to reconstructing from `selections`
+// (raw MCQ index arrays saved by older submissions, e.g. Life and Benefits
+// before answers-backup was added). Index → letter: 0→A, 1→B, 2→C, 3→D.
+function getAnswersFor(prog) {
+  if (prog.answers && Object.keys(prog.answers).length) return prog.answers;
+  if (prog.selections) {
+    try {
+      const sel = JSON.parse(prog.selections);
+      const labels = ['A','B','C','D'];
+      const out = {};
+      Object.keys(sel).forEach(q => {
+        const arr = Array.isArray(sel[q]) ? sel[q] : [sel[q]];
+        out['q' + q] = arr.map(i => labels[i] || i).join(', ');
+      });
+      if (Object.keys(out).length) return out;
+    } catch (e) { /* ignore malformed selections */ }
+  }
+  return null;
+}
+
 function renderSubmittedAnswers() {
   const card = document.getElementById('answers-card');
   const body = document.getElementById('answers-body');
   const progress = currentUserDoc?.progress || {};
 
-  // Any chapter that stored an answers object
+  // Any chapter with stored answers OR recoverable MCQ selections
   const chaptersWithAnswers = Object.keys(progress).filter(chId => {
-    const a = progress[chId] && progress[chId].answers;
-    return a && Object.keys(a).length > 0;
+    return getAnswersFor(progress[chId] || {}) !== null;
   });
 
   if (!chaptersWithAnswers.length) {
@@ -1637,7 +1658,7 @@ function renderSubmittedAnswers() {
 
   body.innerHTML = chaptersWithAnswers.map(chId => {
     const label   = ANSWER_CHAPTER_LABELS[chId] || chId;
-    const answers = progress[chId].answers;
+    const answers = getAnswersFor(progress[chId]);
     const submittedAt = progress[chId].completedAt
       ? new Date(progress[chId].completedAt.seconds * 1000).toLocaleString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
       : '—';
