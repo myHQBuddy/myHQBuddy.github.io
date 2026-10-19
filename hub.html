@@ -642,12 +642,12 @@ body {
   <div class="courses-grid">
 
     <!-- VO CHAPTER 1 — Sales Pitch Framework -->
-    <div class="course-card locked" id="card-vch1">
+    <div class="course-card locked has-backdrop" id="card-vch1">
       <div class="card-top-bar"></div>
-      <div class="card-inner">
+      <div class="card-backdrop" style="background-image:url('vo_sales_pitch_cover.jpg')">
         <div class="card-head">
           <div class="card-num">VO · Chapter 01</div>
-          <div class="card-title" id="title-vch1" style="color:var(--blue-pale);">VO Sales Pitch</div>
+          <div class="card-title" id="title-vch1">VO Sales Pitch</div>
           <div class="badge badge-locked" id="status-vch1">Locked</div>
         </div>
       </div>
@@ -929,7 +929,6 @@ auth.onAuthStateChanged(function(user) {
 
       if (vch1Unlocked) {
         vch1Card.classList.remove('locked'); vch1Card.classList.add('unlocked');
-        vch1Title.style.color = '';
         if (vch1UnlockSec) vch1UnlockSec.style.display = 'none';
         if (vch1Completed) {
           vch1Card.classList.add('completed');
