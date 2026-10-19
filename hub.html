@@ -641,17 +641,22 @@ body {
   <div class="courses-heading">VO Chapters</div>
   <div class="courses-grid">
 
-    <div class="course-card locked">
+    <!-- VO CHAPTER 1 — Sales Pitch Framework -->
+    <div class="course-card locked" id="card-vch1">
       <div class="card-top-bar"></div>
       <div class="card-inner">
         <div class="card-head">
           <div class="card-num">VO · Chapter 01</div>
-          <div class="card-title" style="color:var(--blue-pale);">Chapter 1</div>
-          <div class="badge badge-locked">Coming Soon</div>
+          <div class="card-title" id="title-vch1" style="color:var(--blue-pale);">VO Sales Pitch</div>
+          <div class="badge badge-locked" id="status-vch1">Locked</div>
         </div>
       </div>
-      <div class="card-cta-wrap">
+      <div class="card-cta-wrap" id="footer-vch1">
         <button class="card-cta cta-locked" disabled>Locked</button>
+      </div>
+      <div class="unlock-section" id="unlock-section-vch1" style="display:none;">
+        <div class="unlock-label">VO Chapter 1 is locked</div>
+        <div class="unlock-hint">Complete both Org chapters to unlock the VO Sales Pitch framework.</div>
       </div>
     </div>
 
@@ -899,6 +904,45 @@ auth.onAuthStateChanged(function(user) {
         if (unlockSecW) unlockSecW.style.display = '';
       }
     });
+
+    // ── VO Chapter 1 — Sales Pitch Framework ──
+    // Same entry condition as the AM chain: both Org chapters complete.
+    // VO chapters 2–5 are still being written, so there is no VO chain to
+    // hang this off yet — when they land, rewire this to follow vch0.
+    var vch1Card      = document.getElementById('card-vch1');
+    var vch1Status    = document.getElementById('status-vch1');
+    var vch1Footer    = document.getElementById('footer-vch1');
+    var vch1UnlockSec = document.getElementById('unlock-section-vch1');
+    var vch1Title     = document.getElementById('title-vch1');
+
+    if (vch1Card) {
+      var vch1AdminUnlocked = unlocked.indexOf('vch1') !== -1;
+      var vch1LockedByAdmin = adminLocked.indexOf('vch1') !== -1;
+      var vch1Unlocked = ((ch1Completed && ch2Completed) && !vch1LockedByAdmin) || vch1AdminUnlocked;
+      var vch1Completed = progress.vch1 && progress.vch1.completed;
+
+      if ((ch1Completed && ch2Completed) && !vch1AdminUnlocked && !vch1LockedByAdmin) {
+        db.collection('users').doc(user.uid).set({
+          unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion('vch1') }
+        }, { merge: true });
+      }
+
+      if (vch1Unlocked) {
+        vch1Card.classList.remove('locked'); vch1Card.classList.add('unlocked');
+        vch1Title.style.color = '';
+        if (vch1UnlockSec) vch1UnlockSec.style.display = 'none';
+        if (vch1Completed) {
+          vch1Card.classList.add('completed');
+          vch1Status.textContent = 'Completed'; vch1Status.className = 'badge badge-mint';
+          vch1Footer.innerHTML = '<a class="card-cta cta-done" href="VO_Sales_Pitch.html"><span>Review</span><span class="arrow">→</span></a>';
+        } else {
+          vch1Status.textContent = 'Unlocked'; vch1Status.className = 'badge badge-blue';
+          vch1Footer.innerHTML = '<a class="card-cta cta-primary" href="VO_Sales_Pitch.html"><span>Start</span><span class="arrow">→</span></a>';
+        }
+      } else {
+        if (vch1UnlockSec) vch1UnlockSec.style.display = '';
+      }
+    }
 
     // ── AM Chapter 1 — Know Your City ──
     var amch1Card      = document.getElementById('card-amch1');

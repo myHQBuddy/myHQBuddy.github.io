@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VO Chapter 1: Sales Pitch Framework | myHQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" as="style">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" as="style">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<!-- Firebase v9 compat -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<style>
+/* ── TOKENS (identical to Where We Play) ── */
+:root {
+  --blue:       #1E22AA;
+  --blue-dark:  #161a8b;
+  --green:      #BEE5C2;
+  --coral:      #FF7351;
+  --amber:      #FFB848;
+  --ink:        #0B0F2C;
+  --body:       #4A4D63;
+  --muted:      #94909C;
+  --white:      #FFFFFF;
+  --hairline:   rgba(11,15,44,0.10);
+  --sans:       'Manrope', system-ui, sans-serif;
+  --radius:     8px;
+  --ease:       cubic-bezier(0.22,1,0.36,1);
+  --transition: 0.25s var(--ease);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--sans); background: var(--white); color: var(--ink); overflow: auto; font-size: 16px; line-height: 1.6; }
+
+/* ── TOP BAR ── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: 52px; z-index: 100;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--hairline);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-logo { font-size: 15px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.topbar-chapter { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.topbar-center { font-size: 18px; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; position: absolute; left: 50%; transform: translateX(-50%); }
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+.screen-counter { font-size: 11px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.read-btn {
+  font-size: 11px; font-weight: 700; color: var(--white); background: var(--blue);
+  padding: 6px 14px; border-radius: var(--radius); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: var(--transition); cursor: pointer; border: none; font-family: var(--sans);
+}
+.read-btn:hover { background: var(--blue-dark); }
+.hub-btn {
+  font-size: 14px; color: var(--blue); background: transparent;
+  width: 32px; height: 32px; border-radius: var(--radius);
+  border: 1px solid rgba(30,34,170,0.3);
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: var(--transition); text-decoration: none;
+}
+.hub-btn:hover { background: rgba(30,34,170,0.06); border-color: var(--blue); }
+
+/* ── SLIDES ── */
+.dot-nav { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 100; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hairline); border: 1.5px solid rgba(11,15,44,0.2); cursor: pointer; transition: var(--transition); }
+.dot.active { background: var(--blue); border-color: var(--blue); transform: scale(1.3); }
+.key-hint { position: absolute; bottom: 18px; right: 48px; font-size: 11px; font-weight: 500; color: var(--muted); display: flex; align-items: center; gap: 6px; transition: opacity 0.5s; z-index: 100; }
+.key-hint.hidden { opacity: 0; pointer-events: none; }
+
+.slides { position: absolute; transform-origin: top left; }
+.screen { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); transform: translateY(20px); overflow: hidden; }
+.screen.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+.screen.exit-up { opacity: 0; transform: translateY(-20px); }
+
+.screen-next-btn {
+  position: absolute; bottom: 40px; right: 56px;
+  background: transparent; color: var(--muted); border: 1px solid var(--hairline);
+  font-size: 11px; font-weight: 700; font-family: var(--sans);
+  padding: 7px 14px; border-radius: var(--radius); cursor: pointer;
+  display: flex; align-items: center; gap: 6px; transition: var(--transition);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.screen-next-btn:hover { color: var(--blue); border-color: rgba(30,34,170,0.3); }
+.screen-next-btn--light { color: rgba(255,255,255,0.4); border-color: rgba(255,255,255,0.15); }
+.screen-next-btn--light:hover { color: var(--green); border-color: rgba(190,229,194,0.4); }
+
+/* ── SCREEN 0: INTRO VIDEO ── */
+.screen-video { background: var(--white); }
+.screen-video-inner { display: grid; grid-template-columns: 1fr 1fr; height: 100%; align-items: center; padding: 0 80px; gap: 64px; }
+.s0-eyebrow { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+.s0-eyebrow::before { content: ''; width: 9px; height: 9px; background: var(--blue); border-radius: 50%; display: block; }
+.s0-headline { font-size: 4rem; font-weight: 800; line-height: 1.08; letter-spacing: -0.04em; color: var(--ink); margin-bottom: 24px; }
+.s0-headline em { font-style: normal; color: var(--blue); }
+.s0-sub { font-size: 1.1rem; color: var(--body); line-height: 1.7; margin-bottom: 32px; white-space: nowrap; }
+.s0-vision { display: flex; flex-direction: column; gap: 8px; max-width: 100%; margin-top: 4px; width: 100%; }
+.s0-vision-label { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); display: flex; align-items: center; gap: 10px; }
+.s0-vision-label::before { display: none; }
+.s0-vision-text { font-size: 1.3rem; font-weight: 500; color: var(--ink); line-height: 1.4; letter-spacing: -0.02em; display: inline-block; background: rgba(30,34,170,0.07); border: 1px solid rgba(30,34,170,0.15); border-radius: var(--radius); padding: 18px 24px; width: 100%; }
+.s0-vision-text strong { font-weight: 800; color: var(--blue); }
+.s0-thumb { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: var(--radius); overflow: hidden; cursor: pointer; box-shadow: 0 16px 48px rgba(11,15,44,0.18); }
+.s0-thumb-bg { position: absolute; inset: 0; background: var(--ink); display: flex; align-items: center; justify-content: center; }
+.s0-play-circle { width: 80px; height: 80px; background: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(11,15,44,0.25); transition: var(--transition); }
+.s0-thumb:hover .s0-play-circle { transform: scale(1.1); background: var(--green); }
+.s0-play-circle i { font-size: 28px; color: var(--blue); margin-left: 5px; }
+.s0-play-label { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.1em; white-space: nowrap; }
+
+/* ── SCREEN 1: FOUNDATION ── */
+.screen-foundation { background: var(--white); }
+.screen-center-wrap { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 80px; }
+.s1-eyebrow { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: var(--blue); margin-bottom: 28px; }
+.s1-stat-headline { line-height: 1; margin-bottom: 20px; }
+.s1-year { font-size: 13rem; font-weight: 800; color: var(--ink); letter-spacing: -0.04em; }
+.s1-year-sub { font-size: 2.6rem; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; }
+.s1-vision { font-size: 1.7rem; font-weight: 700; color: var(--body); margin-bottom: 48px; max-width: 56ch; font-style: italic; }
+.s1-facts { display: grid; grid-template-columns: repeat(4, auto); gap: 0; border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; max-width: 900px; }
+.s1-fact { padding: 20px 28px; border-right: 1px solid var(--hairline); text-align: left; }
+.s1-fact:last-child { border-right: none; }
+.s1-fact-num { font-size: 1.7rem; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; margin-bottom: 4px; }
+.s1-fact-lbl { font-size: 13px; color: var(--muted); line-height: 1.4; }
+
+/* ── SCREEN 1/2: THE ORIGIN ── */
+.screen-origin { background: var(--white); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 28px 80px 90px; gap: 20px; }
+.s2-eyebrow-dark { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); text-align: center; }
+.s2-headline { font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); text-align: center; line-height: 1.12; max-width: 760px; }
+.s2-headline span { color: var(--blue); }
+.s2-timeline { display: flex; align-items: stretch; gap: 0; width: 100%; max-width: 1100px; }
+.s2-tl-node { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; padding-top: 0; }
+.s2-tl-sub { flex: 1; }
+.s2-tl-node:not(:last-child)::after { content: ''; position: absolute; top: 22px; left: calc(50% + 26px); right: calc(-50% + 26px); height: 1px; background: var(--hairline); }
+.s2-tl-dot { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--blue); background: rgba(30,34,170,0.06); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 13px; font-weight: 800; color: var(--blue); }
+.s2-tl-node--highlight .s2-tl-dot { background: var(--blue); color: var(--white); border-color: var(--blue); }
+.s2-tl-year { font-size: 13px; font-weight: 800; color: var(--blue); margin-bottom: 6px; letter-spacing: 0.04em; }
+.s2-tl-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 7px; }
+.s2-tl-sub { font-size: 13px; color: var(--muted); line-height: 1.55; max-width: 160px; }
+.s2-tl-node--highlight .s2-tl-title { color: var(--blue); }
+.s2-investors { display: flex; align-items: center; gap: 10px; justify-content: center; padding: 6px 20px; border: 1px solid var(--hairline); border-radius: var(--radius); background: rgba(30,34,170,0.03); }
+.s2-investors-label { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-right: 6px; }
+.s2-investor-tag { font-size: 12px; font-weight: 700; color: var(--blue); padding: 3px 10px; border-radius: 4px; background: rgba(30,34,170,0.06); white-space: nowrap; }
+.s2-investor-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--hairline); }
+
+/* ── SCREEN 3: BUILDING SCALE ── */
+.screen-build { background: var(--white); display: flex; flex-direction: column; justify-content: center; padding: 64px 80px; gap: 40px; }
+.s3-header { text-align: center; }
+.s3-eyebrow { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 12px; }
+.s3-title { font-size: 3.4rem; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); }
+.s3-sub { font-size: 1.1rem; color: var(--body); margin-top: 10px; }
+.s3-milestones { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; align-items: start; }
+.s3-card { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 24px 20px; background: #f7f8ff; display: flex; flex-direction: column; gap: 12px; position: relative; }
+.s3-card--highlight { background: var(--blue); border-color: var(--blue); }
+.s3-card-year { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.04em; color: var(--blue); line-height: 1; }
+.s3-card--highlight .s3-card-year { color: var(--green); }
+.s3-card-title { font-size: 13px; font-weight: 800; color: var(--ink); text-transform: uppercase; letter-spacing: 0.06em; }
+.s3-card--highlight .s3-card-title { color: var(--white); }
+.s3-card-event { font-size: 14px; color: var(--body); line-height: 1.55; }
+.s3-card--highlight .s3-card-event { color: rgba(255,255,255,0.75); }
+.s3-card-investor { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; padding: 6px 12px; border-radius: 4px; background: rgba(30,34,170,0.08); font-size: 13px; font-weight: 600; color: var(--blue); }
+.s3-card--highlight .s3-card-investor { background: rgba(255,255,255,0.15); color: var(--white); }
+.s3-card-investor i { font-size: 11px; }
+.s3-card--covid { background: #fff8f0; border-color: #ffd4b8; border-top: 3px solid var(--coral); }
+.s3-card--covid .s3-card-year { color: var(--coral); }
+.s3-card--covid .s3-card-title { color: var(--coral); }
+.s3-card--covid .s3-card-investor { background: rgba(255,115,81,0.08); color: var(--coral); }
+
+/* ── SCREEN 4: THREE VERTICALS ── */
+.screen-verticals { display: flex; flex-direction: column; justify-content: center; padding: 56px 80px; gap: 36px; background: var(--white); }
+.s4-header { text-align: center; }
+.s4-eyebrow { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 12px; }
+.s4-title { font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); }
+.s4-sub { font-size: 1.1rem; color: var(--body); margin-top: 10px; }
+.s4-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+.s4-card { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 28px 24px; display: flex; flex-direction: column; gap: 16px; }
+.s4-card--am { border-top: 4px solid var(--blue); }
+.s4-card--vo { border-top: 4px solid var(--blue); }
+.s4-card--od { border-top: 4px solid var(--blue); }
+.s4-card--blue { border-top: 4px solid var(--blue); }
+.s4-card-icon { width: 52px; height: 52px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+.s4-icon--coral { background: rgba(255,115,81,0.1); color: var(--coral); }
+.s4-icon--blue { background: rgba(30,34,170,0.1); color: var(--blue); }
+.s4-icon--amber { background: rgba(255,184,72,0.15); color: #c97d00; }
+.s4-card-tag { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.s4-card-title { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
+.s4-card-desc { font-size: 14px; color: var(--body); line-height: 1.6; flex: 1; }
+.s4-card-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 4px; background: rgba(0,0,0,0.04); color: var(--muted); }
+.s4-offices { font-size: 12px; font-weight: 400; color: var(--muted); text-align: center; letter-spacing: 0.01em; }
+.s4-offices strong { color: var(--muted); font-weight: 400; }
+
+/* ── SCREEN 5: TEAM ── */
+.screen-team { background: var(--white); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 80px 72px; gap: 16px; overflow: hidden; height: 100%; box-sizing: border-box; min-height: 0; }
+.s5t-header { text-align: center; }
+.s5t-eyebrow { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 6px; }
+.s5t-title { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); }
+.s5t-sub { font-size: 1rem; color: var(--body); margin-top: 8px; }
+.s5t-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.s5t-founders { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.s5t-pnl { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.s5t-card { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 20px 18px; display: flex; align-items: flex-start; gap: 16px; background: #f7f8ff; }
+.s5t-card--founder { background: var(--blue); border-color: var(--blue); }
+.s5t-avatar { width: 52px; height: 52px; border-radius: 50%; background: rgba(30,34,170,0.12); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; color: var(--blue); flex-shrink: 0; }
+.s5t-card--founder .s5t-avatar { background: rgba(255,255,255,0.15); color: var(--white); }
+.s5t-info { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.s5t-name { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
+.s5t-card--founder .s5t-name { color: var(--white); }
+.s5t-role { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--blue); }
+.s5t-card--founder .s5t-role { color: var(--green); }
+.s5t-vertical-tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 9px; border-radius: 3px; display: inline-block; width: fit-content; }
+.s5t-tag--am { background: rgba(255,115,81,0.1); color: var(--coral); }
+.s5t-tag--vo { background: rgba(30,34,170,0.08); color: var(--blue); }
+.s5t-tag--od { background: rgba(255,184,72,0.15); color: #c97d00; }
+.s5t-tag--mkt { background: rgba(190,229,194,0.3); color: #2a7a30; }
+.s5t-tag--green { background: rgba(190,229,194,0.2); color: var(--green); }
+.s5t-prev { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.s5t-card--founder .s5t-prev { color: rgba(255,255,255,0.6); }
+.s5t-re { font-size: 13px; font-weight: 700; color: var(--body); }
+.s5t-card--founder .s5t-re { color: rgba(255,255,255,0.8); }
+
+/* ── NEW TEAM LAYOUT (matching image) ── */
+.s5t-two-panel { display: flex; align-items: stretch; gap: 16px; width: 100%; height: 420px; }
+.s5t-panel { border: 1.5px solid var(--blue); border-radius: 12px; padding: 0; background: var(--white); overflow: hidden; display: inline-flex; }
+.s5t-panel img { display: block; width: 100%; height: auto; max-height: 75vh; object-fit: contain; }
+.s5t-panel-label { font-size: 12px; font-weight: 700; font-style: italic; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; }
+.s5t-people-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.s5t-person { display: flex; align-items: flex-start; gap: 12px; }
+.s5t-panel--left { flex: 1.15; flex-direction: column; padding: 24px 28px; display: flex; }
+.s5t-panel--right { flex: 0.85; flex-direction: column; padding: 24px 28px; display: flex; gap: 0; justify-content: flex-start; }
+.s5t-bg-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: repeat(3,1fr); gap: 14px; flex: 1; }
+.s5t-photo { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--hairline); background: rgba(30,34,170,0.08); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; color: var(--blue); flex-shrink: 0; overflow: hidden; }
+.s5t-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.s5t-person-name { font-size: 14px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 2px; }
+.s5t-person-role { font-size: 11px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.s5t-person-prev { font-size: 12px; color: var(--muted); line-height: 1.45; }
+/* Background logos */
+.s5t-logo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.s5t-logo-item { display: flex; align-items: center; justify-content: center; padding: 10px 8px; border: 1px solid var(--hairline); border-radius: 6px; min-height: 48px; }
+.s5t-logo-text { font-size: 14px; font-weight: 800; color: var(--ink); text-align: center; letter-spacing: -0.02em; line-height: 1.2; }
+.s5t-logo-text.goldman { font-size: 13px; }
+.s5t-logo-text.adobe { color: #FF0000; }
+.s5t-logo-text.sp { color: #C41230; font-size: 13px; }
+.s5t-logo-text.helion { color: #e6a817; }
+.s5t-logo-text.msft { font-size: 12px; }
+.s5t-logo-item.inst { border-color: rgba(30,34,170,0.15); background: rgba(30,34,170,0.03); }
+.s5t-logo-text.inst { font-size: 11px; font-weight: 700; color: var(--blue); text-align: center; }
+
+/* ── SCREEN 6: ORG PYRAMID ── */
+.screen-org { background: var(--white); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 48px 60px; gap: 8px; overflow: hidden; }
+.s6-title { font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); text-align: center; }
+.s6-pyramid { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; max-width: 1000px; }
+.s6-tier { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; padding: 22px 32px; text-align: center; }
+.s6-tier--1 { width: 35%; background: #1E22AA; }
+.s6-tier--2 { width: 57%; background: #3B40C4; }
+.s6-tier--3 { width: 78%; background: #7178D8; }
+.s6-tier--4 { width: 100%; background: #AEB2E8; }
+.s6-tier-title { font-size: 1.3rem; font-weight: 800; color: var(--white); letter-spacing: -0.01em; }
+.s6-tier-desig { font-size: 0.9rem; font-weight: 500; color: rgba(255,255,255,0.82); }
+.s6-tier-meta  { font-size: 0.9rem; font-weight: 700; color: var(--green); }
+
+/* ── SCREEN 7: SCALE & CLIENTS ── */
+/* All px values are fixed relative to 1440×900 canvas — scaleSlides() handles viewport scaling */
+.screen-scale { background: var(--white); overflow: hidden; display: flex; flex-direction: column; padding: 18px 36px 24px; height: 100%; box-sizing: border-box; }
+#s7-canvas { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 20px; }
+.s7-title { font-size: 20px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); flex-shrink: 0; margin-bottom: 4px; }
+.s7-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; width: 100%; flex-shrink: 0; }
+.s7-stat { border: 1px solid var(--hairline); border-radius: var(--radius); background: #f7f8ff; display: flex; align-items: flex-start; gap: 8px; padding: 10px; }
+.s7-stat-icon { font-size: 14px; flex-shrink: 0; margin-top: 2px; width: 26px; text-align: center; }
+.s7-stat-num { font-size: 14px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 1px; }
+.s7-stat-lbl { font-size: 11px; color: var(--body); line-height: 1.3; font-weight: 500; }
+
+/* ── SCREEN 7: LOGO GRID ── */
+.s7-logo-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; align-items: stretch; margin-top: 0; }
+#read-mode .s7-logo-panels { grid-template-columns: 1fr; }
+.s7-logo-panel { padding: 6px 8px 10px; background: #fff; border: 1px solid var(--hairline); border-radius: var(--radius); display: flex; flex-direction: column; }
+.s7-lp-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; flex-shrink: 0; }
+.s7-lp-title { font-size: 16px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.s7-lp-sub { font-size: 11px; color: var(--body); margin-bottom: 6px; font-weight: 500; flex-shrink: 0; }
+.s7-lp-divider { width: 100%; height: 1.5px; background: repeating-linear-gradient(90deg, var(--blue) 0, var(--blue) 6px, transparent 6px, transparent 12px); margin-bottom: 8px; opacity: 0.35; flex-shrink: 0; }
+.s7-lp-myHQ-icon { width: 30px; height: 30px; object-fit: contain; }
+.s7-sub-panels { display: grid; gap: 6px; flex: 1; min-height: 0; align-items: stretch; }
+.s7-sub-panels--clientele { grid-template-columns: 7fr 5fr; }
+.s7-sub-panels--partners { grid-template-columns: 1fr 1fr; }
+.s7-sub-panel { padding: 4px 8px 8px; border: 1px solid var(--hairline); border-radius: var(--radius); display: flex; flex-direction: column; }
+.s7-sp-label { font-size: 11px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; flex-shrink: 0; }
+.s7-logo-grid { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; flex: 1; align-content: space-around; }
+.s7-logo-img { height: 42px; width: auto; max-width: 165px; object-fit: contain; }
+.s7-logo-img--lg { height: 48px; max-width: 195px; }
+.s7-logo-img--xl { height: 54px; max-width: 240px; }
+.s7-sub-panels--partners-right { grid-template-rows: 1fr 1fr; }
+.s7-partner-grid { display: grid; gap: 8px; }
+.s7-partner-grid--cw { grid-template-columns: 1fr 1fr; }
+.s7-partner-grid--right { grid-template-rows: 1fr 1fr; }
+.s7-enterprises-grid { display: grid; grid-template-columns: repeat(3,1fr); row-gap: 1px; align-items: center; justify-items: center; flex: 1; align-content: flex-start; }
+.s7-enterprises-grid .s7-logo-img { height: 51px; max-width: 180px; }
+.s7-gccs-row { display: flex; align-items: center; flex-wrap: wrap; flex: 1; align-content: center; justify-content: space-around; width: 100%; }
+.s7-gccs-row .s7-logo-img { height: 34px; max-width: 140px; }
+/* Full chapter (read-mode) logo sizes */
+#read-mode .s7-logo-img { height: clamp(36px,5vw,56px); max-width: 160px; }
+#read-mode .s7-logo-img--lg { height: clamp(42px,5.5vw,64px); max-width: 190px; }
+#read-mode .s7-logo-img--xl { height: clamp(48px,6vw,72px); max-width: 220px; }
+#read-mode .s7-enterprises-grid .s7-logo-img { height: clamp(36px,5vw,56px); max-width: 160px; }
+#read-mode .s7-gccs-row .s7-logo-img { height: clamp(42px,5.5vw,64px); max-width: 200px; }
+.s7-logo-badge { font-size: 11px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; border: 1px solid var(--hairline); border-radius: 4px; padding: 3px 8px; white-space: nowrap; }
+
+/* ── SCREEN 8: AMBITION ── */
+.screen-ambition { background: var(--white); display: flex; flex-direction: column; padding: 28px 56px 24px; gap: 10px; overflow: hidden; }
+.s5-headline { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); line-height: 1.25; flex-shrink: 0; }
+.s5-headline span { color: var(--blue); }
+.s5-subtext { font-size: 16px; color: var(--body); line-height: 1.55; flex-shrink: 0; }
+.s5-subtext strong { color: var(--ink); font-weight: 800; }
+.s5-subtext em { font-style: italic; color: var(--blue); font-weight: 600; }
+.s5-body { display: grid; grid-template-columns: 1fr 200px; gap: 20px; align-items: center; flex: 1; min-height: 0; overflow: visible; }
+.s5-growth { overflow: visible; }
+.ambition-chart { width: 100%; position: relative; font-family: Manrope,system-ui,sans-serif; overflow: visible; }
+.ambition-bar-row { display: flex; align-items: flex-end; width: 100%; gap: 0.8%; overflow: visible; }
+.ambition-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; }
+.ambition-val { width: 100%; text-align: center; font-size: 11px; line-height: 1.2; margin-bottom: 2px; white-space: nowrap; }
+.ambition-bar { width: 100%; border-radius: 3px 3px 0 0; box-sizing: border-box; }
+.ambition-label-row { display: flex; width: 100%; gap: 0.8%; margin-top: 4px; }
+.ambition-label { flex: 1; text-align: center; font-size: 11px; }
+.ambition-canvas { position: absolute; top: 0; left: 0; width: 100%; pointer-events: none; }
+.s5-driven { border: 1.5px solid var(--hairline); border-radius: var(--radius); padding: 16px 14px; display: flex; flex-direction: column; gap: 12px; }
+.s5-driven-title { font-size: 13px; font-weight: 800; color: var(--ink); }
+.s5-driven-item { display: flex; align-items: center; gap: 12px; }
+.s5-driven-chevron { width: 0; height: 0; border-top: 7px solid transparent; border-bottom: 7px solid transparent; border-left: 12px solid var(--blue); flex-shrink: 0; }
+.s5-driven-text { font-size: 12px; font-weight: 600; color: var(--body); line-height: 1.4; }
+
+/* ── READ MODE ── */
+#read-mode { margin-top: 52px; }
+#read-mode .topbar-logo { font-size: 15px; }
+.r-layout { display: flex; width: 100%; max-width: 100%; margin: 0; padding: 0 40px 80px; align-items: flex-start; box-sizing: border-box; }
+.r-sidebar { width: 220px; flex-shrink: 0; position: sticky; top: 72px; padding: 32px 20px 0 0; max-height: calc(100vh - 72px); overflow-y: auto; }
+.r-toc-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 10px; }
+.toc-link { display: block; font-size: 12px; font-weight: 500; color: var(--muted); text-decoration: none; padding: 7px 10px; border-radius: 6px; margin-bottom: 2px; transition: all 0.15s; border-left: 2px solid transparent; }
+.toc-link:hover { color: var(--ink); background: rgba(0,0,0,0.04); }
+.toc-link.active { color: var(--blue); font-weight: 700; border-left-color: var(--blue); background: rgba(30,34,170,0.05); }
+.r-content { flex: 1; min-width: 0; padding: 40px 0 0 40px; }
+
+.r-section { margin-bottom: 72px; }
+.r-section-eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.r-section-eyebrow::before { content: ''; width: 8px; height: 8px; background: var(--blue); border-radius: 50%; }
+.r-section-title { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); margin-bottom: 6px; }
+.r-section-sub { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
+.r-body { font-size: 15px; color: var(--body); line-height: 1.75; margin-bottom: 14px; }
+
+/* Timeline */
+.tl-wrap { position: relative; }
+.tl-item { border-top: 1px solid var(--hairline); }
+.tl-item:last-child { border-bottom: 1px solid var(--hairline); }
+.tl-head { display: grid; grid-template-columns: 120px 1fr auto; gap: 20px; align-items: baseline; padding: 20px 0; cursor: pointer; transition: background 0.15s; }
+.tl-head:hover .tl-event { color: var(--blue); }
+.tl-year-col { display: flex; flex-direction: column; gap: 2px; }
+.tl-year { font-size: 1.1rem; font-weight: 800; color: var(--ink); letter-spacing: -0.03em; }
+.tl-phase { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.tl-event { font-size: 1rem; font-weight: 600; color: var(--ink); line-height: 1.35; transition: color 0.15s; }
+.tl-toggle { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--hairline); background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.25s var(--ease); flex-shrink: 0; }
+.tl-toggle svg { width: 12px; height: 12px; stroke: var(--muted); fill: none; stroke-width: 2.5; transition: transform 0.4s var(--ease); }
+.tl-item.open .tl-toggle { background: var(--blue); border-color: var(--blue); }
+.tl-item.open .tl-toggle svg { stroke: var(--white); transform: rotate(45deg); }
+.tl-body { max-height: 0; overflow: hidden; transition: max-height 0.55s var(--ease); }
+.tl-item.open .tl-body { max-height: 1000px; }
+.tl-body-inner { padding: 0 0 28px 140px; max-width: 680px; }
+.tl-detail p { font-size: 14px; color: var(--body); line-height: 1.7; margin-bottom: 12px; }
+.tl-detail p strong { color: var(--ink); font-weight: 600; }
+.tl-detail p em { color: var(--muted); }
+
+/* Timeline sub-components */
+.tl-funding { display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: rgba(30,34,170,0.04); border-left: 3px solid var(--blue); border-radius: 0 var(--radius) var(--radius) 0; margin: 14px 0; }
+.tl-funding-year { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--blue); display: block; margin-bottom: 2px; }
+.tl-funding-names { font-size: 13px; color: var(--ink); font-weight: 500; }
+.tl-funding-icon { width: 32px; height: 32px; border-radius: 50%; background: rgba(30,34,170,0.08); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.tl-funding-icon svg { width: 14px; height: 14px; stroke: var(--blue); fill: none; }
+
+.tl-dyk { margin: 14px 0; border: 1px solid var(--hairline); border-radius: var(--radius); background: rgba(255,184,72,0.04); overflow: hidden; }
+.tl-dyk-trigger { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: transparent; border: none; cursor: pointer; text-align: left; font-family: var(--sans); }
+.tl-dyk-icon { width: 24px; height: 24px; border-radius: 50%; background: var(--amber); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: var(--ink); flex-shrink: 0; }
+.tl-dyk-teaser { font-size: 13px; font-weight: 600; color: var(--ink); }
+.tl-dyk-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #a06800; display: block; margin-bottom: 1px; }
+.tl-dyk-chevron { margin-left: auto; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: var(--muted); transition: transform 0.3s var(--ease); }
+.tl-dyk-chevron svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+.tl-dyk.open .tl-dyk-chevron { transform: rotate(180deg); }
+.tl-dyk-body { max-height: 0; overflow: hidden; transition: max-height 0.4s var(--ease); padding: 0 16px; }
+.tl-dyk.open .tl-dyk-body { max-height: 300px; padding: 0 16px 14px; }
+.tl-dyk-body p { font-size: 13px; color: var(--body); line-height: 1.7; }
+.tl-dyk-body p strong { color: var(--ink); font-weight: 600; }
+
+.tl-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.tl-badge { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; border: 1px solid; }
+.badge-teal { background: rgba(150,230,220,0.15); color: #0d5d52; border-color: rgba(150,230,220,0.5); }
+.badge-mint { background: rgba(190,229,194,0.2); color: #2e7d36; border-color: rgba(190,229,194,0.5); }
+.badge-blue { background: rgba(30,34,170,0.06); color: var(--blue); border-color: rgba(30,34,170,0.2); }
+.badge-amber { background: rgba(255,184,72,0.1); color: #a06800; border-color: rgba(255,184,72,0.3); }
+.badge-white { background: var(--white); color: var(--ink); border-color: var(--hairline); }
+
+/* Verticals grid (inside timeline) */
+.r-verticals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0; }
+.r-vertical-card { padding: 16px 18px; background: var(--white); border: 1px solid var(--hairline); border-radius: var(--radius); cursor: pointer; transition: all 0.2s var(--ease); }
+.r-vertical-card:hover { border-color: var(--ink); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(11,15,44,0.06); }
+.r-vertical-name { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.r-vertical-desc { font-size: 12px; color: var(--body); line-height: 1.5; }
+
+/* Team section */
+.r-team-note { padding: 20px; border: 1px dashed var(--hairline); border-radius: var(--radius); background: rgba(30,34,170,0.02); display: flex; align-items: flex-start; gap: 14px; }
+.r-team-note i { color: var(--blue); margin-top: 2px; }
+.r-team-note-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+/* Org pyramid */
+.r-org-pyramid { display: flex; flex-direction: column; gap: 8px; margin: 20px 0; }
+.r-org-tier { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 16px 20px; transition: all 0.2s var(--ease); cursor: pointer; }
+.r-org-tier:hover { border-color: var(--ink); background: rgba(11,15,44,0.01); }
+.r-org-tier-1 { width: 100%; border-left: 3px solid var(--amber); }
+.r-org-tier-2 { width: 92%; align-self: center; border-left: 3px solid var(--coral); }
+.r-org-tier-3 { width: 84%; align-self: center; border-left: 3px solid var(--blue); }
+.r-org-tier-4 { width: 76%; align-self: center; border-left: 3px solid var(--green); }
+.r-org-num { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 4px; }
+.r-org-name { font-size: 17px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; margin-bottom: 4px; }
+.r-org-desc { font-size: 13px; color: var(--body); }
+
+/* Stats row */
+.r-stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; margin: 24px 0; }
+.r-stat { padding: 20px; border-right: 1px solid var(--hairline); }
+.r-stat:last-child { border-right: none; }
+.r-stat-num { font-size: 1.6rem; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; margin-bottom: 2px; }
+.r-stat-lbl { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+.hidden { display: none !important; }
+
+/* ── SUCCESS STORY GRID (read mode) ── */
+.ss-grid-header { display: grid; grid-template-columns: 140px 1fr 40px 1fr; align-items: center; margin: 28px 0 8px; padding: 0 0 8px; border-bottom: 1px solid var(--hairline); }
+.ss-grid-row    { display: grid; grid-template-columns: 140px 1fr 40px 1fr; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--hairline); position: relative; }
+.ss-divider-line { position: absolute; left: calc(140px + ((100% - 140px - 40px) / 2) + 20px - 1px); top: 0; bottom: 0; width: 2px; border-left: 2px dashed rgba(30,34,170,0.2); z-index: 0; }
+.ss-avatar { width: 60px; height: 60px; border-radius: 50%; border: 3px solid var(--blue); overflow: hidden; flex-shrink: 0; }
+.ss-dot    { width: 18px; height: 18px; border-radius: 50%; background: var(--blue); border: 3px solid #fff; box-shadow: 0 0 0 2px var(--blue); flex-shrink: 0; }
+
+/* ── ORG CHART FUNCTION GRID ── */
+.oc-fn-grid { display: grid; grid-template-columns: 1fr 1fr; row-gap: 36px; column-gap: 36px; width: 100%; max-width: 520px; margin-top: 40px; }
+
+/* ── RESPONSIVE BREAKPOINTS ── */
+
+/* ── ≤1280px: large laptops ── */
+@media (max-width: 1280px) {
+  .s5t-pnl { grid-template-columns: repeat(2, 1fr); }
+  .s5-body { grid-template-columns: 1fr; }
+}
+
+/* ── ≤1024px: small laptops & tablets landscape ── */
+@media (max-width: 1024px) {
+  .screen-video-inner { grid-template-columns: 1fr; text-align: center; }
+
+  .s1-facts { grid-template-columns: repeat(2, 1fr); }
+  .s1-fact { border-right: none; border-bottom: 1px solid var(--hairline); }
+  .s1-fact:nth-child(odd) { border-right: 1px solid var(--hairline); }
+  .s1-fact:last-child { border-bottom: none; }
+
+  .s2-timeline { overflow-x: auto; }
+  .s2-tl-node { min-width: 140px; }
+
+  .s3-milestones { grid-template-columns: repeat(2, 1fr); }
+  .s4-cards { grid-template-columns: repeat(2, 1fr); }
+
+  /* Slide 5 team — scale down to fit fixed-height viewport */
+  .screen-team { overflow-y: auto; padding: 14px 36px 56px; gap: 8px; }
+  .s5t-title { font-size: 1.6rem; }
+  .s5t-two-panel { height: 380px; gap: 8px; }
+  .s5t-panel--left  { padding: 12px 14px; }
+  .s5t-panel--right { padding: 12px 14px; }
+  .s5t-people-grid  { gap: 8px !important; }
+  .s5t-person       { gap: 8px !important; }
+  .s5t-photo        { width: 34px !important; height: 34px !important; }
+  .s5t-person-name  { font-size: 12px !important; }
+  .s5t-person-role  { font-size: 9px !important; }
+  .s5t-person-prev  { font-size: 10px !important; }
+  .s5t-bg-grid      { gap: 8px; }
+
+  /* Slide 6 stats — layout handled by scaleSlides() transform, no overrides needed */
+
+  /* Read mode timeline */
+  .tl-head { grid-template-columns: 80px 1fr auto; gap: 12px; }
+
+  /* Read mode success stories */
+  .ss-grid-header { grid-template-columns: 100px 1fr 32px 1fr; }
+  .ss-grid-row    { grid-template-columns: 100px 1fr 32px 1fr; padding: 14px 0; }
+  .ss-divider-line { left: calc(100px + ((100% - 100px - 32px) / 2) + 16px - 1px); }
+
+  /* Read mode general */
+  .r-stats-row { grid-template-columns: repeat(2, 1fr); }
+  .r-verticals-grid { grid-template-columns: 1fr; }
+}
+
+/* ── ≤768px: tablets portrait ── */
+@media (max-width: 768px) {
+  .s1-facts { grid-template-columns: 1fr; }
+  .s1-fact  { border-right: none; }
+  .s1-fact:nth-child(odd) { border-right: none; }
+
+  .s3-milestones { grid-template-columns: 1fr; }
+  .s4-cards      { grid-template-columns: 1fr; }
+
+  .s5t-grid     { grid-template-columns: 1fr; }
+  .s5t-founders { grid-template-columns: 1fr; }
+  .s5t-pnl      { grid-template-columns: 1fr; }
+  .s5t-two-panel   { height: 340px; }
+  .s5t-photo       { width: 28px !important; height: 28px !important; }
+  .s5t-person-name { font-size: 11px !important; }
+  .s5t-person-prev { display: none; }
+
+  /* s7 layout handled by scaleSlides() transform */
+
+  /* Read mode timeline */
+  .tl-head { grid-template-columns: 60px 1fr auto; gap: 8px; padding: 14px 0; }
+  .tl-year { font-size: 0.85rem; }
+
+  /* Read mode success stories — stack vertically */
+  .ss-grid-header { display: none; }
+  .ss-grid-row    { grid-template-columns: 1fr; gap: 12px; }
+  .ss-divider-line { display: none; }
+
+  /* Org chart function grid — tighter gaps */
+  .oc-fn-grid { column-gap: 10px; row-gap: 10px; }
+
+  .r-stats-row    { grid-template-columns: repeat(2, 1fr); }
+  .book-team-grid { grid-template-columns: 1fr; }
+  .book-verticals { grid-template-columns: 1fr; }
+  .book-stats     { grid-template-columns: repeat(2, 1fr); }
+  .book-org-facts { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+<style>
+/* ── VO CHAPTER ── screens built on the shared .screen frame ── */
+.vo-wrap { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 48px; }
+.vo-eyebrow { font-size: 11px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 10px; }
+.vo-h2 { font-size: 2.1rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.12; color: var(--ink); margin-bottom: 12px; }
+.vo-h2 em { font-style: normal; color: var(--blue); }
+.vo-lede { font-size: 15px; color: var(--body); line-height: 1.7; max-width: 860px; margin-bottom: 22px; }
+
+/* the script box - the thing reps actually read out */
+.vo-script { background: rgba(30,34,170,0.05); border-left: 3px solid var(--blue); border-radius: 0 8px 8px 0; padding: 14px 18px; margin-bottom: 20px; }
+.vo-script-label { font-size: 10px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 5px; }
+.vo-script-text { font-size: 14px; color: var(--ink); line-height: 1.65; font-style: italic; }
+
+/* protocol cards - the A/B/C/D variations under each stage */
+.vo-protos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.vo-protos.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.vo-proto { border: 1px solid var(--hairline); border-radius: 8px; padding: 13px 15px; background: var(--white); }
+.vo-proto-tag { font-size: 10px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px; }
+.vo-proto-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 5px; line-height: 1.3; }
+.vo-proto-body { font-size: 12px; color: var(--body); line-height: 1.55; }
+
+/* the 11-stage call flow */
+.vo-flow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 9px; }
+.vo-step { border: 1px solid var(--hairline); border-radius: 8px; padding: 11px 10px; background: var(--white); position: relative; }
+.vo-step-num { width: 20px; height: 20px; border-radius: 50%; background: var(--blue); color: var(--white); font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-bottom: 7px; }
+.vo-step-name { font-size: 11.5px; font-weight: 700; color: var(--ink); line-height: 1.25; margin-bottom: 3px; }
+.vo-step-sub { font-size: 10px; color: var(--muted); line-height: 1.4; }
+
+/* two-column compare (fresh vs follow-up, owned vs leased) */
+.vo-two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.vo-col { border: 1px solid var(--hairline); border-radius: 10px; overflow: hidden; }
+.vo-col-head { padding: 11px 16px; font-size: 12px; font-weight: 800; letter-spacing: 0.02em; }
+.vo-col-head.blue { background: var(--blue); color: var(--white); }
+.vo-col-head.soft { background: #F5F6FB; color: var(--ink); }
+.vo-col-body { padding: 13px 16px; }
+.vo-ol { list-style: none; counter-reset: v; }
+.vo-ol li { counter-increment: v; font-size: 12.5px; color: var(--body); line-height: 1.5; padding: 4px 0 4px 26px; position: relative; }
+.vo-ol li::before { content: counter(v); position: absolute; left: 0; top: 4px; width: 17px; height: 17px; border-radius: 50%; background: rgba(30,34,170,0.09); color: var(--blue); font-size: 9.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+
+/* RCA blocks - the discovery questions */
+.vo-rca { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; }
+.vo-rca-card { border: 1px solid var(--hairline); border-radius: 10px; padding: 15px 16px; background: var(--white); }
+.vo-rca-head { font-size: 12px; font-weight: 800; color: var(--blue); margin-bottom: 9px; }
+.vo-q { font-size: 12px; color: var(--body); line-height: 1.5; padding: 4px 0 4px 15px; position: relative; }
+.vo-q::before { content: ''; position: absolute; left: 0; top: 10px; width: 5px; height: 5px; border-radius: 50%; background: var(--blue); opacity: 0.45; }
+
+/* the seven plan paths */
+.vo-paths { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px; }
+.vo-path { border: 1px solid var(--hairline); border-radius: 9px; padding: 12px 13px; background: var(--white); }
+.vo-path-num { font-size: 10px; font-weight: 800; color: var(--white); background: var(--blue); border-radius: 4px; padding: 2px 6px; display: inline-block; margin-bottom: 6px; }
+.vo-path-name { font-size: 12.5px; font-weight: 700; color: var(--ink); line-height: 1.25; margin-bottom: 5px; }
+.vo-path-trigger { font-size: 11px; color: var(--body); line-height: 1.45; margin-bottom: 7px; }
+.vo-path-plan { font-size: 10.5px; font-weight: 700; color: var(--blue); border-top: 1px solid var(--hairline); padding-top: 6px; }
+
+/* customer-type cards */
+.vo-types { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.vo-type { border-radius: 9px; padding: 13px 12px; color: var(--white); }
+.vo-type-name { font-size: 12px; font-weight: 800; margin-bottom: 5px; letter-spacing: 0.02em; }
+.vo-type-quote { font-size: 11px; line-height: 1.45; opacity: 0.93; margin-bottom: 8px; font-style: italic; }
+.vo-type-close { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; }
+
+/* tables */
+.vo-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.vo-table th { background: var(--blue); color: var(--white); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 9px 13px; text-align: left; }
+.vo-table th:not(:first-child), .vo-table td:not(:first-child) { text-align: center; }
+.vo-table td { padding: 9px 13px; border-bottom: 1px solid var(--hairline); color: var(--body); }
+.vo-table tr:nth-child(even) td { background: #FAFBFF; }
+.vo-table td:first-child { font-weight: 600; color: var(--ink); }
+
+/* callouts */
+.vo-warn { background: rgba(255,184,72,0.14); border-left: 3px solid var(--amber); border-radius: 0 6px 6px 0; padding: 11px 15px; font-size: 12.5px; color: var(--ink); line-height: 1.55; margin-top: 14px; }
+.vo-warn strong { color: #9A6A00; }
+.vo-coach { background: rgba(190,229,194,0.25); border-left: 3px solid #4CAF74; border-radius: 0 6px 6px 0; padding: 11px 15px; font-size: 12.5px; color: var(--ink); line-height: 1.55; margin-top: 10px; }
+.vo-coach strong { color: #2a7d3f; }
+
+/* process steps */
+.vo-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.vo-pstep { border: 1px solid var(--hairline); border-radius: 9px; padding: 13px 14px; background: var(--white); }
+.vo-pstep-n { font-size: 20px; font-weight: 800; color: rgba(30,34,170,0.22); line-height: 1; margin-bottom: 6px; }
+.vo-pstep-t { font-size: 12.5px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.vo-pstep-b { font-size: 11.5px; color: var(--body); line-height: 1.5; }
+
+/* doc requirement cards (slides 22-23) */
+.vo-docs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; }
+.vo-doc { background: var(--blue); color: var(--white); border-radius: 9px; padding: 15px 16px; }
+.vo-doc-head { font-size: 13px; font-weight: 800; margin-bottom: 10px; line-height: 1.25; }
+.vo-doc li { list-style: none; font-size: 11.5px; line-height: 1.5; padding: 3px 0 3px 14px; position: relative; opacity: 0.95; }
+.vo-doc li::before { content: ''; position: absolute; left: 0; top: 10px; width: 4px; height: 4px; border-radius: 50%; background: var(--white); opacity: 0.7; }
+
+/* cover */
+.vo-cover { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; height: 100%; }
+.vo-cover h1 { font-size: 3.2rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1.05; color: var(--ink); margin-bottom: 16px; }
+.vo-cover h1 em { font-style: normal; color: var(--blue); }
+.vo-cover-sub { font-size: 17px; color: var(--body); line-height: 1.6; max-width: 620px; margin-bottom: 26px; }
+.vo-cover-meta { display: flex; gap: 28px; border-top: 1px solid var(--hairline); padding-top: 18px; }
+.vo-cover-stat { }
+.vo-cover-num { font-size: 1.6rem; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.vo-cover-lbl { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; }
+
+@media (max-width: 1100px) {
+  .vo-flow { grid-template-columns: repeat(4, 1fr); }
+  .vo-paths, .vo-types { grid-template-columns: repeat(2, 1fr); }
+  .vo-rca, .vo-docs, .vo-steps { grid-template-columns: 1fr; }
+  .vo-protos, .vo-protos.cols-4 { grid-template-columns: 1fr; }
+  .vo-two { grid-template-columns: 1fr; }
+  .vo-wrap { padding: 0 24px; }
+}
+</style>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar" id="topbar">
+  <div class="topbar-left">
+    <span class="topbar-logo">myHQ</span>
+    <span class="topbar-chapter" id="chapterLabel">VO · Chapter 1</span>
+  </div>
+  <div class="topbar-center">VO Sales Pitch</div>
+  <div class="topbar-right">
+    <a class="hub-btn" href="hub.html" title="Back to Hub"><i class="fa-solid fa-house"></i></a>
+    <span class="screen-counter" id="screenCounter">1 / 15</span>
+    <button class="read-btn" id="btnRead" onclick="setMode('read')">
+      <i class="fa-solid fa-book-open"></i>&nbsp;Read Full Chapter
+    </button>
+  </div>
+</header>
+
+<!-- ═══ SLIDE MODE ═══ -->
+<!-- SLIDE MODE -->
+<div id="slide-mode">
+<div class="slides" id="slides">
+<div class="screen ">
+<div class="vo-wrap">
+<div class="vo-cover"><div class="vo-eyebrow">myHQ Virtual Office</div><h1>The <em>sales pitch</em><br>framework.</h1><p class="vo-cover-sub">The official end-to-end guide for every client interaction &mdash; from the opening call to post-payment handoff. Standardised, consultative, and built to be followed in order.</p><div class="vo-cover-meta"><div class="vo-cover-stat"><div class="vo-cover-num">11</div><div class="vo-cover-lbl">Call stages</div></div><div class="vo-cover-stat"><div class="vo-cover-num">7</div><div class="vo-cover-lbl">Plan paths</div></div><div class="vo-cover-stat"><div class="vo-cover-num">5</div><div class="vo-cover-lbl">Customer types</div></div></div></div>
+</div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<div class="screen ">
+<div class="vo-wrap">
+<div class="vo-eyebrow">1 · Overview</div>
+<h2 class="vo-h2">Every call follows <em>the same eleven stages</em>.</h2>
+<p class="vo-lede">This framework standardises how we sell Virtual Office. Two principles run through all of it: <strong>personalisation</strong> &mdash; tailoring to the client&rsquo;s context, and <strong>consultative selling</strong> &mdash; understanding the business need before recommending a solution.</p>
+<div class="vo-flow"><div class="vo-step"><div class="vo-step-num">1</div><div class="vo-step-name">Call Opening</div><div class="vo-step-sub">Establish identity, confirm availability, set a professional tone.</div></div><div class="vo-step"><div class="vo-step-num">2</div><div class="vo-step-name">Warm Greeting</div><div class="vo-step-sub">Create a positive first impression and build initial rapport.</div></div><div class="vo-step"><div class="vo-step-num">3</div><div class="vo-step-name">Rapport Building</div><div class="vo-step-sub">Understand the client&rsquo;s context and listen before selling.</div></div><div class="vo-step"><div class="vo-step-num">4</div><div class="vo-step-name">Need Generation</div><div class="vo-step-sub">Uncover the business requirement through structured discovery.</div></div><div class="vo-step"><div class="vo-step-num">5</div><div class="vo-step-name">Need Analysis</div><div class="vo-step-sub">Confirm the requirement and qualify the appropriate plan.</div></div><div class="vo-step"><div class="vo-step-num">6</div><div class="vo-step-name">Product Pitch</div><div class="vo-step-sub">Present the recommended plan and explain its value.</div></div><div class="vo-step"><div class="vo-step-num">7</div><div class="vo-step-name">Explaining the USP</div><div class="vo-step-sub">Highlight the unique advantages relevant to the need.</div></div><div class="vo-step"><div class="vo-step-num">8</div><div class="vo-step-name">Process &amp; Fulfilment</div><div class="vo-step-sub">Communicate pricing, documentation, timelines and T&amp;Cs.</div></div><div class="vo-step"><div class="vo-step-num">9</div><div class="vo-step-name">Negotiation &amp; Closing</div><div class="vo-step-sub">Handle objections, apply discounts within policy, close.</div></div><div class="vo-step"><div class="vo-step-num">10</div><div class="vo-step-name">Booking &amp; Payment</div><div class="vo-step-sub">Facilitate payment confirmation and set KYC expectations.</div></div><div class="vo-step"><div class="vo-step-num">11</div><div class="vo-step-name">Call Closure &amp; Handoff</div><div class="vo-step-sub">Summarise next steps and hand off to onboarding.</div></div></div><div class="vo-warn"><strong>Do not skip or reorder stages.</strong> Each stage sets up the one after it. Jumping to the pitch before need analysis is the single most common reason a call fails to close.</div>
+</div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<div class="screen ">
+<div class="vo-wrap">
+<div class="vo-eyebrow">1.2.1 · Call types</div>
+<h2 class="vo-h2">A follow-up is <em>not</em> a reminder call.</h2>
+<p class="vo-lede">The fresh call runs all eleven stages. The follow-up compresses to five &mdash; but it is still a structured sales conversation, designed to surface the unspoken objection and close.</p>
+<div class="vo-two"><div class="vo-col"><div class="vo-col-head blue">Fresh call &mdash; new lead</div><div class="vo-col-body"><ol class="vo-ol"><li>Call Opening</li><li>Warm Greeting</li><li>Rapport Building</li><li>Need Generation</li><li>Need Analysis</li><li>Product Pitch</li><li>Explaining the USP</li><li>Process &amp; Fulfilment</li><li>Negotiation &amp; Closing</li><li>Booking &amp; Payment</li><li>Call Closure &amp; Handoff</li></ol></div></div><div class="vo-col"><div class="vo-col-head soft">Follow-up call &mdash; returning lead</div><div class="vo-col-body"><ol class="vo-ol"><li>Re-engagement Opening</li><li>Rapport Recap</li><li>Proposal Review</li><li>Objection Handling</li><li>Payment Closure</li></ol></div></div></div>
+</div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<div class="screen ">
+<div class="vo-wrap">
+<div class="vo-eyebrow">2 · Opening call</div>
+<h2 class="vo-h2">Establish identity. Confirm availability.</h2>
+<p class="vo-lede">The opening sets a professional, respectful tone and confirms you are speaking to the right person at a workable moment.</p>
+<div class="vo-script"><div class="vo-script-label">Primary script</div><div class="vo-script-text">&ldquo;Good [morning/afternoon], am I speaking with [Name]? This is [Your Name] calling from myHQ&rsquo;s Virtual Office team regarding your enquiry. Is this a good time to talk?&rdquo;</div></div><div class="vo-protos cols-4"><div class="vo-proto"><div class="vo-proto-tag">Protocol A</div><div class="vo-proto-title">Standard</div><div class="vo-proto-body">Use the primary script. Wait for confirmation before proceeding.</div></div><div class="vo-proto"><div class="vo-proto-tag">Protocol B</div><div class="vo-proto-title">Voicemail</div><div class="vo-proto-body">&ldquo;Hi [Name], this is [Your Name] from myHQ Virtual Office. I&rsquo;m calling about your enquiry &mdash; I&rsquo;ll try again, or reach me on this number.&rdquo;</div></div><div class="vo-proto"><div class="vo-proto-tag">Protocol C</div><div class="vo-proto-title">Gatekeeper</div><div class="vo-proto-body">&ldquo;Hi, this is [Your Name] from myHQ. I&rsquo;m following up on a Virtual Office enquiry made by [Name]. Is [Name] available?&rdquo;</div></div><div class="vo-proto"><div class="vo-proto-tag">Protocol D</div><div class="vo-proto-title">Second attempt</div><div class="vo-proto-body">&ldquo;Hi [Name], I tried reaching you earlier &mdash; just wanted to connect quickly about your Virtual Office enquiry.&rdquo;</div></div></div>
+</div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<div class="screen ">
+<div class="vo-wrap">
+<div class="vo-eyebrow">3 · Warm greeting</div>
+<h2 class="vo-h2">Brief, but <em>intentional</em>.</h2>
+<p class="vo-lede">Acknowledge the client positively and signal that this will be a useful conversation. Do not linger on pleasantries.</p>
+<div class="vo-script"><div class="vo-script-label">Primary script</div><div class="vo-script-text">&ldquo;Wonderful! Thank you for taking my call. I hope your day is going well.&rdquo;</div></div><div class="vo-protos cols-4"><div class="vo-proto"><div class="vo-proto-tag">Protocol A</div><div class="vo-proto-title">Standard</div><div class="vo-proto-body">Primary script. Warm but brief.</div></div><div class="vo-proto"><div class="vo-proto-tag">Protocol B</div><div class="vo-proto-title">Client is rushed</div><div class="vo-proto-body">&ldquo;Great &mdash; I&rsquo;ll keep this brief. You&rsquo;d enquired about a Virtual Office in [City], and I want to make sure I understand what you need.&rdquo;</div></div><div class="vo-proto"><div class="vo-proto-tag">Protocol C</div><div class="vo-proto-title">Returning lead</div><div class="vo-proto-body">&ldquo;Great to connect! I believe you explored our options earlier &mdash; welcome back. Let me get you exactly what you need.&rdquo;</div></div><div class="vo-proto"><div class="vo-proto-tag">Protocol D</div><div class="vo-proto-title">Hostile or impatient</div><div class="vo-proto-body">&ldquo;I completely understand &mdash; I&rsquo;ll be quick and to the point. Three minutes, and you&rsquo;ll have everything you need.&rdquo;</div></div></div>
+</div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<div class="screen ">
+<div class="vo-wrap">
+<div class="vo-eyebrow">4 · Rapport building</div>
+<h2 class="vo-h2">This is <em>listening</em> time, not selling time.</h2>
+<p class="vo-lede">Use this stage to understand the client&rsquo;s context before you position anything. Note every keyword they mention &mdash; you will use it later.</p>
+<div class="vo-script"><div class="vo-script-label">Primary script</div><div class="vo-script-text">&ldquo;I noticed you&rsquo;re looking for a Virtual Office in [City]. That&rsquo;s a great city for business right now &mdash; what&rsquo;s driving the move?&rdquo;</div></div><div class="vo-protos cols-4"><div class="vo-proto"><div class="vo-proto-tag">Protocol A</div><div class="vo-proto-title">Standard</div><div class="vo-proto-body">Let the client talk. Note every keyword mentioned.</div></div><div class="vo-proto"><div class="vo-proto-tag">Protocol B</div><div class="vo-proto-title">Mentions a competitor</div><div class="vo-proto-body">&ldquo;Interesting &mdash; what drew you to them? Clients often find us after comparing, and I want to understand what matters to you.&rdquo;</div></div><div class="vo-proto"><div class="vo-proto-tag">Protocol C</div><div class="vo-proto-title">Client is very brief</div><div class="vo-proto-body">&ldquo;Absolutely &mdash; I&rsquo;ll make this fast. One quick question: is this for an existing company or a new registration?&rdquo;</div></div><div class="vo-proto"><div class="vo-proto-tag">Protocol D</div><div class="vo-proto-title">Mentions urgency</div><div class="vo-proto-body">&ldquo;I hear you &mdash; let&rsquo;s move fast. Give me two minutes to ask the right questions and I can get you a payment link today.&rdquo;</div></div></div>
+</div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<div class="screen ">
+<div class="vo-wrap">
+<div class="vo-eyebrow">5 · Need generation</div>
+<h2 class="vo-h2">The <em>engine</em> of every successful VO sale.</h2>
+<p class="vo-lede">Need generation uncovers the real business requirement, filters out the wrong plan, and earns the right to recommend. Work the three RCA blocks in order.</p>
+<div class="vo-script"><div class="vo-script-label">Primary script</div><div class="vo-script-text">&ldquo;Before I share our options, I want to make sure I understand your situation fully &mdash; the right plan depends entirely on what you&rsquo;re registering and where.&rdquo;</div></div><div class="vo-rca"><div class="vo-rca-card"><div class="vo-rca-head">Block 1 &mdash; Company details</div><div class="vo-q">What is the name of your company (or proposed name)?</div><div class="vo-q">What type of entity? (Pvt. Ltd. / LLP / OPC / Proprietorship / Partnership / Trust)</div><div class="vo-q">What is the nature of your business or industry?</div><div class="vo-q">Already incorporated, or registering a new company?</div><div class="vo-q">All Indian directors, or any foreign directors / NRIs?</div></div><div class="vo-rca-card"><div class="vo-rca-head">Block 2 &mdash; Address requirement</div><div class="vo-q">Registering a new company at a commercial address?</div><div class="vo-q">Registering or changing GST in this city or state?</div><div class="vo-q">Changing an existing registered address with MCA and banks?</div><div class="vo-q">Is the address purely for official correspondence?</div><div class="vo-q">Do you have a CA or CS assisting with the registration?</div></div><div class="vo-rca-card"><div class="vo-rca-head">Block 3 &mdash; Urgency &amp; timeline</div><div class="vo-q">Is there a specific deadline you are working towards?</div><div class="vo-q">How soon are you looking to make a decision?</div><div class="vo-q">Have you started a GST or MCA application with a provisional address?</div></div></div>
+</div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<div class="screen ">
+<div class="vo-wrap">
+<div class="vo-eyebrow">5.1 · Plan-wise RCA</div>
+<h2 class="vo-h2">Seven paths. <em>Follow only one.</em></h2>
+<p class="vo-lede">Based on the general RCA, route the client to the correct plan-specific discovery path. Each path has its own follow-up questions and exactly one recommended plan.</p>
+<div class="vo-paths"><div class="vo-path"><div class="vo-path-num">Path 1</div><div class="vo-path-name">Company Registration</div><div class="vo-path-trigger">Client is setting up a new company and needs a registered address for MCA.</div><div class="vo-path-plan">&rarr; Company Registration Plan</div></div><div class="vo-path"><div class="vo-path-num">Path 2</div><div class="vo-path-name">GST Registration</div><div class="vo-path-trigger">Existing registered company needs GST in a new city or state.</div><div class="vo-path-plan">&rarr; GST Registration Plan</div></div><div class="vo-path"><div class="vo-path-num">Path 3</div><div class="vo-path-name">Business Address Only</div><div class="vo-path-trigger">Needs a professional address for website, letterheads, cards or Google My Business.</div><div class="vo-path-plan">&rarr; Business Address Plan</div></div><div class="vo-path"><div class="vo-path-num">Path 4</div><div class="vo-path-name">Registered Address Change</div><div class="vo-path-trigger">Wants to change an existing company&rsquo;s registered address on MCA and bank accounts.</div><div class="vo-path-plan">&rarr; Company Registration Plan</div></div><div class="vo-path"><div class="vo-path-num">Path 5</div><div class="vo-path-name">GST Address Change</div><div class="vo-path-trigger">Changing the address on an existing GST registration, same or new state.</div><div class="vo-path-plan">&rarr; GST Registration Plan</div></div><div class="vo-path"><div class="vo-path-num">Path 6</div><div class="vo-path-name">VPOB &amp; APOB</div><div class="vo-path-trigger">Sells on Amazon, Flipkart or Meesho and needs a Virtual Place of Business.</div><div class="vo-path-plan">&rarr; GST Plan &mdash; verify with compliance</div></div><div class="vo-path"><div class="vo-path-num">Path 7</div><div class="vo-path-name">Miscellaneous</div><div class="vo-path-trigger">FSSAI, RERA, Trade Licence, Trust, MSME/Udyam or IEC registrations.</div><div class="vo-path-plan">&rarr; Confirm with your TL first</div></div></div><div class="vo-warn"><strong>Path 1 warning.</strong> Never recommend the GST Plan or Business Address Plan for a new company incorporation &mdash; the documentation will not satisfy MCA.</div><div class="vo-coach"><strong>Path 3 check.</strong> Always confirm explicitly: &ldquo;Just to be clear &mdash; this plan is for correspondence only, not for government filing.&rdquo;</div>
+</div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<div class="screen ">
+<div class="vo-wrap">
+<div class="vo-eyebrow">6 · Need analysis</div>
+<h2 class="vo-h2">One strategy. <em>Different pitch.</em></h2>
+<p class="vo-lede">The sales stream never changes &mdash; understand, identify the need, position the solution, build value. What changes is the reason you give this particular client to buy.</p>
+<div class="vo-types"><div class="vo-type" style="background:#19A86A"><div class="vo-type-name">Direct</div><div class="vo-type-quote">&ldquo;Just give me the facts.&rdquo;</div><div class="vo-type-close">Close on clarity</div></div><div class="vo-type" style="background:#1E22AA"><div class="vo-type-name">Curious</div><div class="vo-type-quote">&ldquo;Explain how this works.&rdquo;</div><div class="vo-type-close">Close on understanding</div></div><div class="vo-type" style="background:#E8894A"><div class="vo-type-name">Price conscious</div><div class="vo-type-quote">&ldquo;What&rsquo;s the best you can do?&rdquo;</div><div class="vo-type-close">Close on value</div></div><div class="vo-type" style="background:#7B3FA0"><div class="vo-type-name">Confused</div><div class="vo-type-quote">&ldquo;I don&rsquo;t know what I need.&rdquo;</div><div class="vo-type-close">Close on guidance</div></div><div class="vo-type" style="background:#D9534F"><div class="vo-type-name">In a hurry</div><div class="vo-type-quote">&ldquo;I need this today.&rdquo;</div><div class="vo-type-close">Close on speed</div></div></div><div class="vo-two" style="margin-top:16px"><div class="vo-col"><div class="vo-col-head soft">What stays the same</div><div class="vo-col-body"><ol class="vo-ol"><li>Understand the client&rsquo;s context and goals</li><li>Identify the core problem to solve</li><li>Position the offering against their priorities</li><li>Quantify the impact and the value</li></ol></div></div><div class="vo-col"><div class="vo-col-head blue">What changes</div><div class="vo-col-body"><div class="vo-q"><strong>Time-based</strong> &mdash; close on speed and TAT</div><div class="vo-q"><strong>Price-based</strong> &mdash; shift price to value and relevance</div><div class="vo-q"><strong>Location-based</strong> &mdash; close on choice and coverage</div><div class="vo-coach" style="margin-top:10px"><strong>The principle.</strong> The process stays the same. The reason we give the customer to buy changes.</div></div></div></div>
+</div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<div class="screen ">
+<div class="vo-wrap">
+<div class="vo-eyebrow">7 · Product pitch</div>
+<h2 class="vo-h2">Pitch <em>one</em> plan. Never a menu.</h2>
+<p class="vo-lede">Present only the plan that matches the confirmed requirement. One recommendation is clarity; multiple options are confusion and delay.</p>
+<div class="vo-steps"><div class="vo-pstep"><div class="vo-pstep-n">01</div><div class="vo-pstep-t">One recommendation</div><div class="vo-pstep-b">Pitch only one plan. Multiple options stall the decision.</div></div><div class="vo-pstep"><div class="vo-pstep-n">02</div><div class="vo-pstep-t">Match to the need</div><div class="vo-pstep-b">The plan must correspond to the use case confirmed in need analysis.</div></div><div class="vo-pstep"><div class="vo-pstep-n">03</div><div class="vo-pstep-t">Explain the value</div><div class="vo-pstep-b">Present benefits in the context of their specific business requirement.</div></div><div class="vo-pstep"><div class="vo-pstep-n">04</div><div class="vo-pstep-t">Check the deck</div><div class="vo-pstep-b">Consult the current Plan &amp; USP deck before every pitch.</div></div></div><div class="vo-coach"><strong>Root ownership.</strong> If the client has to choose between plans, you have not done need analysis properly. Go back a stage.</div>
+</div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<div class="screen ">
+<div class="vo-wrap">
+<div class="vo-eyebrow">8 · Process &amp; fulfilment</div>
+<h2 class="vo-h2">Non-WeWork spaces.</h2>
+<p class="vo-lede">Standard process via the myHQ dashboard. KYC is self-serve. Documents are delivered in 5&ndash;7 business days from KYC approval. Explain this <strong>before</strong> asking for payment &mdash; it builds trust.</p>
+<div class="vo-steps"><div class="vo-pstep"><div class="vo-pstep-n">01</div><div class="vo-pstep-t">Proposal email</div><div class="vo-pstep-b">Plan, space, pricing breakdown and a link to review sample documents.</div></div><div class="vo-pstep"><div class="vo-pstep-n">02</div><div class="vo-pstep-t">Sample documents</div><div class="vo-pstep-b">Encourage download before payment. No changes are made post-payment.</div></div><div class="vo-pstep"><div class="vo-pstep-n">03</div><div class="vo-pstep-t">Payment link</div><div class="vo-pstep-b">Personalised link with all applicable discounts pre-applied.</div></div><div class="vo-pstep"><div class="vo-pstep-n">04</div><div class="vo-pstep-t">Pay via link only</div><div class="vo-pstep-b">Never pay directly on the website &mdash; the discount will not apply.</div></div></div><table class="vo-table" style="margin-top:16px"><tr><th>Term</th><th>Detail</th></tr><tr><td>Minimum ticket size</td><td>&#8377;8,500 &mdash; no transaction below this</td></tr><tr><td>GST</td><td>18% on base price + documentation. Mandatory, non-negotiable</td></tr><tr><td>Discounts</td><td>Base price only. Documentation, PG charges and GST are non-discountable</td></tr><tr><td>NEFT / RTGS / IMPS</td><td>24&ndash;48 hours to reflect. Adds 2 business days</td></tr></table>
+</div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<div class="screen ">
+<div class="vo-wrap">
+<div class="vo-eyebrow">8.2 · Documents</div>
+<h2 class="vo-h2">What we provide. What the client provides.</h2>
+<p class="vo-lede">Document sets differ between owned and leased spaces, and between new and existing company registrations.</p>
+<table class="vo-table"><tr><th>Document</th><th>Owned space</th><th>Leased space</th><th>Compulsory</th></tr><tr><td>Space&ndash;Client Agreement</td><td>Provided</td><td>Provided</td><td>Yes</td></tr><tr><td>Utility Bill</td><td>Provided</td><td>Provided</td><td>Yes</td></tr><tr><td>NOC to Client</td><td>Provided</td><td>Provided</td><td>Yes</td></tr><tr><td>Master Agreement</td><td>Not required</td><td>Provided</td><td>Leased only</td></tr><tr><td>Master NOC</td><td>Not required</td><td>Provided</td><td>Leased only</td></tr><tr><td>Property Tax Receipt</td><td>On request</td><td>On request</td><td>Additional</td></tr><tr><td>Notarised Documents</td><td colspan="2">On request &mdash; extra charges, +4&ndash;5 days</td><td>Additional</td></tr></table><div class="vo-warn" style="margin-top:14px"><strong>The 30-day rule.</strong> KYC must be completed within 30 days of payment. After that window the client is no longer eligible for a refund under any circumstances.</div>
+</div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<div class="screen ">
+<div class="vo-wrap">
+<div class="vo-eyebrow">9 · WeWork spaces</div>
+<h2 class="vo-h2">A <em>separate</em> process, and a faster one.</h2>
+<p class="vo-lede">WeWork manages its own documentation and KYC through an internal team. The turnaround is 2 hours from KYC approval instead of 5&ndash;7 days.</p>
+<div class="vo-two"><div class="vo-col"><div class="vo-col-head blue">Timeline</div><div class="vo-col-body"><div class="vo-q">Standard, online + same-day KYC &mdash; <strong>2 hours from approval</strong></div><div class="vo-q">NEFT / RTGS / IMPS &mdash; +2 business days</div><div class="vo-q">Notarisation requested &mdash; +4&ndash;5 business days</div><div class="vo-q">KYC submitted late &mdash; clock starts at approval</div></div></div><div class="vo-col"><div class="vo-col-head soft">What differs</div><div class="vo-col-body"><div class="vo-q">Two payment routes: myHQ link (discount applies) or the WeWork website (no discount)</div><div class="vo-q">KYC runs on WeWork&rsquo;s system, not the myHQ dashboard</div><div class="vo-q">No physical signage &mdash; digital and system-based only</div><div class="vo-q">Support routes through <strong>contactwwvo@myhq.in</strong></div></div></div></div><div class="vo-coach"><strong>Coaching note.</strong> Mention the &lsquo;no physical signage&rsquo; point proactively, before the client asks. It is the most common post-sale surprise on WeWork deals.</div>
+</div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<div class="screen ">
+<div class="vo-wrap">
+<div class="vo-eyebrow">10 · Pricing &amp; negotiation</div>
+<h2 class="vo-h2">Open at 5&ndash;10%. <em>Never</em> lead with your maximum.</h2>
+<p class="vo-lede">Before quoting, verify in the Master Sheet: location and city, website price, maximum payout to the space, and the minimum ticket size.</p>
+<div class="vo-script"><div class="vo-script-label">Primary script</div><div class="vo-script-text">&ldquo;The standard price for this plan on the website is &#8377;X. Based on your requirement and current availability, I can offer you &#8377;Y if we close today.&rdquo;</div></div><div class="vo-protos"><div class="vo-proto"><div class="vo-proto-tag">Protocol A</div><div class="vo-proto-title">Client questions the price</div><div class="vo-proto-body">Break it down: base price covers address and documentation, plus 18% GST, which is standard and non-negotiable.</div></div><div class="vo-proto"><div class="vo-proto-tag">Protocol B</div><div class="vo-proto-title">Client negotiates further</div><div class="vo-proto-body">&ldquo;This is already the best price I can offer. What I can assure you is full transparency and compliance-ready documentation.&rdquo;</div></div><div class="vo-proto"><div class="vo-proto-tag">Protocol C</div><div class="vo-proto-title">Compares with a competitor</div><div class="vo-proto-body">&ldquo;Fair comparison. The difference comes down to documentation quality and compliance integrity &mdash; is the cheaper space owned or leased? Is its GSTIN verified?&rdquo;</div></div><div class="vo-proto"><div class="vo-proto-tag">Protocol D</div><div class="vo-proto-title">&ldquo;I&rsquo;ll think about it&rdquo;</div><div class="vo-proto-body">&ldquo;Of course. Just so you know, this pricing is linked to current availability. Is there a specific concern I can address right now?&rdquo;</div></div></div><div class="vo-warn"><strong>Root ownership.</strong> You must communicate T&amp;Cs, the refund policy, document finality and payment gateway charges <em>before</em> payment &mdash; never after a dispute.</div>
+</div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<div class="screen ">
+<div class="vo-wrap">
+<div class="vo-eyebrow">11 · Closing &amp; follow-up</div>
+<h2 class="vo-h2">Every call ends with a <em>specific</em> next action.</h2>
+<p class="vo-lede">Closing converts intent into commitment. If payment does not happen on the call, lock in a dated follow-up before you hang up.</p>
+<div class="vo-script"><div class="vo-script-label">Primary script</div><div class="vo-script-text">&ldquo;I&rsquo;ll send the proposal to your email and WhatsApp. Once you&rsquo;ve reviewed it, I can generate your payment link &mdash; shall I call you back at [specific time] tomorrow?&rdquo;</div></div><div class="vo-steps"><div class="vo-pstep"><div class="vo-pstep-n">01</div><div class="vo-pstep-t">Confirm a specific time</div><div class="vo-pstep-b">A dated, timed follow-up. Never leave it open-ended.</div></div><div class="vo-pstep"><div class="vo-pstep-n">02</div><div class="vo-pstep-t">Send within 5 minutes</div><div class="vo-pstep-b">Proposal email immediately after the call: plan, pricing, samples.</div></div><div class="vo-pstep"><div class="vo-pstep-n">03</div><div class="vo-pstep-t">Update Zoho CRM</div><div class="vo-pstep-b">Follow-up date, call notes, stage status &mdash; same day.</div></div><div class="vo-pstep"><div class="vo-pstep-n">04</div><div class="vo-pstep-t">WhatsApp confirmation</div><div class="vo-pstep-b">Confirm the proposal and the agreed follow-up time.</div></div></div><div class="vo-coach"><strong>A-C-E on every objection.</strong> <strong>Acknowledge</strong> the concern, <strong>Clarify</strong> what is really behind it by asking one more question, then answer with <strong>Evidence</strong> &mdash; data, sample documents, success rates. On a follow-up call, the objection you hear first is rarely the real one.</div>
+</div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+</div>
+</div><!-- /slide-mode -->
+
+<!-- ═══ READ MODE ═══ -->
+<style>
+/* ── BOOK READ MODE ADDITIONS ── */
+.section { margin-bottom: 72px; }
+.section-num { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 6px; }
+.section-title { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1.15; margin-bottom: 16px; }
+.section-body { font-size: 15px; color: var(--body); line-height: 1.78; margin-bottom: 14px; }
+.section-outcome { font-size: 12px; color: var(--blue); font-weight: 600; margin-bottom: 20px; padding: 10px 16px; background: rgba(30,34,170,0.05); border-left: 3px solid var(--blue); border-radius: 0 6px 6px 0; }
+.section-outcome span { opacity: 0.6; }
+.takeaway { background: rgba(190,229,194,0.22); border-left: 3px solid #4CAF74; border-radius: 0 6px 6px 0; padding: 13px 18px; font-size: 14px; font-weight: 600; color: var(--ink); margin: 22px 0 12px; }
+.takeaway::before { content: '✦  '; color: #4CAF74; }
+.next-up { font-size: 13px; color: var(--blue); font-weight: 600; display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+.bridge { display: flex; align-items: center; gap: 14px; margin: -16px 0 26px; color: var(--muted); font-size: 13px; font-weight: 500; }
+.bridge::before, .bridge::after { content: ''; flex: 1; height: 1px; background: var(--hairline); }
+.visual { margin: 24px 0; }
+
+/* Book timeline — always expanded, no toggle */
+.btl { display: flex; flex-direction: column; position: relative; padding-left: 32px; }
+.btl::before { content: ''; position: absolute; left: 4px; top: 8px; bottom: 8px; width: 1.5px; background: var(--hairline); }
+.btl-item { position: relative; padding: 0 0 36px 28px; }
+.btl-item:last-child { padding-bottom: 0; }
+.btl-dot { position: absolute; left: -5px; top: 5px; width: 11px; height: 11px; border-radius: 50%; background: var(--white); border: 2px solid var(--blue); }
+.btl-item:last-child .btl-dot { background: var(--blue); }
+.btl-year { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 5px; }
+.btl-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 6px; letter-spacing: -0.01em; }
+.btl-body { font-size: 14px; color: var(--body); line-height: 1.7; }
+.btl-funding { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(30,34,170,0.04); border-left: 3px solid var(--blue); border-radius: 0 var(--radius) var(--radius) 0; margin: 10px 0; }
+.btl-funding-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--blue); margin-bottom: 2px; }
+.btl-funding-name { font-size: 13px; color: var(--ink); font-weight: 500; }
+.btl-dyk { margin: 12px 0; padding: 14px 16px; background: rgba(255,184,72,0.06); border: 1px solid rgba(255,184,72,0.25); border-radius: var(--radius); }
+.btl-dyk-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #a06800; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.btl-dyk-label::before { content: '?'; width: 18px; height: 18px; background: var(--amber); border-radius: 50%; font-size: 11px; font-weight: 800; color: var(--ink); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.btl-dyk-text { font-size: 13px; color: var(--body); line-height: 1.65; }
+.btl-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+
+/* Team cards — book style, always expanded */
+.book-team-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin: 20px 0; }
+.book-team-card { border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; }
+.book-team-banner { height: 120px; overflow: hidden; background: rgba(30,34,170,0.06); display: flex; align-items: center; justify-content: center; }
+.book-team-banner img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.book-team-initials { font-size: 2rem; font-weight: 800; color: var(--blue); }
+.book-team-body { padding: 16px 18px; }
+.book-team-name { font-size: 16px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; margin-bottom: 3px; }
+.book-team-role { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--blue); margin-bottom: 10px; }
+.book-team-bio { font-size: 13px; color: var(--body); line-height: 1.65; margin-bottom: 10px; }
+.book-team-meta { display: flex; flex-direction: column; gap: 4px; padding-top: 10px; border-top: 1px solid var(--hairline); }
+.book-team-meta-row { font-size: 12px; color: var(--muted); }
+.book-team-meta-row strong { color: var(--ink); font-weight: 600; }
+.book-team-tag { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 4px; background: rgba(30,34,170,0.08); color: var(--blue); margin-bottom: 6px; }
+.book-team-avatar { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; border: 2px solid var(--hairline); flex-shrink: 0; background: rgba(30,34,170,0.06); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; color: var(--blue); }
+.book-team-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.book-team-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.book-team-header-text { flex: 1; }
+
+/* Org pyramid — book style, widths stepped, all details shown */
+.book-org { display: flex; flex-direction: column; gap: 8px; margin: 24px 0; }
+.book-org-tier { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--hairline); align-self: center; }
+.book-org-tier-1 { width: 100%; border-left: 4px solid var(--amber); }
+.book-org-tier-2 { width: 92%; border-left: 4px solid var(--coral); }
+.book-org-tier-3 { width: 84%; border-left: 4px solid var(--blue); }
+.book-org-tier-4 { width: 76%; border-left: 4px solid #4CAF74; }
+.book-org-header { display: grid; grid-template-columns: 1fr auto; align-items: start; padding: 16px 20px 12px; background: #fafbff; border-bottom: 1px solid var(--hairline); }
+.book-org-name { font-size: 16px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; }
+.book-org-desig { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.book-org-num { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.book-org-facts { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; }
+.book-org-fact { padding: 12px 16px; border-right: 1px solid var(--hairline); }
+.book-org-fact:last-child { border-right: none; }
+.book-org-fact-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 4px; }
+.book-org-fact-value { font-size: 12px; color: var(--body); line-height: 1.5; }
+.book-org-fact-value strong { color: var(--ink); font-weight: 700; }
+
+/* Mind map — static tree, fully expanded */
+.book-mm { display: flex; flex-direction: column; align-items: center; gap: 0; margin: 24px 0; }
+.book-mm-root { background: var(--blue); color: var(--white); font-size: 18px; font-weight: 800; padding: 18px 48px; border-radius: 14px; letter-spacing: -0.02em; }
+.book-mm-vline { width: 2px; height: 28px; background: rgba(30,34,170,0.2); }
+.book-mm-dept-row { display: flex; justify-content: center; gap: 12px; width: 100%; }
+.book-mm-dept-col { display: flex; flex-direction: column; align-items: center; flex: 1; max-width: 200px; }
+.book-mm-hbar { height: 2px; background: rgba(30,34,170,0.15); width: 100%; margin: 0; }
+.book-mm-dept { background: var(--white); border: 1.5px solid rgba(30,34,170,0.2); color: var(--blue); font-size: 13px; font-weight: 700; padding: 12px 16px; border-radius: 10px; text-align: center; width: 100%; }
+.book-mm-sub-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; width: 100%; }
+.book-mm-sub { background: #f4f5ff; border: 1px solid var(--hairline); color: var(--ink); font-size: 12px; font-weight: 600; padding: 8px 12px; border-radius: 7px; text-align: center; }
+
+/* Stat cards */
+.book-stats { display: grid; grid-template-columns: repeat(5,1fr); gap: 0; border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; margin: 20px 0; }
+.book-stat { padding: 16px; border-right: 1px solid var(--hairline); }
+.book-stat:last-child { border-right: none; }
+.book-stat-num { font-size: 1.4rem; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; margin-bottom: 3px; }
+.book-stat-lbl { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+/* Verticals */
+.book-verticals { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin: 20px 0; }
+.book-vertical { padding: 20px 18px; border-radius: var(--radius); border: 1px solid var(--hairline); display: flex; flex-direction: column; gap: 8px; }
+.book-vertical--am { border-top: 3px solid var(--blue); }
+.book-vertical--vo { border-top: 3px solid var(--blue); }
+.book-vertical--od { border-top: 3px solid var(--blue); }
+.book-vertical-icon { width: 40px; height: 40px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.book-vertical-name { font-size: 15px; font-weight: 800; color: var(--ink); }
+.book-vertical-desc { font-size: 13px; color: var(--body); line-height: 1.55; flex: 1; }
+.book-vertical-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 4px; background: rgba(0,0,0,0.04); color: var(--muted); }
+
+/* Ambition chart embed */
+.book-ambition-chart { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 24px; background: #fafbff; margin: 20px 0; }
+
+/* ── Assessment ── */
+.aq-tracker { display: flex; align-items: center; gap: 14px; margin-bottom: 36px; padding: 16px 20px; background: #FAFBFF; border: 1px solid var(--hairline); border-radius: var(--radius); }
+.aq-tracker-bar { flex: 1; height: 6px; background: var(--hairline); border-radius: 99px; overflow: hidden; }
+.aq-tracker-fill { height: 100%; width: 0%; background: var(--blue); border-radius: 99px; transition: width 0.4s var(--ease); }
+.aq-tracker-label { font-size: 12px; font-weight: 700; color: var(--blue); white-space: nowrap; letter-spacing: 0.02em; }
+.aq-question { margin-bottom: 36px; padding: 24px 28px; border: 1px solid var(--hairline); border-radius: 12px; background: var(--white); transition: border-color 0.2s; }
+.aq-question.is-filled { border-color: rgba(30,34,170,0.35); }
+.aq-q-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.aq-q-num { font-size: 10px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue); background: rgba(30,34,170,0.08); padding: 3px 10px; border-radius: 99px; }
+.aq-q-status { font-size: 12px; font-weight: 600; color: var(--muted); }
+.aq-q-status.done { color: #2a7d3f; }
+.aq-q-text { font-size: 14px; color: var(--ink); line-height: 1.7; margin-bottom: 14px; font-weight: 500; }
+.aq-textarea { width: 100%; padding: 12px 16px; border: 1px solid var(--hairline); border-radius: 8px; font-family: var(--sans); font-size: 14px; color: var(--ink); line-height: 1.65; resize: vertical; min-height: 120px; transition: border-color 0.2s, box-shadow 0.2s; background: #FAFBFF; }
+.aq-textarea:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(30,34,170,0.1); background: var(--white); }
+.aq-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 24px; border-top: 1px solid var(--hairline); }
+.aq-footer-note { font-size: 13px; color: var(--muted); }
+.aq-submit-btn { padding: 10px 28px; background: var(--blue); color: var(--white); font-size: 13px; font-weight: 700; border: none; border-radius: var(--radius); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; transition: var(--transition); }
+.aq-submit-btn:hover:not(:disabled) { background: var(--blue-dark); }
+.aq-submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.aq-error { margin-top: 12px; padding: 12px 16px; background: #fff3f3; border: 1px solid #f5c6c6; border-radius: 8px; font-size: 13px; color: #c0392b; }
+.aq-submitted { text-align: center; padding: 48px 24px; border: 1px solid rgba(30,34,170,0.2); border-radius: 12px; background: #FAFBFF; margin-bottom: 24px; }
+.aq-submitted-icon { font-size: 40px; color: #2a7d3f; margin-bottom: 16px; }
+.aq-submitted-title { font-size: 20px; font-weight: 800; color: var(--ink); margin-bottom: 8px; }
+.aq-submitted-body { font-size: 14px; color: var(--body); line-height: 1.7; max-width: 440px; margin: 0 auto; }
+</style>
+
+<div id="read-mode" class="hidden" style="margin-top:52px;">
+  <div class="r-layout">
+    <aside class="r-sidebar">
+      <div class="r-toc-label">VO · Chapter 1</div>
+<a href="#r-overview" class="toc-link" data-s="r-overview">Introduction</a>
+<a href="#r-flow" class="toc-link" data-s="r-flow">01 &middot; The call flow</a>
+<a href="#r-opening" class="toc-link" data-s="r-opening">02 &middot; Opening &amp; greeting</a>
+<a href="#r-need" class="toc-link" data-s="r-need">03 &middot; Need generation</a>
+<a href="#r-paths" class="toc-link" data-s="r-paths">04 &middot; The seven plan paths</a>
+<a href="#r-types" class="toc-link" data-s="r-types">05 &middot; Customer types</a>
+<a href="#r-pitch" class="toc-link" data-s="r-pitch">06 &middot; Product pitch &amp; USP</a>
+<a href="#r-process" class="toc-link" data-s="r-process">07 &middot; Process &amp; fulfilment</a>
+<a href="#r-docs" class="toc-link" data-s="r-docs">08 &middot; Documents</a>
+<a href="#r-wework" class="toc-link" data-s="r-wework">09 &middot; WeWork spaces</a>
+<a href="#r-refund" class="toc-link" data-s="r-refund">10 &middot; Refunds &amp; T&amp;Cs</a>
+<a href="#r-pricing" class="toc-link" data-s="r-pricing">11 &middot; Pricing &amp; negotiation</a>
+<a href="#r-closing" class="toc-link" data-s="r-closing">12 &middot; Closing</a>
+<a href="#r-followup" class="toc-link" data-s="r-followup">13 &middot; The follow-up call</a>
+    </aside>
+    <div class="r-content">
+<section class="section" id="r-overview">
+<h2 class="section-title">Overview</h2>
+<div class="section-outcome">Why this framework exists</div>
+<p class="section-body">This chapter is the official Sales Pitch Framework for myHQ&rsquo;s Virtual Office team. It standardises how every client interaction runs, from the opening call through to post-payment handoff.</p>
+<p class="section-body">Two principles sit underneath all of it. <strong>Personalisation</strong> means tailoring the conversation to the individual client&rsquo;s context and requirements rather than reciting a script at them. <strong>Consultative selling</strong> means understanding the business need before recommending a solution &mdash; which in practice means the discovery stages matter more than the pitch.</p>
+<div class="takeaway">If you only remember one rule: never pitch a plan before you have confirmed the use case. Every avoidable lost deal in VO traces back to that.</div>
+</section>
+
+<section class="section" id="r-flow">
+<div class="section-num">01</div><h2 class="section-title">The call flow</h2>
+<div class="section-outcome">Eleven stages. Do not skip or reorder.</div>
+<p class="section-body">Every sales call follows the sequence below. The stages are ordered because each one earns the right to the next: you cannot analyse a need you have not generated, and you cannot pitch against a need you have not confirmed.</p>
+<table class="vo-table"><tr><th>#</th><th style="text-align:left">Stage</th><th style="text-align:left">Purpose</th></tr><tr><td>1</td><td style="text-align:left">Call Opening</td><td style="text-align:left">Establish identity, confirm availability, set a professional tone.</td></tr><tr><td>2</td><td style="text-align:left">Warm Greeting</td><td style="text-align:left">Create a positive first impression and build initial rapport.</td></tr><tr><td>3</td><td style="text-align:left">Rapport Building</td><td style="text-align:left">Understand the client&rsquo;s context and listen before selling.</td></tr><tr><td>4</td><td style="text-align:left">Need Generation</td><td style="text-align:left">Uncover the business requirement through structured discovery.</td></tr><tr><td>5</td><td style="text-align:left">Need Analysis</td><td style="text-align:left">Confirm the requirement and qualify the appropriate plan.</td></tr><tr><td>6</td><td style="text-align:left">Product Pitch</td><td style="text-align:left">Present the recommended plan and explain its value.</td></tr><tr><td>7</td><td style="text-align:left">Explaining the USP</td><td style="text-align:left">Highlight the unique advantages relevant to the need.</td></tr><tr><td>8</td><td style="text-align:left">Process &amp; Fulfilment</td><td style="text-align:left">Communicate pricing, documentation, timelines and T&amp;Cs.</td></tr><tr><td>9</td><td style="text-align:left">Negotiation &amp; Closing</td><td style="text-align:left">Handle objections, apply discounts within policy, close.</td></tr><tr><td>10</td><td style="text-align:left">Booking &amp; Payment</td><td style="text-align:left">Facilitate payment confirmation and set KYC expectations.</td></tr><tr><td>11</td><td style="text-align:left">Call Closure &amp; Handoff</td><td style="text-align:left">Summarise next steps and hand off to onboarding.</td></tr></table><p class="section-body"><strong>Fresh calls</strong> run all eleven stages. <strong>Follow-up calls</strong> compress to five: re-engagement opening, rapport recap, proposal review, objection handling, payment closure. A follow-up is not a reminder call &mdash; it is a structured sales conversation designed to surface the unspoken objection and close.</p>
+
+</section>
+
+<section class="section" id="r-opening">
+<div class="section-num">02</div><h2 class="section-title">Opening, greeting and rapport</h2>
+<div class="section-outcome">Stages 1 to 3</div>
+<h3 class="section-subhead">Call opening</h3><p class="section-body">The opening establishes your identity, confirms the client&rsquo;s availability, and sets a professional tone.</p>
+<div class="vo-script"><div class="vo-script-label">Primary script</div><div class="vo-script-text">&ldquo;Good [morning/afternoon], am I speaking with [Name]? This is [Your Name] calling from myHQ&rsquo;s Virtual Office team regarding your enquiry. Is this a good time to talk?&rdquo;</div></div><p class="section-body"><strong>Voicemail.</strong> &ldquo;Hi [Name], this is [Your Name] from myHQ Virtual Office. I&rsquo;m calling about your enquiry about a virtual office &mdash; I&rsquo;ll try again shortly, or you can reach me on this number.&rdquo;</p>
+<p class="section-body"><strong>Gatekeeper.</strong> &ldquo;Hi, this is [Your Name] from myHQ. I&rsquo;m following up on a Virtual Office enquiry made by [Name]. Is [Name] available?&rdquo;</p>
+<p class="section-body"><strong>Second attempt.</strong> &ldquo;Hi [Name], I tried reaching you earlier &mdash; just wanted to connect quickly about your Virtual Office enquiry.&rdquo;</p>
+<h3 class="section-subhead">Warm greeting</h3><p class="section-body">Brief but intentional. Acknowledge the client positively and signal that the conversation will be useful. Do not linger.</p>
+<div class="vo-script"><div class="vo-script-label">Primary script</div><div class="vo-script-text">&ldquo;Wonderful! Thank you for taking my call. I hope your day is going well.&rdquo;</div></div><p class="section-body"><strong>If the client sounds rushed.</strong> &ldquo;Great &mdash; I&rsquo;ll keep this brief. You&rsquo;d enquired about a Virtual Office in [City], and I wanted to make sure I understand exactly what you need.&rdquo;</p>
+<p class="section-body"><strong>If hostile or impatient.</strong> &ldquo;I completely understand &mdash; I&rsquo;ll be quick and to the point. Three minutes, and you&rsquo;ll have everything you need.&rdquo;</p>
+<h3 class="section-subhead">Rapport building</h3><p class="section-body">This is listening time, not selling time. Understand the client&rsquo;s context before positioning anything, and note every keyword they use &mdash; you will reuse their own language later in the pitch.</p>
+<div class="vo-script"><div class="vo-script-label">Primary script</div><div class="vo-script-text">&ldquo;I noticed you&rsquo;re looking for a Virtual Office in [City]. That&rsquo;s a great city for business right now &mdash; what&rsquo;s driving the move?&rdquo;</div></div><p class="section-body"><strong>If they mention a competitor.</strong> &ldquo;Interesting &mdash; what drew you to them? I ask because clients often find us after comparing, and I want to understand what matters most to you.&rdquo;</p>
+<div class="takeaway">Rapport is where you collect the words you will sell back to them. If you did all the talking, you have nothing to work with.</div>
+</section>
+
+<section class="section" id="r-need">
+<div class="section-num">03</div><h2 class="section-title">Need generation and analysis</h2>
+<div class="section-outcome">The RCA framework</div>
+<p class="section-body">Need generation is the engine of every successful VO sale. It uncovers the real business requirement, filters out the wrong plan, and earns you the right to make a recommendation the client will accept.</p>
+<div class="vo-script"><div class="vo-script-label">Primary script</div><div class="vo-script-text">&ldquo;Before I share our options, I want to make sure I understand your situation fully &mdash; the right plan depends entirely on what you&rsquo;re registering and where.&rdquo;</div></div><h3 class="section-subhead">Block 1 &mdash; Company details</h3><div class="vo-q">What is the name of your company, or the proposed company name?</div><div class="vo-q">What type of entity is it? Pvt. Ltd., LLP, OPC, Sole Proprietorship, Partnership or Trust.</div><div class="vo-q">What is the nature of your business or industry?</div><div class="vo-q">Is the company already incorporated, or are you registering a new one?</div><div class="vo-q">Are all directors Indian residents, or are there foreign directors or NRIs?</div><h3 class="section-subhead">Block 2 &mdash; Address requirement</h3><div class="vo-q">Are you looking to register a new company at a commercial address?</div><div class="vo-q">Are you looking to register or change your GST in this city or state?</div><div class="vo-q">Do you need to change your existing registered address with MCA and your bank?</div><div class="vo-q">Do you need this address purely for official correspondence?</div><div class="vo-q">Do you already have a CA or CS assisting with the registration?</div><h3 class="section-subhead">Block 3 &mdash; Urgency and timeline</h3><div class="vo-q">Is there a specific deadline you are working towards?</div><div class="vo-q">How soon are you looking to make a decision?</div><div class="vo-q">Have you already started a GST or MCA application with a provisional address?</div><h3 class="section-subhead">When the VO use case is already filled</h3><p class="section-body">If the CRM shows the VO Use Case field has been completed by the lead, confirm it rather than re-running discovery from scratch.</p>
+<div class="vo-script"><div class="vo-script-label">Verification script</div><div class="vo-script-text">&ldquo;I can see from your enquiry that you&rsquo;re looking for [Use Case] in [City]. Before I share the details, can I confirm that&rsquo;s still what you need?&rdquo;</div></div><p class="section-body">If the client <strong>confirms</strong>, go straight to plan recommendation. If the <strong>requirement has changed</strong>, return to the general RCA and re-qualify. Present only the single plan that matches the confirmed need.</p>
+
+</section>
+
+<section class="section" id="r-paths">
+<div class="section-num">04</div><h2 class="section-title">The seven plan paths</h2>
+<div class="section-outcome">Follow only the path that matches</div>
+<p class="section-body">Based on the general RCA, route the client to the correct plan-specific discovery path. Each path has its own follow-up questions and exactly one recommended plan. Do not blend paths.</p>
+<h3 class="section-subhead">Path 1 &mdash; Company Registration</h3><p class="section-body"><strong>Trigger.</strong> Client is setting up a new company and needs a registered address for MCA.</p>
+<div class="vo-q">Have you completed MCA name approval (the RUN process)?</div><div class="vo-q">What type of company are you registering?</div><div class="vo-q">Are all directors Indian residents, or are there foreign nationals or NRIs?</div><div class="vo-q">Will you also need GST registration at this address?</div><div class="vo-q">Do you have a CA or CS who will file the incorporation?</div><p class="section-body"><strong>Recommend:</strong> Company Registration Plan</p>
+<h3 class="section-subhead">Path 2 &mdash; GST Registration</h3><p class="section-body"><strong>Trigger.</strong> Existing registered company needs GST in a new city or state.</p>
+<div class="vo-q">What is your company&rsquo;s state of incorporation?</div><div class="vo-q">In which states do you need GST registered?</div><div class="vo-q">Do you supply goods or services to customers in this state?</div><div class="vo-q">Have you obtained GST in this state before?</div><div class="vo-q">Does your CA have experience working with virtual office addresses?</div><p class="section-body"><strong>Recommend:</strong> GST Registration Plan</p>
+<h3 class="section-subhead">Path 3 &mdash; Business Address Only</h3><p class="section-body"><strong>Trigger.</strong> Needs a professional address for website, letterheads, cards or Google My Business.</p>
+<div class="vo-q">Is this address purely for correspondence, or also for government filing?</div><div class="vo-q">Will you list this address on your website, visiting cards or Google My Business?</div><div class="vo-q">Are you a freelancer, sole proprietor, or an established company expanding presence?</div><div class="vo-q">Do you need one city or multiple cities?</div><p class="section-body"><strong>Recommend:</strong> Business Address Plan</p>
+<h3 class="section-subhead">Path 4 &mdash; Registered Address Change</h3><p class="section-body"><strong>Trigger.</strong> Wants to change an existing company&rsquo;s registered address on MCA and bank accounts.</p>
+<div class="vo-q">Where is your company currently registered?</div><div class="vo-q">Why do you want to change the registered address on MCA or other licences?</div><div class="vo-q">Will you also need to update GST at the new address?</div><div class="vo-q">Is your CA handling the change on the MCA portal?</div><p class="section-body"><strong>Recommend:</strong> Company Registration Plan</p>
+<h3 class="section-subhead">Path 5 &mdash; GST Address Change</h3><p class="section-body"><strong>Trigger.</strong> Changing the address on an existing GST registration, same or new state.</p>
+<div class="vo-q">Are you changing the principal place of business, or adding an additional place?</div><div class="vo-q">Is this a state change, or an address change within the same state?</div><p class="section-body"><strong>Recommend:</strong> GST Registration Plan</p>
+<h3 class="section-subhead">Path 6 &mdash; VPOB &amp; APOB</h3><p class="section-body"><strong>Trigger.</strong> Sells on Amazon, Flipkart or Meesho and needs a Virtual Place of Business.</p>
+<div class="vo-q">Which marketplace are you selling on?</div><div class="vo-q">Is the marketplace requiring GST in a specific state for their fulfilment centres?</div><div class="vo-q">Has the marketplace shared a specific list of documents they require?</div><p class="section-body"><strong>Recommend:</strong> GST Plan &mdash; verify with compliance</p>
+<h3 class="section-subhead">Path 7 &mdash; Miscellaneous</h3><p class="section-body"><strong>Trigger.</strong> FSSAI, RERA, Trade Licence, Trust, MSME/Udyam or IEC registrations.</p>
+<div class="vo-q">FSSAI licence &mdash; verify space compatibility before selling</div><div class="vo-q">RERA licence &mdash; requires specific documentation</div><div class="vo-q">Trade Licence / S&amp;E Certificate &mdash; verify by city</div><div class="vo-q">Trust registration &mdash; confirm space support</div><div class="vo-q">MSME / Udyam &mdash; generally supported, low risk</div><div class="vo-q">IEC (Import Export Code) &mdash; address must match the VO address</div><p class="section-body"><strong>Recommend:</strong> Confirm with your TL first</p>
+<div class="vo-warn"><strong>Path 1.</strong> Do not recommend the GST Plan or Business Address Plan for a new company incorporation. The documentation will not satisfy MCA and the application will be rejected.</div><div class="vo-warn"><strong>Path 6, VPOB/APOB.</strong> Requirements vary by marketplace and change often. Always verify with the compliance team before confirming anything to the client.</div><div class="vo-coach"><strong>Path 4.</strong> Address-change clients often underestimate that they need the top-tier plan. Educate rather than discount.</div><div class="vo-coach"><strong>Path 7.</strong> Tell the client: &ldquo;We support this in many locations, but I want to verify with our team before I confirm.&rdquo;</div>
+</section>
+
+<section class="section" id="r-types">
+<div class="section-num">05</div><h2 class="section-title">Customer types</h2>
+<div class="section-outcome">One strategy, different pitch</div>
+<p class="section-body">The sales stream never changes: understand the context, identify the need, position the solution, build the value. What changes is the reason you give this particular client to buy.</p>
+<h3 class="section-subhead">Time-based &mdash; &ldquo;I need this done fast&rdquo;</h3><p class="section-body">Lead with turnaround. Fast documentation, quick KYC and onboarding, verified locations, a digital process with minimal waiting. Prioritise locations with faster documentation TAT, shortlist two or three, and follow up with an immediate KYC and payment link. <strong>Convert on speed and convenience.</strong></p>
+<h3 class="section-subhead">Price-based &mdash; &ldquo;I need the best value&rdquo;</h3><p class="section-body">Shift the conversation from price to value. Transparent pricing, relevant plans, verified documentation, end-to-end support. Offer two or three options at different price points, give a clear breakup of inclusions, and use discount only as a closing lever &mdash; never as the opening pitch. <strong>Convert on value, not just price.</strong></p>
+<div class="vo-script"><div class="vo-script-label">Primary script</div><div class="vo-script-text">&ldquo;I understand pricing is important. Before we compare numbers, let me understand exactly what you need &mdash; I want to make sure we&rsquo;re comparing like for like.&rdquo;</div></div><h3 class="section-subhead">Location-based &mdash; &ldquo;I need the right address&rdquo;</h3><p class="section-body">Lead with coverage: 350+ locations across 20+ cities, all verified. Offer a comparison of relevant options rather than pushing one. <strong>Convert on relevance.</strong></p>
+<h3 class="section-subhead">Direct, curious, confused, in a hurry</h3><p class="section-body"><strong>Direct</strong> &mdash; keep it short, crisp and factual. <strong>Curious</strong> &mdash; explain and educate with relevant detail. <strong>Confused</strong> &mdash; simplify, guide, and make a single clear recommendation. <strong>In a hurry</strong> &mdash; prioritise the key information and get to the point.</p>
+<div class="takeaway">Same strategy. Same goal. Different communication.</div>
+</section>
+
+<section class="section" id="r-pitch">
+<div class="section-num">06</div><h2 class="section-title">Product pitch and USP</h2>
+<div class="section-outcome">One recommendation</div>
+<p class="section-body">At this stage, present only the plan that matches the confirmed requirement. Never present multiple plans side by side. One recommendation is clarity; multiple options are confusion and delay.</p>
+<p class="section-body">The plan you pitch must correspond directly to the use case confirmed during need analysis. Present its benefits in the context of the client&rsquo;s specific business requirement, not as a generic feature list. Consult the current Plan &amp; USP deck before every pitch &mdash; it changes.</p>
+<div class="vo-coach"><strong>Root ownership.</strong> If the client is being asked to choose between plans, need analysis was not completed. Go back a stage rather than presenting a menu.</div>
+</section>
+
+<section class="section" id="r-process">
+<div class="section-num">07</div><h2 class="section-title">Process and fulfilment</h2>
+<div class="section-outcome">Non-WeWork spaces</div>
+<p class="section-body">Standard process runs through the myHQ dashboard. KYC is self-serve and takes about ten minutes. Documents are delivered in 5&ndash;7 business days from KYC approval. After payment the process is fully digital &mdash; no physical visits.</p>
+<h3 class="section-subhead">Pre-payment &mdash; explain this before asking for money</h3><p class="section-body"><strong>1. Proposal email.</strong> The client receives a proposal summarising the plan, the space, the pricing breakdown, and a link to review sample documents.</p>
+<p class="section-body"><strong>2. Sample documents.</strong> Encourage the client to download and review these before paying. No changes to standard documents are made after payment.</p>
+<p class="section-body"><strong>3. Personalised payment link.</strong> Generated with all applicable discounts pre-applied.</p>
+<p class="section-body"><strong>4. Pay via the link only.</strong> Never pay directly on the website &mdash; the discount will not apply.</p>
+<h3 class="section-subhead">Payment methods and terms</h3><table class="vo-table"><tr><th style="text-align:left">Item</th><th style="text-align:left">Detail</th></tr><tr><td style="text-align:left">Online (preferred)</td><td style="text-align:left">Personalised myHQ payment link. Reflects immediately.</td></tr><tr><td style="text-align:left">NEFT / RTGS / IMPS</td><td style="text-align:left">Manual invoice raised. 24&ndash;48 hours to reflect, adds 2 business days.</td></tr><tr><td style="text-align:left">Minimum ticket size</td><td style="text-align:left">&#8377;8,500. No transaction closed below this amount.</td></tr><tr><td style="text-align:left">GST</td><td style="text-align:left">18% on base price plus documentation charges. Mandatory, non-negotiable.</td></tr><tr><td style="text-align:left">Discounts</td><td style="text-align:left">Base price only. Documentation, PG charges and GST are non-discountable.</td></tr></table>
+</section>
+
+<section class="section" id="r-docs">
+<div class="section-num">08</div><h2 class="section-title">Documents</h2>
+<div class="section-outcome">What we provide, what the client provides</div>
+<h3 class="section-subhead">Documents we provide</h3><table class="vo-table"><tr><th style="text-align:left">Document</th><th>Owned space</th><th>Leased space</th><th>Compulsory</th></tr><tr><td style="text-align:left">Space&ndash;Client Agreement</td><td>Provided</td><td>Provided</td><td>Yes</td></tr><tr><td style="text-align:left">Utility Bill</td><td>Provided</td><td>Provided</td><td>Yes</td></tr><tr><td style="text-align:left">NOC to Client</td><td>Provided</td><td>Provided</td><td>Yes</td></tr><tr><td style="text-align:left">Master Agreement (space &amp; landlord)</td><td>Not required</td><td>Provided</td><td>Leased only</td></tr><tr><td style="text-align:left">Master NOC (landlord to space)</td><td>Not required</td><td>Provided</td><td>Leased only</td></tr><tr><td style="text-align:left">Property Tax Receipt</td><td>On request</td><td>On request</td><td>Additional</td></tr><tr><td style="text-align:left">Notarised documents</td><td>On request</td><td>On request</td><td>+charges, +4&ndash;5 days</td></tr></table><h3 class="section-subhead">New company registration &mdash; required from the client</h3><div class="vo-docs"><div class="vo-doc"><div class="vo-doc-head">Private Limited / LLP / OPC</div><li>Name Approval Letter</li><li>Director KYC (Aadhaar + PAN of all directors)</li><li>Cancelled cheque</li></div><div class="vo-doc"><div class="vo-doc-head">Proprietor</div><li>Director KYC (Aadhaar + PAN)</li><li>Cancelled cheque</li></div><div class="vo-doc"><div class="vo-doc-head">Partnership Firm</div><li>Partners KYC (Aadhaar + PAN of all partners)</li><li>Cancelled cheque</li><li>Partnership Deed</li></div></div><h3 class="section-subhead">Existing company registration &mdash; required from the client</h3><div class="vo-docs"><div class="vo-doc"><div class="vo-doc-head">Private Limited / Limited</div><li>MOA (Memorandum of Association)</li><li>AOA (Articles of Association)</li><li>Cancelled cheque</li><li>Company PAN card</li><li>COI (Certificate of Incorporation)</li><li>Director KYC (Aadhaar + PAN)</li><li>Board Resolution</li></div><div class="vo-doc"><div class="vo-doc-head">LLP / OPC</div><li>Cancelled cheque</li><li>Company PAN card</li><li>COI (Certificate of Incorporation)</li><li>Director KYC (Aadhaar + PAN)</li></div><div class="vo-doc"><div class="vo-doc-head">Proprietor</div><li>Director KYC (Aadhaar + PAN)</li><li>Cancelled cheque</li></div></div><div class="vo-warn"><strong>The 30-day rule.</strong> KYC must be completed within 30 days of payment. After this window the client is no longer eligible for a refund under any circumstances.</div><div class="vo-coach"><strong>Note.</strong> If the client holds an MSME Certificate or GST Certificate, they must provide those as well.</div>
+</section>
+
+<section class="section" id="r-wework">
+<div class="section-num">09</div><h2 class="section-title">WeWork spaces</h2>
+<div class="section-outcome">A separate, faster process</div>
+<p class="section-body">WeWork spaces have their own documentation and KYC process, managed through WeWork&rsquo;s internal team. The turnaround is substantially faster: 2 hours from KYC approval, against 5&ndash;7 business days for non-WeWork spaces.</p>
+<h3 class="section-subhead">Payment</h3><p class="section-body">Two routes are available: the myHQ personalised payment link, which carries the discount, or the WeWork website directly, which does not. NEFT and RTGS are also accepted with the usual delay.</p>
+<h3 class="section-subhead">Documentation timeline</h3><table class="vo-table"><tr><th style="text-align:left">Scenario</th><th>Timeline</th></tr><tr><td style="text-align:left">Standard &mdash; online payment, same-day KYC</td><td>2 hours from KYC approval</td></tr><tr><td style="text-align:left">NEFT / RTGS / IMPS</td><td>+2 business days</td></tr><tr><td style="text-align:left">Notarisation requested</td><td>+4&ndash;5 business days</td></tr><tr><td style="text-align:left">KYC submitted late</td><td>Clock starts at approval, not payment</td></tr></table><h3 class="section-subhead">WeWork-specific terms</h3><p class="section-body">WeWork spaces do not provide physical signage &mdash; the approach is digital and system-based. Clients should not expect an A4 board at reception. WeWork&rsquo;s KYC runs on their own system, separate from the myHQ dashboard. GST verification is handled systematically, with WeWork presenting digital records to government officers. The plan is not transferable to another entity.</p>
+<div class="vo-coach"><strong>Coaching note.</strong> Mention the no-physical-signage point proactively, before the client asks. It is the most common post-sale surprise on WeWork deals, and it is far cheaper to raise it early.</div><div class="vo-coach"><strong>Support.</strong> All WeWork queries route to <strong>contactwwvo@myhq.in</strong> &mdash; not to WeWork directly.</div>
+</section>
+
+<section class="section" id="r-refund">
+<div class="section-num">10</div><h2 class="section-title">Refunds and terms</h2>
+<div class="section-outcome">Say this before payment, never after</div>
+<h3 class="section-subhead">Refund policy</h3><p class="section-body"><strong>Refund window.</strong> A refund is possible only until the draft agreement is signed and approved by the space partner. After signing, no refund.</p>
+<p class="section-body"><strong>Two government rejections.</strong> If the GST or company registration application is rejected by the government twice, the client may be eligible for a partial refund.</p>
+<p class="section-body"><strong>Rejection letters.</strong> Must be submitted within 60 days of the payment date.</p>
+<p class="section-body"><strong>Non-refundable components.</strong> Payment gateway charges and documentation charges are non-refundable in all cases, including approved refunds.</p>
+<div class="vo-script"><div class="vo-script-label">Refund transparency script</div><div class="vo-script-text">&ldquo;Before you make the payment &mdash; just to be upfront: refunds are possible until the draft agreement is signed. After that point the space has already committed, so I want you to be comfortable before we proceed.&rdquo;</div></div><h3 class="section-subhead">Key terms and conditions</h3><p class="section-body">The plan is for the specific entity and signatory named in the agreement and is not transferable. Plans have a defined validity, typically one year, and renewal is required to maintain the registered address. Mail handling is included in all plans; call forwarding is not available. No modifications to standard documents are entertained post-payment. The same address can be used by multiple companies &mdash; this is standard practice and legally compliant. A virtual office plan does not entitle the client to use the physical workspace.</p>
+<div class="vo-coach"><strong>Support.</strong> Post-sales queries on documentation, KYC and refunds go to <strong>supportvo@myhq.in</strong>.</div>
+</section>
+
+<section class="section" id="r-pricing">
+<div class="section-num">11</div><h2 class="section-title">Pricing and negotiation</h2>
+<div class="section-outcome">Discount discipline</div>
+<p class="section-body">Before sharing pricing, verify in the Master Sheet: the location and city, the website price, the maximum payout to the space, and the minimum ticket size.</p>
+<div class="vo-script"><div class="vo-script-label">Primary script</div><div class="vo-script-text">&ldquo;The investment for this plan is [Website Price]. That is the base price plus documentation charges, plus 18% GST.&rdquo;</div></div><p class="section-body"><strong>Never lead with the maximum discount.</strong> Begin at 5&ndash;10% and negotiate from there.</p>
+<div class="vo-script"><div class="vo-script-label">Primary script</div><div class="vo-script-text">&ldquo;The standard price on the website is &#8377;X. Based on your requirement and current availability, I can offer &#8377;Y if we close today.&rdquo;</div></div><h3 class="section-subhead">Handling the common pushbacks</h3><p class="section-body"><strong>Questions the price.</strong> &ldquo;Let me break it down: [Base Price] covers the address and documentation, plus 18% GST, which is standard and set by the government.&rdquo;</p>
+<p class="section-body"><strong>Negotiates further.</strong> &ldquo;I understand. This is already the best price I can offer. What I can assure you is full transparency and compliance-ready documentation.&rdquo;</p>
+<p class="section-body"><strong>Compares with a competitor.</strong> &ldquo;That is a fair comparison. The difference usually comes down to documentation quality and compliance integrity &mdash; is the cheaper space owned or leased? Is its GSTIN verified?&rdquo;</p>
+<p class="section-body"><strong>Large company wanting a manual invoice.</strong> &ldquo;Of course &mdash; I can raise a manual invoice for NEFT or RTGS. Please note documentation begins only after the payment reflects, which adds about two business days.&rdquo;</p>
+<div class="vo-warn"><strong>Root ownership.</strong> You must communicate the T&amp;Cs, refund policy, document finality and payment gateway charges before payment. Never after a dispute.</div>
+</section>
+
+<section class="section" id="r-closing">
+<div class="section-num">12</div><h2 class="section-title">Closing</h2>
+<div class="section-outcome">Converting intent into a committed action</div>
+<p class="section-body">Every closing conversation must end with a specific, dated next action. &ldquo;I&rsquo;ll get back to you&rdquo; from the client is an open loop and should be closed before the call ends.</p>
+<div class="vo-script"><div class="vo-script-label">Primary script</div><div class="vo-script-text">&ldquo;I will send the proposal to your email and WhatsApp. Once you have reviewed it, I can generate your payment link &mdash; shall I call you back at [specific time] tomorrow?&rdquo;</div></div><p class="section-body"><strong>&ldquo;Let me think about it.&rdquo;</strong> &ldquo;Absolutely &mdash; that is fair. Is there a specific concern I can address right now? Sometimes a quick answer saves you a day of thinking.&rdquo;</p>
+<p class="section-body"><strong>&ldquo;I need to check with my partner or CA.&rdquo;</strong> &ldquo;Of course. I will send the full proposal so everyone can review it. When do you expect to hear back &mdash; today or tomorrow?&rdquo;</p>
+<p class="section-body"><strong>Urgency close, used compliantly.</strong> &ldquo;I want to be transparent &mdash; the coupon code I mentioned expires [today / in 24 hours]. After that it is full price.&rdquo; Only say this when it is true.</p>
+<h3 class="section-subhead">If they do not pay on the call</h3><p class="section-body">Confirm a specific follow-up date and time. Send the proposal within five minutes of the call ending, including plan details, pricing and sample documents. Update Zoho CRM with the follow-up date, call notes and stage status. Send a WhatsApp message confirming both the proposal and the agreed follow-up time.</p>
+
+</section>
+
+<section class="section" id="r-followup">
+<div class="section-num">13</div><h2 class="section-title">The follow-up call</h2>
+<div class="section-outcome">Scripts, questions and objections</div>
+<p class="section-body">The follow-up is not a reminder call. It is a structured sales conversation designed to surface the objection the client did not voice the first time.</p>
+<div class="vo-script"><div class="vo-script-label">Primary script</div><div class="vo-script-text">&ldquo;Hi [Name]! This is [Your Name] from myHQ Virtual Office. We spoke on [Day] about your [City] requirement &mdash; do you have two minutes?&rdquo;</div></div><p class="section-body"><strong>Did not open the proposal.</strong> &ldquo;No problem at all &mdash; let me take two minutes to walk you through the most important highlights right now.&rdquo;</p>
+<p class="section-body"><strong>Opened it but did not respond.</strong> &ldquo;I see you&rsquo;ve had a chance to look at it. Was there anything that needed more clarity?&rdquo;</p>
+<p class="section-body"><strong>Unresponsive, third attempt or beyond.</strong> &ldquo;Hi [Name] &mdash; I&rsquo;ll keep this very short. I just want to make sure I haven&rsquo;t missed something important. Is the requirement still active?&rdquo; Opening with a pattern interrupt works better than another reminder.</p>
+<h3 class="section-subhead">Rapport on a follow-up</h3><p class="section-body">Use what they told you last time. &ldquo;Last time you mentioned you&rsquo;re setting up a Pvt. Ltd. / expanding to [City] for GST&hellip;&rdquo; Personalised rapport shows you remembered the conversation, which signals professionalism.</p>
+<h3 class="section-subhead">Common questions and quick answers</h3><table class="vo-table"><tr><th style="text-align:left">Question</th><th style="text-align:left">Answer</th></tr><tr><td style="text-align:left">Are the documents accepted by the government?</td><td style="text-align:left">Yes &mdash; 95%+ success rate across 10,000+ registrations. Samples are on the website for CA verification.</td></tr><tr><td style="text-align:left">What if my CA says the documents aren&rsquo;t enough?</td><td style="text-align:left">Encourage the CA to download samples before payment. Post-payment, no modifications are made.</td></tr><tr><td style="text-align:left">Can I get documents in 2 days?</td><td style="text-align:left">Minimum 5&ndash;7 business days from KYC approval. Fastest route: pay online and complete KYC the same day.</td></tr><tr><td style="text-align:left">What happens if I don&rsquo;t renew?</td><td style="text-align:left">The space is no longer obligated to honour the agreement, signage or mail handling. The address stays on MCA/GST until changed.</td></tr></table><h3 class="section-subhead">Objection handling &mdash; the A-C-E framework</h3><p class="section-body"><strong>Acknowledge</strong> the concern &mdash; validate it, never dismiss it. <strong>Clarify</strong> the real issue by asking one more question after their first answer. <strong>Evidence</strong> &mdash; respond with proof rather than opinion: data, sample documents, success rates.</p>
+<table class="vo-table"><tr><th style="text-align:left">Objection</th><th style="text-align:left">Response</th></tr><tr><td style="text-align:left">&ldquo;Still thinking about it&rdquo;</td><td style="text-align:left">&ldquo;Of course.&rdquo; &rarr; &ldquo;What&rsquo;s the one thing still creating hesitation?&rdquo; &rarr; Address that specific thing.</td></tr><tr><td style="text-align:left">&ldquo;Found it cheaper elsewhere&rdquo;</td><td style="text-align:left">&ldquo;That&rsquo;s fair.&rdquo; &rarr; &ldquo;Is the cheaper space owned or leased? Is its GSTIN verified?&rdquo; &rarr; Rejection risk from poor documentation.</td></tr><tr><td style="text-align:left">&ldquo;My CA hasn&rsquo;t responded yet&rdquo;</td><td style="text-align:left">&ldquo;Completely understand.&rdquo; &rarr; &ldquo;Would it help if I prepared a one-pager for your CA?&rdquo; &rarr; Share proactively.</td></tr><tr><td style="text-align:left">&ldquo;We postponed the registration&rdquo;</td><td style="text-align:left">&ldquo;No problem.&rdquo; &rarr; &ldquo;Temporary hold, or has the requirement changed?&rdquo; &rarr; Diary accordingly.</td></tr><tr><td style="text-align:left">&ldquo;I need a better discount&rdquo;</td><td style="text-align:left">&ldquo;I hear you.&rdquo; &rarr; &ldquo;If I can get you [X]%, can you confirm today?&rdquo; &rarr; Escalate to TL for approval.</td></tr></table><h3 class="section-subhead">Closing the follow-up</h3><div class="vo-script"><div class="vo-script-label">Primary script</div><div class="vo-script-text">&ldquo;Perfect &mdash; I&rsquo;m glad we&rsquo;re aligned. Let me generate your payment link right now. I&rsquo;ll send it on WhatsApp and email together.&rdquo;</div></div><p class="section-body">If the client hesitates: &ldquo;I&rsquo;ll stay on the line &mdash; let me know when you have the link open and I can walk you through it.&rdquo; Confirm payment completion before ending the call, then remind the client to complete KYC today. Update the CRM immediately and send the post-payment WhatsApp confirmation.</p>
+<div class="takeaway">The follow-up call has one goal: payment confirmation before the call ends. Everything else is preparation for that moment.</div>
+</section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── FIREBASE AUTH GATE ── */
+(function() {
+  var CHAPTER_ID = 'vch1';
+  window.firebaseAuth.onAuthStateChanged(function(user) {
+    if (!user) { window.location.href = 'landing.html'; return; }
+    var db = window.firebaseDB;
+    db.collection('users').doc(user.uid).get().then(function(snap) {
+      var data = snap.exists ? snap.data() : {};
+      var unlocked = (data.unlockedChapters && data.unlockedChapters.beginner) || [];
+      if (unlocked.indexOf(CHAPTER_ID) === -1) {
+        document.getElementById('slide-mode').style.display = 'none';
+        var rm = document.getElementById('read-mode');
+        if (rm) rm.style.display = 'none';
+        var lock = document.createElement('div');
+        lock.style.cssText = 'position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;font-family:Manrope,sans-serif;z-index:9999;';
+        lock.innerHTML = '<div style="font-size:2.5rem;">🔒</div><div style="font-size:1.2rem;font-weight:800;color:#1E22AA;">This chapter is locked.</div><div style="font-size:14px;color:#7B7FE8;max-width:340px;text-align:center;">Ask your admin to unlock it.</div><a href="hub.html" style="margin-top:8px;font-size:13px;font-weight:700;color:#1E22AA;text-decoration:underline;">← Back to Hub</a>';
+        document.body.appendChild(lock);
+        return;
+      }
+      db.collection('content').doc(CHAPTER_ID).get().then(function(cSnap) {
+        if (!cSnap.exists) return;
+        var cData = cSnap.data();
+        document.querySelectorAll('[data-editable]').forEach(function(el) {
+          var key = el.getAttribute('data-editable');
+          var val = cData[key];
+          if (val === undefined) return;
+          el.innerHTML = val;
+        });
+      });
+
+    });
+  });
+})();
+
+/* ── MODE TOGGLE ── */
+let currentMode = 'slide';
+
+function setMode(mode) {
+  currentMode = mode;
+  const isSlide = mode === 'slide';
+  document.getElementById('slide-mode').style.display = isSlide ? '' : 'none';
+  const readEl = document.getElementById('read-mode');
+  readEl.classList.toggle('hidden', isSlide);
+  document.body.style.overflow = isSlide ? 'hidden' : 'auto';
+  document.getElementById('screenCounter').style.display = isSlide ? '' : 'none';
+  document.getElementById('dotNav').style.display = isSlide ? '' : 'none';
+  const keyHintEl = document.getElementById('keyHint'); if (keyHintEl) keyHintEl.style.display = isSlide ? '' : 'none';
+  const chapterLabelEl = document.getElementById('chapterLabel');
+  if (chapterLabelEl) chapterLabelEl.style.display = isSlide ? '' : 'none';
+  const btn = document.getElementById('btnRead');
+  if (isSlide) {
+    btn.innerHTML = '<i class="fa-solid fa-book-open"></i>&nbsp;Read Full Chapter';
+    btn.onclick = function() { setMode('read'); };
+  } else {
+    btn.innerHTML = '<i class="fa-solid fa-display"></i>&nbsp;Back to Slides';
+    btn.onclick = function() { setMode('slide'); };
+    window.scrollTo(0, 0);
+  }
+}
+
+/* ── SLIDE ENGINE ── */
+const TOTAL = 15;
+let current = 0;
+let animating = false;
+
+function buildDots() {
+  const nav = document.getElementById('dotNav');
+  nav.innerHTML = '';
+  for (let i = 0; i < TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    nav.appendChild(d);
+  }
+}
+
+function updateCounter() {
+  document.getElementById('screenCounter').textContent = `${current + 1} / ${TOTAL}`;
+  const chap = document.getElementById('chapterLabel');
+  if (chap) chap.style.display = current === 0 ? '' : 'none';
+}
+
+// Baseline device-pixel-ratio captured at first paint (100% zoom reference).
+const BASE_DPR = window.devicePixelRatio || 1;
+
+function scaleSlides() {
+  const REF_W = 1440;
+  const REF_H = 900;
+  const wrap = document.getElementById('slides');
+  if (!wrap) return;
+  const topbar = document.querySelector('.topbar');
+  const topbarH = topbar ? topbar.offsetHeight : 52;
+  const vw = document.documentElement.clientWidth;
+  const vh = document.documentElement.clientHeight - topbarH;
+
+  // Browser zoom factor: when the user zooms in (Cmd +), devicePixelRatio
+  // rises above the baseline. clientWidth shrinks at the same time, so the
+  // raw fit-scale would shrink the slide (content "zooms out"). Multiplying
+  // the fit-scale by the zoom factor makes the slide grow with the browser
+  // zoom — exactly like the natively-zoomed topbar.
+  const zoom = (window.devicePixelRatio || 1) / BASE_DPR;
+  const fit = Math.min(vw / REF_W, vh / REF_H);
+  const scale = fit * zoom;
+
+  const scaledW = REF_W * scale;
+  const scaledH = REF_H * scale;
+  // Center while the scaled slide still fits; once it grows past the viewport
+  // (zoomed in), clamp to 0 so the top-left stays anchored and the overflow
+  // extends down/right where the body can scroll to it.
+  const offsetX = Math.max(0, Math.round((vw - scaledW) / 2));
+  const offsetY = Math.max(0, Math.round((vh - scaledH) / 2));
+  wrap.style.width = REF_W + 'px';
+  wrap.style.height = REF_H + 'px';
+  wrap.style.left = offsetX + 'px';
+  wrap.style.top = (topbarH + offsetY) + 'px';
+  wrap.style.right = 'auto';
+  wrap.style.bottom = 'auto';
+  wrap.style.transform = `scale(${scale})`;
+  wrap.style.transformOrigin = 'top left';
+  // Grow the document so the body can scroll to overflowing (zoomed-in) slide.
+  document.body.style.minHeight = (topbarH + offsetY + scaledH) + 'px';
+  document.body.style.minWidth = (offsetX + scaledW) + 'px';
+}
+window.addEventListener('resize', scaleSlides);
+
+// Re-scale when browser zoom changes (devicePixelRatio changes on zoom).
+(function watchZoom() {
+  const mq = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+  mq.addEventListener('change', function() { scaleSlides(); watchZoom(); });
+})();
+
+function goTo(index) {
+  if (animating || index === current || index < 0 || index >= TOTAL) return;
+  animating = true;
+  const screens = document.querySelectorAll('.screen');
+  const dots = document.querySelectorAll('.dot');
+  const prev = current;
+  current = index;
+  screens[prev].classList.add('exit-up');
+  screens[prev].classList.remove('active');
+  setTimeout(() => screens[prev].classList.remove('exit-up'), 500);
+  screens[current].classList.add('active');
+  dots[prev].classList.remove('active');
+  dots[current].classList.add('active');
+  updateCounter();
+  const keyHint = document.getElementById('keyHint'); if (keyHint) keyHint.classList.add('hidden');
+  setTimeout(() => {
+    animating = false;
+    if (typeof redrawAmbitionChart === 'function') redrawAmbitionChart();
+  }, 520);
+}
+
+function next() { goTo(current + 1); }
+function prev() { goTo(current - 1); }
+
+
+document.addEventListener('keydown', e => {
+  if (currentMode !== 'slide') return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prev();
+});
+
+/* ── TIMELINE ACCORDION ── */
+
+/* ── DYK ACCORDION ── */
+
+/* ── TOC SCROLL SPY ── */
+const tocLinks = document.querySelectorAll('.toc-link');
+const readSections = document.querySelectorAll('.section[id], .r-section[id]');
+const tocObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      tocLinks.forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`.toc-link[data-s="${entry.target.id}"]`);
+      if (a) a.classList.add('active');
+    }
+  });
+}, { rootMargin: '-15% 0px -75% 0px', threshold: 0 });
+readSections.forEach(s => tocObserver.observe(s));
+
+/* ── INIT ── */
+window.addEventListener('DOMContentLoaded', () => {
+  scaleSlides();
+  buildDots();
+  document.querySelectorAll('.screen')[0].classList.add('active');
+  updateCounter();
+});
+
+
+/* ── ASSESSMENT ── */
+const SHEET_URL_CH2 = 'https://script.google.com/macros/s/AKfycbwX0Z5vx6DSwdwZwK26pKZL3V3U9XwEyWgPa9Ek_cFEH1_tpULnWNcn7RlgE-wT8M9M/exec';
+
+const MIN_WORDS = 50;
+
+
+
+
+
+
+
+// ── Ambition 2030 Chart ──────────────────────────────────────────────────────
+(function() {
+  const BARS = [
+    { label:'FY 22', value:20,   actual:true  },
+    { label:'FY 23', value:200,  actual:true  },
+    { label:'FY 24', value:400,  actual:true  },
+    { label:'FY 25', value:700,  actual:true  },
+    { label:'FY 26', value:1200, actual:true  },
+    { label:'FY 27', value:1700, actual:false },
+    { label:'FY 28', value:2400, actual:false },
+    { label:'FY 29', value:3500, actual:false },
+    { label:'FY 30', value:5000, actual:false, target:true },
+  ];
+  const MAX_VAL = 5000;
+  const BLUE = '#1E22AA';
+  const GREEN = '#2e7d36';
+  const MAX_H = '370px'; // tallest bar height — px fits within 900px canvas
+
+  function buildChart(container) {
+    container.innerHTML = '';
+
+    const barRow = document.createElement('div');
+    barRow.className = 'ambition-bar-row';
+    barRow.style.height = MAX_H;
+    barRow.style.position = 'relative';
+    barRow.style.paddingTop = '2vw'; // room for arrowhead + value labels above tallest bar
+    container.appendChild(barRow);
+
+    const labelRow = document.createElement('div');
+    labelRow.className = 'ambition-label-row';
+    container.appendChild(labelRow);
+
+    BARS.forEach((bar) => {
+
+      const col = document.createElement('div');
+      col.className = 'ambition-bar-col';
+
+      const valLabel = document.createElement('div');
+      valLabel.className = 'ambition-val';
+      valLabel.style.fontWeight = bar.target ? '800' : '700';
+      valLabel.style.color = bar.target ? GREEN : BLUE;
+      if (bar.actual || bar.target) valLabel.textContent = bar.value + ' Cr';
+      else valLabel.innerHTML = '&nbsp;';
+
+      const barEl = document.createElement('div');
+      barEl.className = 'ambition-bar';
+      barEl.style.height = ((bar.value / MAX_VAL) * 370).toFixed(1) + 'px';
+      if (bar.target) {
+        barEl.style.background = 'rgba(30,100,60,0.06)';
+        barEl.style.border = '1.5px dashed ' + GREEN;
+      } else if (bar.actual) {
+        barEl.style.background = BLUE;
+      } else {
+        barEl.style.background = 'rgba(30,34,170,0.08)';
+        barEl.style.border = '1.5px dashed ' + BLUE;
+      }
+
+      col.appendChild(valLabel);
+      col.appendChild(barEl);
+      barRow.appendChild(col);
+
+      const fyEl = document.createElement('div');
+      fyEl.className = 'ambition-label';
+      fyEl.style.fontWeight = bar.target ? '700' : '600';
+      fyEl.style.color = bar.target ? GREEN : '#94909C';
+      fyEl.textContent = bar.label;
+      labelRow.appendChild(fyEl);
+    });
+
+    // Canvas for curve — CSS sized to match barRow, redrawn on resize
+    const cvs = document.createElement('canvas');
+    cvs.className = 'ambition-canvas';
+    cvs.style.height = MAX_H;
+    barRow.appendChild(cvs);
+    redrawCanvas(cvs);
+  }
+
+  function redrawCanvas(cvs) {
+    requestAnimationFrame(() => {
+      const W = cvs.offsetWidth;
+      const H = cvs.offsetHeight;
+      if (!W || !H) return;
+      const dpr = window.devicePixelRatio || 1;
+      cvs.width = Math.round(W * dpr);
+      cvs.height = Math.round(H * dpr);
+      const ctx = cvs.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      const n = BARS.length;
+      const gapFrac = 0.008;
+      const colW = (W - gapFrac * W * (n - 1)) / n;
+
+      const pts = BARS.map((bar, i) => ({
+        x: i * (colW + gapFrac * W) + colW / 2,
+        y: H - (bar.value / MAX_VAL) * H,
+      }));
+
+      // Gridlines
+      [0, 1200, 2400, 3500, 5000].forEach((v, idx) => {
+        const y = H - (v / MAX_VAL) * H;
+        ctx.strokeStyle = '#e8e8f0';
+        ctx.lineWidth = 1;
+        ctx.setLineDash(idx === 0 ? [] : [4, 3]);
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+      });
+      ctx.setLineDash([]);
+
+      // Curve
+      ctx.strokeStyle = BLUE;
+      ctx.lineWidth = Math.max(1.5, W * 0.004);
+      ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 0; i < pts.length - 1; i++) {
+        const mx = (pts[i].x + pts[i + 1].x) / 2;
+        ctx.bezierCurveTo(mx, pts[i].y, mx, pts[i + 1].y, pts[i + 1].x, pts[i + 1].y);
+      }
+      ctx.stroke();
+
+      // Arrowhead
+      const tip = pts[pts.length - 1];
+      const a = Math.max(5, W * 0.011);
+      ctx.fillStyle = BLUE;
+      ctx.beginPath();
+      ctx.moveTo(tip.x, tip.y - a);
+      ctx.lineTo(tip.x - a * 0.6, tip.y + a * 0.35);
+      ctx.lineTo(tip.x + a * 0.6, tip.y + a * 0.35);
+      ctx.closePath(); ctx.fill();
+    });
+  }
+
+  function initChart(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const ro = new ResizeObserver(() => { if (el.offsetWidth > 0) buildChart(el); });
+    ro.observe(el);
+    if (el.offsetWidth > 0) buildChart(el);
+  }
+
+  window.redrawAmbitionChart = function() {
+    ['ambitionChart','ambitionChartRead'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.offsetWidth > 0) buildChart(el);
+    });
+  };
+
+  // On zoom, only the canvas needs redrawing — bars are vw-sized CSS, browser handles them
+  window.addEventListener('resize', () => {
+    document.querySelectorAll('.ambition-canvas').forEach(cvs => redrawCanvas(cvs));
+  });
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+  buildDots();
+  updateCounter();
+  scaleSlides();
+  watchZoom();
+});
+
+</script>
+</body>
+</html>
