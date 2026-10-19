@@ -532,7 +532,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 </style>
 <style>
 /* ── VO CHAPTER ── screens built on the shared .screen frame ── */
-.vo-wrap { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 48px; }
+.vo-wrap { width: 100%; max-width: 1180px; margin: 0 auto; padding: 44px 48px; height: 100%; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; }
 .vo-eyebrow { font-size: 11px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 10px; }
 .vo-h2 { font-size: 2.1rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.12; color: var(--ink); margin-bottom: 12px; }
 .vo-h2 em { font-style: normal; color: var(--blue); }
@@ -660,7 +660,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 <!-- SLIDE MODE -->
 <div id="slide-mode">
 <div class="slides" id="slides">
-<div class="screen ">
+<div class="screen  active">
 <div class="vo-wrap">
 <div class="vo-cover"><div class="vo-eyebrow">myHQ Virtual Office</div><h1>The <em>sales pitch</em><br>framework.</h1><p class="vo-cover-sub">The official end-to-end guide for every client interaction &mdash; from the opening call to post-payment handoff. Standardised, consultative, and built to be followed in order.</p><div class="vo-cover-meta"><div class="vo-cover-stat"><div class="vo-cover-num">11</div><div class="vo-cover-lbl">Call stages</div></div><div class="vo-cover-stat"><div class="vo-cover-num">7</div><div class="vo-cover-lbl">Plan paths</div></div><div class="vo-cover-stat"><div class="vo-cover-num">5</div><div class="vo-cover-lbl">Customer types</div></div></div></div>
 </div>
@@ -806,6 +806,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 </div>
 <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
 </div>
+  <nav class="dot-nav" id="dotNav"></nav>
 </div>
 </div><!-- /slide-mode -->
 
@@ -1318,162 +1319,11 @@ const MIN_WORDS = 50;
 
 
 // ── Ambition 2030 Chart ──────────────────────────────────────────────────────
-(function() {
-  const BARS = [
-    { label:'FY 22', value:20,   actual:true  },
-    { label:'FY 23', value:200,  actual:true  },
-    { label:'FY 24', value:400,  actual:true  },
-    { label:'FY 25', value:700,  actual:true  },
-    { label:'FY 26', value:1200, actual:true  },
-    { label:'FY 27', value:1700, actual:false },
-    { label:'FY 28', value:2400, actual:false },
-    { label:'FY 29', value:3500, actual:false },
-    { label:'FY 30', value:5000, actual:false, target:true },
-  ];
-  const MAX_VAL = 5000;
-  const BLUE = '#1E22AA';
-  const GREEN = '#2e7d36';
-  const MAX_H = '370px'; // tallest bar height — px fits within 900px canvas
 
-  function buildChart(container) {
-    container.innerHTML = '';
-
-    const barRow = document.createElement('div');
-    barRow.className = 'ambition-bar-row';
-    barRow.style.height = MAX_H;
-    barRow.style.position = 'relative';
-    barRow.style.paddingTop = '2vw'; // room for arrowhead + value labels above tallest bar
-    container.appendChild(barRow);
-
-    const labelRow = document.createElement('div');
-    labelRow.className = 'ambition-label-row';
-    container.appendChild(labelRow);
-
-    BARS.forEach((bar) => {
-
-      const col = document.createElement('div');
-      col.className = 'ambition-bar-col';
-
-      const valLabel = document.createElement('div');
-      valLabel.className = 'ambition-val';
-      valLabel.style.fontWeight = bar.target ? '800' : '700';
-      valLabel.style.color = bar.target ? GREEN : BLUE;
-      if (bar.actual || bar.target) valLabel.textContent = bar.value + ' Cr';
-      else valLabel.innerHTML = '&nbsp;';
-
-      const barEl = document.createElement('div');
-      barEl.className = 'ambition-bar';
-      barEl.style.height = ((bar.value / MAX_VAL) * 370).toFixed(1) + 'px';
-      if (bar.target) {
-        barEl.style.background = 'rgba(30,100,60,0.06)';
-        barEl.style.border = '1.5px dashed ' + GREEN;
-      } else if (bar.actual) {
-        barEl.style.background = BLUE;
-      } else {
-        barEl.style.background = 'rgba(30,34,170,0.08)';
-        barEl.style.border = '1.5px dashed ' + BLUE;
-      }
-
-      col.appendChild(valLabel);
-      col.appendChild(barEl);
-      barRow.appendChild(col);
-
-      const fyEl = document.createElement('div');
-      fyEl.className = 'ambition-label';
-      fyEl.style.fontWeight = bar.target ? '700' : '600';
-      fyEl.style.color = bar.target ? GREEN : '#94909C';
-      fyEl.textContent = bar.label;
-      labelRow.appendChild(fyEl);
-    });
-
-    // Canvas for curve — CSS sized to match barRow, redrawn on resize
-    const cvs = document.createElement('canvas');
-    cvs.className = 'ambition-canvas';
-    cvs.style.height = MAX_H;
-    barRow.appendChild(cvs);
-    redrawCanvas(cvs);
-  }
-
-  function redrawCanvas(cvs) {
-    requestAnimationFrame(() => {
-      const W = cvs.offsetWidth;
-      const H = cvs.offsetHeight;
-      if (!W || !H) return;
-      const dpr = window.devicePixelRatio || 1;
-      cvs.width = Math.round(W * dpr);
-      cvs.height = Math.round(H * dpr);
-      const ctx = cvs.getContext('2d');
-      ctx.scale(dpr, dpr);
-
-      const n = BARS.length;
-      const gapFrac = 0.008;
-      const colW = (W - gapFrac * W * (n - 1)) / n;
-
-      const pts = BARS.map((bar, i) => ({
-        x: i * (colW + gapFrac * W) + colW / 2,
-        y: H - (bar.value / MAX_VAL) * H,
-      }));
-
-      // Gridlines
-      [0, 1200, 2400, 3500, 5000].forEach((v, idx) => {
-        const y = H - (v / MAX_VAL) * H;
-        ctx.strokeStyle = '#e8e8f0';
-        ctx.lineWidth = 1;
-        ctx.setLineDash(idx === 0 ? [] : [4, 3]);
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-      });
-      ctx.setLineDash([]);
-
-      // Curve
-      ctx.strokeStyle = BLUE;
-      ctx.lineWidth = Math.max(1.5, W * 0.004);
-      ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.moveTo(pts[0].x, pts[0].y);
-      for (let i = 0; i < pts.length - 1; i++) {
-        const mx = (pts[i].x + pts[i + 1].x) / 2;
-        ctx.bezierCurveTo(mx, pts[i].y, mx, pts[i + 1].y, pts[i + 1].x, pts[i + 1].y);
-      }
-      ctx.stroke();
-
-      // Arrowhead
-      const tip = pts[pts.length - 1];
-      const a = Math.max(5, W * 0.011);
-      ctx.fillStyle = BLUE;
-      ctx.beginPath();
-      ctx.moveTo(tip.x, tip.y - a);
-      ctx.lineTo(tip.x - a * 0.6, tip.y + a * 0.35);
-      ctx.lineTo(tip.x + a * 0.6, tip.y + a * 0.35);
-      ctx.closePath(); ctx.fill();
-    });
-  }
-
-  function initChart(id) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const ro = new ResizeObserver(() => { if (el.offsetWidth > 0) buildChart(el); });
-    ro.observe(el);
-    if (el.offsetWidth > 0) buildChart(el);
-  }
-
-  window.redrawAmbitionChart = function() {
-    ['ambitionChart','ambitionChartRead'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el && el.offsetWidth > 0) buildChart(el);
-    });
-  };
-
-  // On zoom, only the canvas needs redrawing — bars are vw-sized CSS, browser handles them
-  window.addEventListener('resize', () => {
-    document.querySelectorAll('.ambition-canvas').forEach(cvs => redrawCanvas(cvs));
-  });
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function() {
   buildDots();
   updateCounter();
   scaleSlides();
-  watchZoom();
 });
 
 </script>
