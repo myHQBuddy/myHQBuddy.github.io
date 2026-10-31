@@ -69,3 +69,7 @@ node_modules/
 .dataconnect
 
 .DS_Store
+
+# Build scripts and source decks - not served, and the pptx is 11-484 MB
+_build/
+VO Chapter 5/

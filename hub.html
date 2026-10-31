@@ -641,12 +641,31 @@ body {
   <div class="courses-heading">VO Chapters</div>
   <div class="courses-grid">
 
-    <!-- VO CHAPTER 1 — Sales Pitch Framework -->
+    <!-- VO CHAPTER 01 — Virtual Office Foundations -->
+    <div class="course-card locked has-backdrop" id="card-vch0">
+      <div class="card-top-bar"></div>
+      <div class="card-backdrop" style="background-image:url('vo_foundations_cover.jpg')">
+        <div class="card-head">
+          <div class="card-num">VO · Chapter 01</div>
+          <div class="card-title" id="title-vch0">Virtual Office Foundations</div>
+          <div class="badge badge-locked" id="status-vch0">Locked</div>
+        </div>
+      </div>
+      <div class="card-cta-wrap" id="footer-vch0">
+        <button class="card-cta cta-locked" disabled>Locked</button>
+      </div>
+      <div class="unlock-section" id="unlock-section-vch0" style="display:none;">
+        <div class="unlock-label">VO Chapter 01 is locked</div>
+        <div class="unlock-hint">Complete both Org chapters to unlock the VO track.</div>
+      </div>
+    </div>
+
+    <!-- VO CHAPTER 02 — VO Sales Pitch -->
     <div class="course-card locked has-backdrop" id="card-vch1">
       <div class="card-top-bar"></div>
       <div class="card-backdrop" style="background-image:url('vo_sales_pitch_cover.jpg')">
         <div class="card-head">
-          <div class="card-num">VO · Chapter 01</div>
+          <div class="card-num">VO · Chapter 02</div>
           <div class="card-title" id="title-vch1">VO Sales Pitch</div>
           <div class="badge badge-locked" id="status-vch1">Locked</div>
         </div>
@@ -655,36 +674,27 @@ body {
         <button class="card-cta cta-locked" disabled>Locked</button>
       </div>
       <div class="unlock-section" id="unlock-section-vch1" style="display:none;">
-        <div class="unlock-label">VO Chapter 1 is locked</div>
-        <div class="unlock-hint">Complete both Org chapters to unlock the VO Sales Pitch framework.</div>
+        <div class="unlock-label">VO Chapter 02 is locked</div>
+        <div class="unlock-hint">Complete VO Chapter 1 to unlock the Sales Pitch framework.</div>
       </div>
     </div>
 
-    <div class="course-card locked">
-      <div class="card-top-bar"></div>
-      <div class="card-inner">
-        <div class="card-head">
-          <div class="card-num">VO · Chapter 02</div>
-          <div class="card-title" style="color:var(--blue-pale);">Chapter 2</div>
-          <div class="badge badge-locked">Coming Soon</div>
-        </div>
-      </div>
-      <div class="card-cta-wrap">
-        <button class="card-cta cta-locked" disabled>Locked</button>
-      </div>
-    </div>
-
-    <div class="course-card locked">
+    <!-- VO CHAPTER 03 — Sample Recordings -->
+    <div class="course-card locked" id="card-vch2">
       <div class="card-top-bar"></div>
       <div class="card-inner">
         <div class="card-head">
           <div class="card-num">VO · Chapter 03</div>
-          <div class="card-title" style="color:var(--blue-pale);">Chapter 3</div>
-          <div class="badge badge-locked">Coming Soon</div>
+          <div class="card-title" id="title-vch2">Sample Recordings</div>
+          <div class="badge badge-locked" id="status-vch2">Locked</div>
         </div>
       </div>
-      <div class="card-cta-wrap">
+      <div class="card-cta-wrap" id="footer-vch2">
         <button class="card-cta cta-locked" disabled>Locked</button>
+      </div>
+      <div class="unlock-section" id="unlock-section-vch2" style="display:none;">
+        <div class="unlock-label">VO Chapter 03 is locked</div>
+        <div class="unlock-hint">Complete VO Chapter 2 to unlock the sample recordings.</div>
       </div>
     </div>
 
@@ -694,6 +704,20 @@ body {
         <div class="card-head">
           <div class="card-num">VO · Chapter 04</div>
           <div class="card-title" style="color:var(--blue-pale);">Chapter 4</div>
+          <div class="badge badge-locked">Coming Soon</div>
+        </div>
+      </div>
+      <div class="card-cta-wrap">
+        <button class="card-cta cta-locked" disabled>Locked</button>
+      </div>
+    </div>
+
+    <div class="course-card locked">
+      <div class="card-top-bar"></div>
+      <div class="card-inner">
+        <div class="card-head">
+          <div class="card-num">VO · Chapter 05</div>
+          <div class="card-title" style="color:var(--blue-pale);">Chapter 5</div>
           <div class="badge badge-locked">Coming Soon</div>
         </div>
       </div>
@@ -905,43 +929,55 @@ auth.onAuthStateChanged(function(user) {
       }
     });
 
-    // ── VO Chapter 1 — Sales Pitch Framework ──
-    // Same entry condition as the AM chain: both Org chapters complete.
-    // VO chapters 2–5 are still being written, so there is no VO chain to
-    // hang this off yet — when they land, rewire this to follow vch0.
-    var vch1Card      = document.getElementById('card-vch1');
-    var vch1Status    = document.getElementById('status-vch1');
-    var vch1Footer    = document.getElementById('footer-vch1');
-    var vch1UnlockSec = document.getElementById('unlock-section-vch1');
-    var vch1Title     = document.getElementById('title-vch1');
+    // ── VO chain — Foundations → Sales Pitch → Sample Recordings ──
+    // Entry is the same as the AM chain (both Org chapters), then each VO
+    // chapter opens the next one. Admin unlock still overrides the chain.
+    var VO_CHAIN = [
+      { id: 'vch0', href: 'VO_Chapter_1.html' },
+      { id: 'vch1', href: 'VO_Sales_Pitch.html' },
+      { id: 'vch2', href: 'VO_Chapter_2.html' }
+    ];
 
-    if (vch1Card) {
-      var vch1AdminUnlocked = unlocked.indexOf('vch1') !== -1;
-      var vch1LockedByAdmin = adminLocked.indexOf('vch1') !== -1;
-      var vch1Unlocked = ((ch1Completed && ch2Completed) && !vch1LockedByAdmin) || vch1AdminUnlocked;
-      var vch1Completed = progress.vch1 && progress.vch1.completed;
+    var voPrevDone = ch1Completed && ch2Completed;   // entry condition
+    VO_CHAIN.forEach(function(c) {
+      var card   = document.getElementById('card-' + c.id);
+      if (!card) return;
+      var status = document.getElementById('status-' + c.id);
+      var footer = document.getElementById('footer-' + c.id);
+      var sec    = document.getElementById('unlock-section-' + c.id);
 
-      if ((ch1Completed && ch2Completed) && !vch1AdminUnlocked && !vch1LockedByAdmin) {
+      var adminOpen   = unlocked.indexOf(c.id) !== -1;
+      var adminLockd  = adminLocked.indexOf(c.id) !== -1;
+      var isUnlocked  = (voPrevDone && !adminLockd) || adminOpen;
+      var isCompleted = progress[c.id] && progress[c.id].completed;
+
+      // Persist the unlock so the admin screen reflects the chain.
+      if (voPrevDone && !adminOpen && !adminLockd) {
         db.collection('users').doc(user.uid).set({
-          unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion('vch1') }
+          unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion(c.id) }
         }, { merge: true });
       }
 
-      if (vch1Unlocked) {
-        vch1Card.classList.remove('locked'); vch1Card.classList.add('unlocked');
-        if (vch1UnlockSec) vch1UnlockSec.style.display = 'none';
-        if (vch1Completed) {
-          vch1Card.classList.add('completed');
-          vch1Status.textContent = 'Completed'; vch1Status.className = 'badge badge-mint';
-          vch1Footer.innerHTML = '<a class="card-cta cta-done" href="VO_Sales_Pitch.html"><span>Review</span><span class="arrow">→</span></a>';
+      if (isUnlocked) {
+        card.classList.remove('locked'); card.classList.add('unlocked');
+        if (sec) sec.style.display = 'none';
+        if (isCompleted) {
+          card.classList.add('completed');
+          status.textContent = 'Completed'; status.className = 'badge badge-mint';
+          footer.innerHTML = '<a class="card-cta cta-done" href="' + c.href +
+            '"><span>Review</span><span class="arrow">→</span></a>';
         } else {
-          vch1Status.textContent = 'Unlocked'; vch1Status.className = 'badge badge-blue';
-          vch1Footer.innerHTML = '<a class="card-cta cta-primary" href="VO_Sales_Pitch.html"><span>Start</span><span class="arrow">→</span></a>';
+          status.textContent = 'Unlocked'; status.className = 'badge badge-blue';
+          footer.innerHTML = '<a class="card-cta cta-primary" href="' + c.href +
+            '"><span>Start</span><span class="arrow">→</span></a>';
         }
       } else {
-        if (vch1UnlockSec) vch1UnlockSec.style.display = '';
+        if (sec) sec.style.display = '';
       }
-    }
+
+      // The next chapter opens only once this one is done.
+      voPrevDone = isUnlocked && isCompleted;
+    });
 
     // ── AM Chapter 1 — Know Your City ──
     var amch1Card      = document.getElementById('card-amch1');

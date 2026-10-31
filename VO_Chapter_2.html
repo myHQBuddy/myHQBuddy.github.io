@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VO Chapter 3: Sample Recordings | myHQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" as="style">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" as="style">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<!-- Firebase v9 compat -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<style>
+/* ── TOKENS (identical to VO Chapter 1) ── */
+:root {
+  --blue:       #1E22AA;
+  --blue-dark:  #161a8b;
+  --green:      #BEE5C2;
+  --coral:      #FF7351;
+  --amber:      #FFB848;
+  --ink:        #0B0F2C;
+  --body:       #4A4D63;
+  --muted:      #94909C;
+  --white:      #FFFFFF;
+  --hairline:   rgba(11,15,44,0.10);
+  --sans:       'Manrope', system-ui, sans-serif;
+  --radius:     8px;
+  --ease:       cubic-bezier(0.22,1,0.36,1);
+  --transition: 0.25s var(--ease);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--sans); background: var(--white); color: var(--ink); overflow: hidden; font-size: 16px; line-height: 1.6; }
+
+/* ── TOP BAR ── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: 52px; z-index: 100;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--hairline);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-logo { font-size: 15px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.topbar-chapter { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.topbar-center { font-size: 18px; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; position: absolute; left: 50%; transform: translateX(-50%); }
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+.screen-counter { font-size: 11px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.hub-btn {
+  font-size: 14px; color: var(--blue); background: transparent;
+  width: 32px; height: 32px; border-radius: var(--radius);
+  border: 1px solid rgba(30,34,170,0.3);
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: var(--transition); text-decoration: none;
+}
+.hub-btn:hover { background: rgba(30,34,170,0.06); border-color: var(--blue); }
+
+/* ── SLIDES ── */
+.dot-nav { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 100; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hairline); border: 1.5px solid rgba(11,15,44,0.2); cursor: pointer; transition: var(--transition); }
+.dot.active { background: var(--blue); border-color: var(--blue); transform: scale(1.3); }
+.key-hint { position: absolute; bottom: 18px; right: 48px; font-size: 11px; font-weight: 500; color: var(--muted); display: flex; align-items: center; gap: 6px; transition: opacity 0.5s; z-index: 100; }
+.key-hint.hidden { opacity: 0; pointer-events: none; }
+
+.slides { position: absolute; transform-origin: top left; }
+.screen { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); transform: translateY(20px); overflow: hidden; }
+.screen.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+.screen.exit-up { opacity: 0; transform: translateY(-20px); }
+
+.screen-next-btn {
+  position: absolute; bottom: 40px; right: 56px;
+  background: transparent; color: var(--muted); border: 1px solid var(--hairline);
+  font-size: 11px; font-weight: 700; font-family: var(--sans);
+  padding: 7px 14px; border-radius: var(--radius); cursor: pointer;
+  display: flex; align-items: center; gap: 6px; transition: var(--transition);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.screen-next-btn:hover { color: var(--blue); border-color: rgba(30,34,170,0.3); }
+
+/* ── SHARED LAYOUT ── */
+.vo-wrap { height: 100%; padding: 64px 80px 80px; display: flex; flex-direction: column; }
+.vo-wrap--recs { padding-top: 52px; }
+.vo-eyebrow { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+.vo-eyebrow::before { content: ''; width: 9px; height: 9px; background: var(--blue); border-radius: 50%; display: block; flex: none; }
+.vo-h2 { font-size: 2.6rem; font-weight: 800; line-height: 1.1; letter-spacing: -0.035em; color: var(--ink); margin-bottom: 18px; }
+.vo-h2 em { font-style: normal; color: var(--blue); }
+.vo-lede { font-size: 1.05rem; color: var(--body); line-height: 1.7; max-width: 60ch; margin-bottom: 28px; }
+.vo-lede strong { color: var(--ink); font-weight: 700; }
+
+/* ── COVER ── */
+.vo-cover { height: 100%; display: flex; flex-direction: column; justify-content: center; }
+.vo-cover h1 { font-size: 4.4rem; font-weight: 800; line-height: 1.05; letter-spacing: -0.045em; color: var(--ink); margin-bottom: 22px; }
+.vo-cover h1 em { font-style: normal; color: var(--blue); }
+.vo-cover-sub { font-size: 1.1rem; color: var(--body); line-height: 1.7; max-width: 62ch; }
+.vo-cover-meta { display: flex; gap: 56px; margin-top: 44px; }
+.vo-cover-num { font-size: 2.4rem; font-weight: 800; color: var(--blue); letter-spacing: -0.04em; line-height: 1; }
+.vo-cover-lbl { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 8px; }
+
+/* ── WARNING / COACH CALLOUTS ── */
+.vo-warn { background: rgba(255,115,81,0.08); border-left: 3px solid var(--coral); border-radius: 0 6px 6px 0; padding: 14px 20px; font-size: 14px; color: var(--body); line-height: 1.65; margin-top: auto; }
+.vo-warn strong { color: var(--ink); font-weight: 800; }
+.vo-coach { background: rgba(190,229,194,0.25); border-left: 3px solid #4CAF74; border-radius: 0 6px 6px 0; padding: 14px 20px; font-size: 14px; color: var(--body); line-height: 1.65; margin-top: auto; }
+.vo-coach strong { color: var(--ink); font-weight: 800; }
+
+/* ══════════════════════════════════════════════════════════════════
+   PROTECTED AUDIO PLAYER
+   No <audio controls>, so no browser download button / overflow menu.
+   Playback is driven by a custom UI over a hidden media element.
+   ══════════════════════════════════════════════════════════════════ */
+.rec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; align-content: start; }
+
+.rec {
+  border: 1px solid var(--hairline); border-radius: var(--radius);
+  background: var(--white); padding: 14px 18px;
+  display: grid; grid-template-columns: 40px 1fr; align-items: center; gap: 14px;
+  transition: var(--transition);
+  /* Deterrent: no text selection, no long-press "save audio" menu */
+  -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none;
+}
+.rec:hover { border-color: rgba(30,34,170,0.3); box-shadow: 0 4px 16px rgba(11,15,44,0.06); }
+.rec.playing { border-color: var(--blue); background: rgba(30,34,170,0.03); }
+
+.rec-play {
+  width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer;
+  background: var(--blue); color: var(--white); font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition); flex: none; font-family: var(--sans);
+}
+.rec-play:hover { background: var(--blue-dark); transform: scale(1.06); }
+.rec-play i { margin-left: 2px; }
+.rec.playing .rec-play i { margin-left: 0; }
+
+.rec-mid { min-width: 0; }
+.rec-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 2px; }
+.rec-name { font-size: 13px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rec-tag { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* Scrub bar */
+.rec-bar { height: 4px; border-radius: 2px; background: var(--hairline); margin-top: 8px; position: relative; cursor: pointer; }
+.rec-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; border-radius: 2px; background: var(--blue); transition: width 0.1s linear; }
+.rec-knob { position: absolute; top: 50%; width: 10px; height: 10px; border-radius: 50%; background: var(--blue); transform: translate(-50%,-50%); left: 0%; opacity: 0; transition: opacity var(--transition); }
+.rec:hover .rec-knob, .rec.playing .rec-knob { opacity: 1; }
+
+.rec-time { font-size: 11px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Lock chip */
+.rec-lock { font-size: 10px; color: var(--muted); display: inline-flex; align-items: center; gap: 4px; }
+
+/* Protection banner */
+.rec-note {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(30,34,170,0.05); border: 1px solid rgba(30,34,170,0.15);
+  border-radius: var(--radius); padding: 11px 16px; font-size: 12.5px; color: var(--body);
+  margin-bottom: 22px;
+}
+.rec-note i { color: var(--blue); font-size: 14px; }
+.rec-note strong { color: var(--ink); font-weight: 800; }
+</style>
+</head>
+<body oncontextmenu="return false;">
+
+<!-- TOP BAR -->
+<header class="topbar" id="topbar">
+  <div class="topbar-left">
+    <span class="topbar-logo">myHQ</span>
+    <span class="topbar-chapter" id="chapterLabel">VO &middot; Chapter 3</span>
+  </div>
+  <div class="topbar-center">Sample Recordings</div>
+  <div class="topbar-right">
+    <a class="hub-btn" href="hub.html" title="Back to Hub"><i class="fa-solid fa-house"></i></a>
+    <span class="screen-counter" id="screenCounter">1 / 3</span>
+  </div>
+</header>
+
+<!-- ═══ SLIDE MODE ═══ -->
+<div id="slide-mode">
+<div class="slides" id="slides">
+
+<!-- SCREEN 0 — COVER -->
+<div class="screen active">
+<div class="vo-wrap">
+<div class="vo-cover">
+  <div class="vo-eyebrow">myHQ Virtual Office</div>
+  <h1>Learn from <em>real calls</em>.</h1>
+  <p class="vo-cover-sub">Listen to live Virtual Office sales calls and hear the framework in practice &mdash; how the opening lands, where need analysis actually happens, and how objections get handled in the moment.</p>
+  <div class="vo-cover-meta">
+    <div class="vo-cover-stat"><div class="vo-cover-num">8</div><div class="vo-cover-lbl">Recordings</div></div>
+    <div class="vo-cover-stat"><div class="vo-cover-num">11</div><div class="vo-cover-lbl">Stages to spot</div></div>
+    <div class="vo-cover-stat"><div class="vo-cover-num"><i class="fa-solid fa-lock" style="font-size:1.8rem;"></i></div><div class="vo-cover-lbl">Streaming only</div></div>
+  </div>
+</div>
+</div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<!-- SCREEN 1 — HOW TO LISTEN -->
+<div class="screen">
+<div class="vo-wrap">
+<div class="vo-eyebrow">1 &middot; How to use this chapter</div>
+<h2 class="vo-h2">Listen for <em>the eleven stages</em>, not the words.</h2>
+<p class="vo-lede">These are unedited calls from the floor. They are not perfect scripts &mdash; they are real conversations where the framework works, and sometimes where it slips. Your job is to map what you hear back onto the stages from Chapter 2.</p>
+<p class="vo-lede">As you listen to each call, note: <strong>where did need analysis actually begin?</strong> Did the pitch come before or after the requirement was confirmed? What objection surfaced, and was it the real one?</p>
+<div class="vo-warn"><strong>Confidential &mdash; internal training use only.</strong> These recordings contain live client conversations. They are streamed inside this module and must not be shared, re-recorded, or taken outside myHQ.</div>
+</div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+
+<!-- SCREEN 2 — THE RECORDINGS -->
+<div class="screen">
+<div class="vo-wrap vo-wrap--recs">
+<div class="vo-eyebrow">2 &middot; The recordings</div>
+<h2 class="vo-h2">Eight live <em>Virtual Office</em> calls.</h2>
+<div class="rec-note">
+  <i class="fa-solid fa-shield-halved"></i>
+  <span><strong>Streaming only.</strong> These recordings play inside the module and cannot be downloaded, saved, or right-clicked out.</span>
+</div>
+<div class="rec-grid" id="recGrid"></div>
+</div>
+</div>
+
+  <nav class="dot-nav" id="dotNav"></nav>
+</div>
+</div><!-- /slide-mode -->
+
+<script>
+/* FIREBASE AUTH GATE - matches VO Chapter 1 and 2. */
+(function() {
+  var CHAPTER_ID = 'vch2';
+  window.firebaseAuth.onAuthStateChanged(function(user) {
+    if (!user) { window.location.href = 'landing.html'; return; }
+    window.firebaseDB.collection('users').doc(user.uid).get().then(function(snap) {
+      var data = snap.exists ? snap.data() : {};
+      var unlocked = (data.unlockedChapters && data.unlockedChapters.beginner) || [];
+      if (unlocked.indexOf(CHAPTER_ID) !== -1) return;
+      var sm = document.getElementById('slide-mode');
+      if (sm) sm.style.display = 'none';
+      var lock = document.createElement('div');
+      lock.style.cssText = 'position:fixed;inset:0;background:#fff;display:flex;'
+        + 'flex-direction:column;align-items:center;justify-content:center;'
+        + 'gap:20px;font-family:Manrope,sans-serif;z-index:9999;';
+      lock.innerHTML = '<div style="font-size:2.5rem;">🔒</div>'
+        + '<div style="font-size:1.2rem;font-weight:800;color:#1E22AA;">'
+        + 'This chapter is locked.</div>'
+        + '<div style="font-size:14px;color:#7B7FE8;max-width:340px;text-align:center;">'
+        + 'Complete VO Chapter 2 to unlock the sample recordings.</div>'
+        + '<a href="hub.html" style="margin-top:8px;font-size:13px;font-weight:700;'
+        + 'color:#1E22AA;text-decoration:underline;">← Back to Hub</a>';
+      document.body.appendChild(lock);
+    });
+  });
+})();
+</script>
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   RECORDINGS
+   ══════════════════════════════════════════════════════════════════ */
+const RECORDINGS = [
+  { file: 'vo_ch2_audio/call_01.mp4', name: 'Call 01 — Opening &amp; rapport',     tag: 'Stages 1–3' },
+  { file: 'vo_ch2_audio/call_02.mp4', name: 'Call 02 — Full call, end to end',  tag: 'Stages 1–11' },
+  { file: 'vo_ch2_audio/call_03.mp4', name: 'Call 03 — Need generation',        tag: 'Stages 4–5' },
+  { file: 'vo_ch2_audio/call_04.mp4', name: 'Call 04 — Short enquiry',          tag: 'Stages 1–4' },
+  { file: 'vo_ch2_audio/call_05.mp4', name: 'Call 05 — Product pitch &amp; USP',   tag: 'Stages 6–7' },
+  { file: 'vo_ch2_audio/call_06.mp4', name: 'Call 06 — Pricing &amp; process',     tag: 'Stage 8' },
+  { file: 'vo_ch2_audio/call_07.mp4', name: 'Call 07 — Objection handling',     tag: 'Stage 9' },
+  { file: 'vo_ch2_audio/call_08.mp4', name: 'Call 08 — Closing &amp; handoff',     tag: 'Stages 10–11' },
+];
+
+/* ══════════════════════════════════════════════════════════════════
+   DOWNLOAD DETERRENTS
+
+   Honest note: anything the browser can play, the browser has fetched.
+   A determined user with dev tools can always recover the stream. These
+   measures remove every *easy* path, which is what stops almost everyone:
+
+     1. No `controls` attribute  -> no native download button or kebab menu
+     2. controlsList=nodownload  -> belt-and-braces if controls ever appear
+     3. contextmenu blocked      -> no right-click "Save audio as..."
+     4. user-select / callout    -> no long-press save sheet on mobile
+     5. no <a href> to the file  -> nothing to copy as a link
+     6. Ctrl+S / Ctrl+U blocked  -> no save-page or view-source by shortcut
+
+   For real protection the server must stop serving these as plain static
+   files. See the note at the bottom of this file.
+   ══════════════════════════════════════════════════════════════════ */
+
+let activeAudio = null;   // the one <audio> currently playing
+let activeCard  = null;
+
+function fmt(s) {
+  if (!isFinite(s) || s < 0) s = 0;
+  const m = Math.floor(s / 60);
+  const r = Math.floor(s % 60);
+  return m + ':' + String(r).padStart(2, '0');
+}
+
+function buildRecordings() {
+  const grid = document.getElementById('recGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  RECORDINGS.forEach(function(rec) {
+    const card = document.createElement('div');
+    card.className = 'rec';
+    card.innerHTML =
+      '<button class="rec-play" aria-label="Play ' + rec.name + '"><i class="fa-solid fa-play"></i></button>' +
+      '<div class="rec-mid">' +
+        '<div class="rec-top">' +
+          '<div class="rec-name">' + rec.name + '</div>' +
+          '<div class="rec-time">0:00</div>' +
+        '</div>' +
+        '<div class="rec-tag">' + rec.tag + '</div>' +
+        '<div class="rec-bar"><div class="rec-fill"></div><div class="rec-knob"></div></div>' +
+      '</div>';
+
+    // Hidden media element - deliberately NOT given `controls`.
+    const audio = document.createElement('audio');
+    audio.preload = 'metadata';
+    audio.setAttribute('controlsList', 'nodownload noplaybackrate');
+    audio.disableRemotePlayback = true;
+    audio.src = rec.file;
+    card.appendChild(audio);
+
+    const btn  = card.querySelector('.rec-play');
+    const icon = card.querySelector('.rec-play i');
+    const fill = card.querySelector('.rec-fill');
+    const knob = card.querySelector('.rec-knob');
+    const bar  = card.querySelector('.rec-bar');
+    const time = card.querySelector('.rec-time');
+
+    audio.addEventListener('loadedmetadata', function() {
+      time.textContent = fmt(audio.duration);
+    });
+
+    audio.addEventListener('timeupdate', function() {
+      const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+      fill.style.width = pct + '%';
+      knob.style.left  = pct + '%';
+      time.textContent = fmt(audio.currentTime) + ' / ' + fmt(audio.duration);
+    });
+
+    audio.addEventListener('ended', function() {
+      icon.className = 'fa-solid fa-play';
+      card.classList.remove('playing');
+      fill.style.width = '0%';
+      knob.style.left  = '0%';
+      time.textContent = fmt(audio.duration);
+      activeAudio = null;
+      activeCard  = null;
+    });
+
+    btn.addEventListener('click', function() {
+      if (audio.paused) {
+        // Only one recording plays at a time.
+        if (activeAudio && activeAudio !== audio) {
+          activeAudio.pause();
+          if (activeCard) {
+            activeCard.classList.remove('playing');
+            activeCard.querySelector('.rec-play i').className = 'fa-solid fa-play';
+          }
+        }
+        audio.play();
+        icon.className = 'fa-solid fa-pause';
+        card.classList.add('playing');
+        activeAudio = audio;
+        activeCard  = card;
+      } else {
+        audio.pause();
+        icon.className = 'fa-solid fa-play';
+        card.classList.remove('playing');
+      }
+    });
+
+    // Click-to-scrub
+    bar.addEventListener('click', function(e) {
+      if (!audio.duration) return;
+      const r = bar.getBoundingClientRect();
+      audio.currentTime = ((e.clientX - r.left) / r.width) * audio.duration;
+    });
+
+    grid.appendChild(card);
+  });
+}
+
+/* Block right-click save, and save-page / view-source shortcuts. */
+document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
+document.addEventListener('keydown', function(e) {
+  const k = (e.key || '').toLowerCase();
+  if ((e.ctrlKey || e.metaKey) && (k === 's' || k === 'u')) {
+    e.preventDefault();
+    return false;
+  }
+});
+
+/* ── SLIDE ENGINE (same as VO Chapter 1) ── */
+const TOTAL = 3;
+let current = 0;
+let animating = false;
+
+function buildDots() {
+  const nav = document.getElementById('dotNav');
+  nav.innerHTML = '';
+  for (let i = 0; i < TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = (function(n) { return function() { goTo(n); }; })(i);
+    nav.appendChild(d);
+  }
+}
+
+function updateCounter() {
+  document.getElementById('screenCounter').textContent = (current + 1) + ' / ' + TOTAL;
+  const chap = document.getElementById('chapterLabel');
+  if (chap) chap.style.display = current === 0 ? '' : 'none';
+}
+
+const BASE_DPR = window.devicePixelRatio || 1;
+
+function scaleSlides() {
+  const REF_W = 1440, REF_H = 900;
+  const wrap = document.getElementById('slides');
+  if (!wrap) return;
+  const topbar = document.querySelector('.topbar');
+  const topbarH = topbar ? topbar.offsetHeight : 52;
+  const vw = document.documentElement.clientWidth;
+  const vh = document.documentElement.clientHeight - topbarH;
+  const zoom = (window.devicePixelRatio || 1) / BASE_DPR;
+  const scale = Math.min(vw / REF_W, vh / REF_H) * zoom;
+  const scaledW = REF_W * scale, scaledH = REF_H * scale;
+  const offsetX = Math.max(0, Math.round((vw - scaledW) / 2));
+  const offsetY = Math.max(0, Math.round((vh - scaledH) / 2));
+  wrap.style.width  = REF_W + 'px';
+  wrap.style.height = REF_H + 'px';
+  wrap.style.left   = offsetX + 'px';
+  wrap.style.top    = (topbarH + offsetY) + 'px';
+  wrap.style.right  = 'auto';
+  wrap.style.bottom = 'auto';
+  wrap.style.transform = 'scale(' + scale + ')';
+  wrap.style.transformOrigin = 'top left';
+  document.body.style.minHeight = (topbarH + offsetY + scaledH) + 'px';
+  document.body.style.minWidth  = (offsetX + scaledW) + 'px';
+}
+window.addEventListener('resize', scaleSlides);
+
+(function watchZoom() {
+  const mq = window.matchMedia('(resolution: ' + window.devicePixelRatio + 'dppx)');
+  mq.addEventListener('change', function() { scaleSlides(); watchZoom(); });
+})();
+
+function goTo(index) {
+  if (animating || index === current || index < 0 || index >= TOTAL) return;
+  animating = true;
+  const screens = document.querySelectorAll('.screen');
+  const dots = document.querySelectorAll('.dot');
+  const prev = current;
+  current = index;
+  screens[prev].classList.add('exit-up');
+  screens[prev].classList.remove('active');
+  setTimeout(function() { screens[prev].classList.remove('exit-up'); }, 500);
+  screens[current].classList.add('active');
+  dots[prev].classList.remove('active');
+  dots[current].classList.add('active');
+  updateCounter();
+  setTimeout(function() { animating = false; }, 520);
+}
+function next()      { goTo(current + 1); }
+function prevSlide() { goTo(current - 1); }
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prevSlide();
+});
+
+/* ── INIT ── */
+window.addEventListener('DOMContentLoaded', function() {
+  scaleSlides();
+  buildDots();
+  buildRecordings();
+  // Deep-link support: VO_Chapter_2.html#2 opens the third slide.
+  var h = parseInt((location.hash || '').replace('#', ''), 10);
+  if (!isNaN(h) && h > 0 && h < TOTAL) {
+    document.querySelectorAll('.screen')[0].classList.remove('active');
+    document.querySelectorAll('.screen')[h].classList.add('active');
+    document.querySelectorAll('.dot')[0].classList.remove('active');
+    document.querySelectorAll('.dot')[h].classList.add('active');
+    current = h;
+  }
+  updateCounter();
+});
+</script>
+
+<!--
+  NOTE ON REAL PROTECTION
+  -----------------------
+  The measures above remove every easy download path, which stops the
+  overwhelming majority of users. They are deterrents, not encryption:
+  the file URL is still visible in the browser Network tab.
+
+  To make the recordings genuinely non-retrievable, the server must stop
+  serving them as plain static files. Options, cheapest first:
+
+    1. Firebase Storage + signed URLs that expire in minutes, minted only
+       for a signed-in user. This project already uses Firebase Auth.
+    2. Storage security rules requiring auth, so the file 404s for anyone
+       not logged into the module.
+    3. HLS with encrypted segments - strongest, and the most work.
+
+  GitHub Pages serves static files to anyone who has the URL, so while the
+  module is hosted there, option 1 or 2 means moving the audio into
+  Firebase Storage.
+-->
+</body>
+</html>
