@@ -1543,6 +1543,15 @@ function loadUserResult(doc) {
   document.getElementById('result-lastlogin').textContent = 'Last login: ' + ll;
 
   const adminArea = document.getElementById('result-admin-area');
+  // The VO track is behind VO_PREVIEW_ONLY in hub.html and the chapter
+  // pages. Nothing in unlockedChapters opens it on its own, so early
+  // access needs its own switch rather than a chapter toggle.
+  const voSwitch = `
+      <span class="admin-label">VO preview</span>
+      <label class="toggle">
+        <input type="checkbox" id="vo-toggle" ${d.voPreview ? 'checked' : ''} onchange="toggleVoPreview(this.checked)">
+        <span class="toggle-slider"></span>
+      </label>`;
   if (d.masterAdmin) {
     adminArea.innerHTML = '<span class="master-badge">Master Admin</span>';
   } else {
@@ -1551,7 +1560,7 @@ function loadUserResult(doc) {
       <label class="toggle">
         <input type="checkbox" id="admin-toggle" ${d.isAdmin ? 'checked' : ''} onchange="toggleAdmin(this.checked)">
         <span class="toggle-slider"></span>
-      </label>`;
+      </label>` + voSwitch;
   }
 
   resultEl.classList.add('visible');
@@ -1689,6 +1698,14 @@ async function toggleAdmin(checked) {
   loadAllUsers();
 }
 
+async function toggleVoPreview(checked) {
+  if (!currentUser) return;
+  await db.collection('users').doc(currentUser).update({ voPreview: checked });
+  currentUserDoc.voPreview = checked;
+  renderChapterList();   // the VO rows change meaning with this flag
+  loadAllUsers();
+}
+
 /* ── Course selection ── */
 function selectCourse(course, btn) {
   selectedCourse = course;
@@ -1706,6 +1723,13 @@ function renderChapterList() {
   }
   const unlocked = (currentUserDoc?.unlockedChapters?.[selectedCourse] || []);
   const progress = currentUserDoc?.progress || {};
+  // Keep in step with VO_PREVIEW_ONLY in hub.html and the VO chapter pages.
+  // Without this the portal reports a VO chapter as Unlocked from a stale
+  // unlockedChapters entry while the live page refuses entry.
+  const VO_PREVIEW_ONLY = true;
+  const voIds = ['vch0', 'vch1', 'vch2'];
+  const voBlocked = VO_PREVIEW_ONLY
+    && !(currentUserDoc?.masterAdmin || currentUserDoc?.voPreview);
 
   list.innerHTML = groups.map(group => {
     const rows = group.chapters.map(ch => {
@@ -1715,7 +1739,8 @@ function renderChapterList() {
           <button class="unlock-pill na">Coming Soon</button>
         </div>`;
       }
-      const isUnlocked  = unlocked.includes(ch.id);
+      const inVoPreview = voBlocked && voIds.indexOf(ch.id) !== -1;
+      const isUnlocked  = unlocked.includes(ch.id) && !inVoPreview;
       const chProg      = progress[ch.id] || {};
       const isCompleted = chProg.completed === true;
       const completedAt = chProg.completedAt
@@ -1729,7 +1754,7 @@ function renderChapterList() {
         <div style="display:flex;align-items:center;gap:6px;">
           ${statusBadge}
           <button class="unlock-pill ${isUnlocked ? 'unlocked' : 'locked'}" id="pill-${ch.id}" onclick="toggleChapter('${ch.id}', this)">
-            ${isUnlocked ? 'Unlocked' : 'Locked'}
+            ${inVoPreview ? 'VO preview' : (isUnlocked ? 'Unlocked' : 'Locked')}
           </button>
         </div>
       </div>`;
