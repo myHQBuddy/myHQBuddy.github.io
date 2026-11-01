@@ -938,6 +938,13 @@ auth.onAuthStateChanged(function(user) {
       { id: 'vch2', href: 'VO_Chapter_2.html' }
     ];
 
+    // VO track is in preview: visible to the master admin only. The
+    // per-user admin lock could not do this - it lives on each user's own
+    // document, so it would need setting by hand on every account and new
+    // signups would still arrive unlocked.
+    var VO_PREVIEW_ONLY = true;
+    var voPreviewBlocked = VO_PREVIEW_ONLY && !(data.masterAdmin || data.voPreview);
+
     var voPrevDone = ch1Completed && ch2Completed;   // entry condition
     VO_CHAIN.forEach(function(c) {
       var card   = document.getElementById('card-' + c.id);
@@ -948,11 +955,12 @@ auth.onAuthStateChanged(function(user) {
 
       var adminOpen   = unlocked.indexOf(c.id) !== -1;
       var adminLockd  = adminLocked.indexOf(c.id) !== -1;
-      var isUnlocked  = (voPrevDone && !adminLockd) || adminOpen;
+      var isUnlocked  = ((voPrevDone && !adminLockd) || adminOpen)
+                        && !voPreviewBlocked;
       var isCompleted = progress[c.id] && progress[c.id].completed;
 
       // Persist the unlock so the admin screen reflects the chain.
-      if (voPrevDone && !adminOpen && !adminLockd) {
+      if (voPrevDone && !adminOpen && !adminLockd && !voPreviewBlocked) {
         db.collection('users').doc(user.uid).set({
           unlockedChapters: { beginner: firebase.firestore.FieldValue.arrayUnion(c.id) }
         }, { merge: true });
@@ -973,6 +981,13 @@ auth.onAuthStateChanged(function(user) {
         }
       } else {
         if (sec) sec.style.display = '';
+        if (voPreviewBlocked) {
+          var lbl = sec && sec.querySelector('.unlock-label');
+          var hnt = sec && sec.querySelector('.unlock-hint');
+          if (lbl) lbl.textContent = 'Coming soon';
+          if (hnt) hnt.textContent = 'The Virtual Office track is being '
+            + 'finalised and will open shortly.';
+        }
       }
 
       // The next chapter opens only once this one is done.

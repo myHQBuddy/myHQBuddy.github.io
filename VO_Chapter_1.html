@@ -1258,6 +1258,12 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
     db.collection('users').doc(user.uid).get().then(function(snap) {
       var data = snap.exists ? snap.data() : {};
       var unlocked = (data.unlockedChapters && data.unlockedChapters.beginner) || [];
+      // VO track is in preview - master admin only. Keep this in
+      // step with VO_PREVIEW_ONLY in hub.html.
+      var VO_PREVIEW_ONLY = true;
+      if (VO_PREVIEW_ONLY && !(data.masterAdmin || data.voPreview)) {
+        unlocked = [];
+      }
       if (unlocked.indexOf(CHAPTER_ID) === -1) {
         document.getElementById('slide-mode').style.display = 'none';
         var rm = document.getElementById('read-mode');
