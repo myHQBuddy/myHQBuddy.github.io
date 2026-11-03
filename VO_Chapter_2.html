@@ -171,7 +171,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 <header class="topbar" id="topbar">
   <div class="topbar-left">
     <span class="topbar-logo">myHQ</span>
-    <span class="topbar-chapter" id="chapterLabel">VO &middot; Chapter 3</span>
+    <span class="topbar-chapter" id="chapterLabel">VO &middot; Chapter 9</span>
   </div>
   <div class="topbar-center">Mock Calls</div>
   <div class="topbar-right">
@@ -223,6 +223,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
   <span><strong>Streaming only.</strong> These recordings play inside the module and cannot be downloaded, saved, or right-clicked out.</span>
 </div>
 <div class="rec-grid" id="recGrid"></div>
+<button class="mk-open" type="button" onclick="openMock()"><i class="fa-solid fa-microphone"></i>Take the mock call assessment</button>
 </div>
 </div>
 
@@ -523,43 +524,7 @@ window.addEventListener('DOMContentLoaded', function() {
   Firebase Storage.
 -->
 
-<div id="r-assess" class="vo-standalone">
 
-<div class="section-num">Assessment</div>
-
-<h2 class="section-title">Mock call assessment</h2>
-<div class="vo-quiz" id="quiz-mock">
-<div class="vo-quiz-head"><h3>Mock call assessment</h3>
-<p>Record a full mock call and upload it. Your trainer scores it against the
-framework in Chapter 6 and the objection bank in Chapter 8.</p></div>
-<div class="aq-question" id="mk1">
-<div class="aq-q-header"><span class="aq-q-num">Q1</span>
-<span class="aq-q-status" id="mk1-status"></span></div>
-<p class="aq-q-text">Upload your mock call recording.</p>
-<div class="aq-upload-zone" id="mk1-zone">
-<i class="fa-solid fa-microphone"></i>
-<div class="aq-upload-label">Click to upload or drag &amp; drop</div>
-<div class="aq-upload-sub">Accepted: .mp3 &middot; .m4a &middot; .mp4 &middot; .wav</div>
-<input type="file" class="aq-file-input" id="mk1-file"
- accept=".mp3,.m4a,.mp4,.wav,.webm" onchange="onFileSelect(1)"></div>
-<div class="aq-fname" id="mk1-fname"></div></div>
-<div class="aq-question" id="mk2">
-<div class="aq-q-header"><span class="aq-q-num">Q2</span>
-<span class="aq-q-status" id="mk2-status"></span></div>
-<p class="aq-q-text">Which plan did you recommend, and why was it the right fit?</p>
-<textarea rows="4" id="mk2-text"></textarea></div>
-<div class="aq-footer"><span class="aq-footer-note">Submitted for review.</span>
-<button class="aq-submit-btn" type="button" onclick="submitQuiz('mock')">Submit</button>
-</div></div>
-</div>
-<style>
-.vo-standalone { max-width: 760px; margin: 0 auto; padding: 48px 24px 72px; }
-.vo-standalone .section-num { font-size: 11px; font-weight: 800;
-  letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
-  margin-bottom: 6px; }
-.vo-standalone .section-title { font-size: 24px; font-weight: 800;
-  color: var(--ink); letter-spacing: -.02em; margin-bottom: 18px; }
-</style>
 <style>
 /* -- VO assessments -- built from existing tokens only -- */
 .vo-quiz { margin-top: 26px; }
@@ -657,5 +622,106 @@ function submitQuiz(key) {
 }
 </script>
 
+
+<div class="mk-overlay" id="mkOverlay" hidden>
+  <div class="mk-panel" role="dialog" aria-modal="true" aria-label="Mock call assessment">
+    <div class="mk-bar">
+      <div>
+        <div class="mk-eyebrow">Assessment</div>
+        <div class="mk-title">Mock call</div>
+      </div>
+      <button class="mk-close" type="button" onclick="closeMock()" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="mk-body">
+<div class="vo-quiz" id="quiz-mock">
+<div class="vo-quiz-head"><h3>Mock call assessment</h3>
+<p>Record a full mock call and upload it. Your trainer scores it against the
+framework in Chapter 6 and the objection bank in Chapter 8.</p></div>
+<div class="aq-question" id="mk1">
+<div class="aq-q-header"><span class="aq-q-num">Q1</span>
+<span class="aq-q-status" id="mk1-status"></span></div>
+<p class="aq-q-text">Upload your mock call recording.</p>
+<div class="aq-upload-zone" id="mk1-zone">
+<i class="fa-solid fa-microphone"></i>
+<div class="aq-upload-label">Click to upload or drag &amp; drop</div>
+<div class="aq-upload-sub">Accepted: .mp3 &middot; .m4a &middot; .mp4 &middot; .wav</div>
+<input type="file" class="aq-file-input" id="mk1-file"
+ accept=".mp3,.m4a,.mp4,.wav,.webm" onchange="onFileSelect(1)"></div>
+<div class="aq-fname" id="mk1-fname"></div></div>
+<div class="aq-question" id="mk2">
+<div class="aq-q-header"><span class="aq-q-num">Q2</span>
+<span class="aq-q-status" id="mk2-status"></span></div>
+<p class="aq-q-text">Which plan did you recommend, and why was it the right fit?</p>
+<textarea rows="4" id="mk2-text"></textarea></div>
+<div class="aq-footer"><span class="aq-footer-note">Submitted for review.</span>
+<button class="aq-submit-btn" type="button" onclick="submitQuiz('mock')">Submit</button>
+</div></div>
+    </div>
+  </div>
+</div>
+<style>
+/* -- mock call overlay -- sits above the scaled deck, scrolls itself -- */
+.mk-overlay { position: fixed; inset: 0; z-index: 200;
+  background: rgba(11,15,44,0.44); display: flex; align-items: center;
+  justify-content: center; padding: clamp(12px,3vw,48px); }
+.mk-overlay[hidden] { display: none; }
+.mk-panel { background: var(--white); border-radius: 14px; width: 100%;
+  max-width: 740px; max-height: 100%; display: flex; flex-direction: column;
+  overflow: hidden; box-shadow: 0 24px 60px rgba(11,15,44,0.22); }
+.mk-bar { display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 24px; border-bottom: 1px solid var(--hairline); flex-shrink: 0; }
+.mk-eyebrow { font-size: 10px; font-weight: 800; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--muted); }
+.mk-title { font-size: 19px; font-weight: 800; color: var(--ink);
+  letter-spacing: -.02em; margin-top: 2px; }
+.mk-close { appearance: none; border: 1px solid var(--hairline);
+  background: var(--white); border-radius: 8px; width: 34px; height: 34px;
+  cursor: pointer; color: var(--muted); font-size: 14px;
+  transition: color var(--transition), border-color var(--transition); }
+.mk-close:hover { color: var(--blue); border-color: var(--blue); }
+.mk-body { overflow-y: auto; padding: 22px 24px 26px; }
+.mk-open { appearance: none; border: none; cursor: pointer;
+  font-family: var(--sans); background: var(--blue); color: var(--white);
+  border-radius: var(--radius); padding: 12px 22px; font-size: 13px;
+  font-weight: 700; margin-top: 22px;
+  transition: background var(--transition); }
+.mk-open:hover { background: var(--blue-dark); }
+.mk-open i { margin-right: 7px; }
+</style>
+<script>
+function openMock() {
+  var o = document.getElementById('mkOverlay');
+  if (o) o.hidden = false;
+}
+function closeMock() {
+  var o = document.getElementById('mkOverlay');
+  if (o) o.hidden = true;
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeMock();
+});
+</script>
+
+<style>
+/* -- upload + question styling, from the AM chapters -- */
+.aq-question { margin-bottom: 36px; padding: 24px 28px; border: 1px solid var(--hairline); border-radius: 12px; background: var(--white); transition: border-color 0.2s; }
+.aq-question.is-filled { border-color: rgba(30,34,170,0.35); }
+.aq-q-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.aq-q-num { font-size: 10px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue); background: rgba(30,34,170,0.08); padding: 3px 10px; border-radius: 99px; }
+.aq-q-status { font-size: 12px; font-weight: 600; color: var(--muted); }
+.aq-q-status.done { color: #2a7d3f; }
+.aq-q-text { font-size: 14px; color: var(--ink); line-height: 1.7; margin-bottom: 14px; font-weight: 500; }
+.aq-upload-zone { position: relative; border: 1.5px dashed rgba(30,34,170,0.30); border-radius: var(--radius); background: #F8F9FF; padding: 32px 24px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+.aq-upload-zone:hover { border-color: var(--blue); background: rgba(30,34,170,0.04); }
+.aq-upload-zone.has-file { border-color: #2a7d3f; background: rgba(42,125,63,0.05); }
+.aq-upload-zone i { font-size: 28px; color: rgba(30,34,170,0.30); margin-bottom: 10px; display: block; }
+.aq-upload-zone.has-file i { color: #2a7d3f; }
+.aq-upload-label { font-size: 13px; font-weight: 700; color: var(--body); margin-bottom: 4px; }
+.aq-upload-sub { font-size: 11px; color: var(--muted); }
+.aq-file-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.aq-fname { font-size: 12px; font-weight: 600; color: #2a7d3f; margin-top: 8px; display: none; }
+</style>
 </body>
 </html>
