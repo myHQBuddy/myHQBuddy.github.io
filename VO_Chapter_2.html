@@ -522,5 +522,140 @@ window.addEventListener('DOMContentLoaded', function() {
   module is hosted there, option 1 or 2 means moving the audio into
   Firebase Storage.
 -->
+
+<div id="r-assess" class="vo-standalone">
+
+<div class="section-num">Assessment</div>
+
+<h2 class="section-title">Mock call assessment</h2>
+<div class="vo-quiz" id="quiz-mock">
+<div class="vo-quiz-head"><h3>Mock call assessment</h3>
+<p>Record a full mock call and upload it. Your trainer scores it against the
+framework in Chapter 6 and the objection bank in Chapter 8.</p></div>
+<div class="aq-question" id="mk1">
+<div class="aq-q-header"><span class="aq-q-num">Q1</span>
+<span class="aq-q-status" id="mk1-status"></span></div>
+<p class="aq-q-text">Upload your mock call recording.</p>
+<div class="aq-upload-zone" id="mk1-zone">
+<i class="fa-solid fa-microphone"></i>
+<div class="aq-upload-label">Click to upload or drag &amp; drop</div>
+<div class="aq-upload-sub">Accepted: .mp3 &middot; .m4a &middot; .mp4 &middot; .wav</div>
+<input type="file" class="aq-file-input" id="mk1-file"
+ accept=".mp3,.m4a,.mp4,.wav,.webm" onchange="onFileSelect(1)"></div>
+<div class="aq-fname" id="mk1-fname"></div></div>
+<div class="aq-question" id="mk2">
+<div class="aq-q-header"><span class="aq-q-num">Q2</span>
+<span class="aq-q-status" id="mk2-status"></span></div>
+<p class="aq-q-text">Which plan did you recommend, and why was it the right fit?</p>
+<textarea rows="4" id="mk2-text"></textarea></div>
+<div class="aq-footer"><span class="aq-footer-note">Submitted for review.</span>
+<button class="aq-submit-btn" type="button" onclick="submitQuiz('mock')">Submit</button>
+</div></div>
+</div>
+<style>
+.vo-standalone { max-width: 760px; margin: 0 auto; padding: 48px 24px 72px; }
+.vo-standalone .section-num { font-size: 11px; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
+  margin-bottom: 6px; }
+.vo-standalone .section-title { font-size: 24px; font-weight: 800;
+  color: var(--ink); letter-spacing: -.02em; margin-bottom: 18px; }
+</style>
+<style>
+/* -- VO assessments -- built from existing tokens only -- */
+.vo-quiz { margin-top: 26px; }
+.vo-quiz-head { margin-bottom: 20px; }
+.vo-quiz-head h3 { font-size: 17px; font-weight: 800; color: var(--ink);
+  letter-spacing: -0.01em; margin-bottom: 5px; }
+.vo-quiz-head p { font-size: 13.5px; color: var(--body); }
+.vo-quiz-sec { font-size: 11.5px; font-weight: 800; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--muted); margin: 26px 0 12px; }
+.mcq-q { border: 1px solid var(--hairline); border-radius: var(--radius);
+  padding: 17px 19px; margin-bottom: 11px; background: var(--white); }
+.mcq-q .aq-q-header { display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 7px; }
+.mcq-q .aq-q-num { font-size: 11px; font-weight: 800; color: var(--blue);
+  letter-spacing: 0.08em; }
+.mcq-q .aq-q-text { font-size: 14.5px; font-weight: 600; color: var(--ink);
+  line-height: 1.5; margin-bottom: 4px; }
+.mcq-hint { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+.mcq-options { display: grid; gap: 7px; }
+.mcq-opt { display: flex; align-items: flex-start; gap: 10px; cursor: pointer;
+  border: 1px solid var(--hairline); border-radius: var(--radius);
+  padding: 10px 13px; transition: border-color var(--transition); }
+.mcq-opt:hover { border-color: var(--blue); }
+.mcq-opt.sel { border-color: var(--blue); background: rgba(30,34,170,0.04); }
+.mcq-opt input { display: none; }
+.mcq-badge { font-size: 11px; font-weight: 800; color: var(--muted);
+  flex-shrink: 0; margin-top: 1px; }
+.mcq-opt.sel .mcq-badge { color: var(--blue); }
+.mcq-opt-text { font-size: 13.5px; line-height: 1.5; color: var(--body); }
+.mcq-explain { display: none; font-size: 13px; line-height: 1.6;
+  color: var(--body); margin-top: 11px; padding-top: 11px;
+  border-top: 1px solid var(--hairline); }
+.mcq-explain.show { display: block; }
+.vo-sc { border: 1px solid var(--hairline); border-radius: var(--radius);
+  padding: 18px 20px; margin-bottom: 14px; }
+.vo-sc-head { display: flex; align-items: baseline; gap: 12px;
+  flex-wrap: wrap; margin-bottom: 14px; }
+.vo-sc-meta { display: flex; flex-wrap: wrap; gap: 7px; }
+.vo-sc-chip { font-size: 11.5px; color: var(--body); border: 1px solid var(--hairline);
+  border-radius: 20px; padding: 3px 10px; }
+.vo-sc-chip b { color: var(--muted); font-weight: 700; margin-right: 4px; }
+.vo-sc-part { margin-bottom: 13px; }
+.vo-sc-part label { display: block; font-size: 13px; font-weight: 700;
+  color: var(--ink); margin-bottom: 3px; }
+.vo-sc-hint { font-size: 11.5px; color: var(--muted); margin-bottom: 6px; }
+.vo-quiz textarea { width: 100%; border: 1px solid var(--hairline);
+  border-radius: var(--radius); padding: 10px 12px; font-family: var(--sans);
+  font-size: 13.5px; line-height: 1.55; color: var(--ink); resize: vertical; }
+.vo-quiz textarea:focus { outline: none; border-color: var(--blue); }
+.aq-footer { display: flex; justify-content: space-between; align-items: center;
+  gap: 16px; margin-top: 20px; padding-top: 16px;
+  border-top: 1px solid var(--hairline); }
+.aq-footer-note { font-size: 12px; color: var(--muted); }
+.aq-submit-btn { background: var(--blue); color: var(--white); border: none;
+  border-radius: var(--radius); padding: 10px 22px; font-family: var(--sans);
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: background var(--transition); }
+.aq-submit-btn:hover { background: var(--blue-dark); }
+</style>
+<script>
+function selectOpt(el, n) {
+  var box = el.closest('.mcq-options');
+  box.querySelectorAll('.mcq-opt').forEach(function(o){ o.classList.remove('sel'); });
+  el.classList.add('sel');
+  el.querySelector('input').checked = true;
+}
+/* Answer keys are not loaded yet: data-correct="-1" means unscored, so the
+   page collects answers without claiming any of them is right. Once keys are
+   filled in, scoring and the explanation panel light up with no other edit. */
+function submitQuiz(key) {
+  var root = document.getElementById('quiz-' + key);
+  if (!root) return;
+  var qs = root.querySelectorAll('.mcq-q');
+  var answered = 0, scored = 0, right = 0;
+  qs.forEach(function(q) {
+    var sel = q.querySelector('.mcq-opt.sel');
+    if (sel) answered++;
+    var key = parseInt(q.getAttribute('data-correct'), 10);
+    if (key >= 0) {
+      scored++;
+      var opts = Array.prototype.slice.call(q.querySelectorAll('.mcq-opt'));
+      if (sel && opts.indexOf(sel) === key) right++;
+      var exp = q.querySelector('.mcq-explain');
+      if (exp && exp.textContent.trim()) exp.classList.add('show');
+    }
+  });
+  var note = root.querySelector('.aq-footer-note');
+  if (qs.length === 0) { if (note) note.textContent = 'Submitted for review.'; return; }
+  if (scored === qs.length) {
+    note.textContent = 'Scored ' + right + ' / ' + qs.length;
+  } else {
+    note.textContent = answered + ' of ' + qs.length +
+      ' answered. Saved \u2014 answer key not yet loaded, so this is not scored.';
+  }
+}
+</script>
+
 </body>
 </html>

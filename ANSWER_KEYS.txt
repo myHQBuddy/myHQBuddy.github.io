@@ -1,0 +1,1564 @@
+ANSWER KEY CHECKLIST - VO assessments
+Mark the correct option for each question, then send this back.
+Format:  <quiz>  Q<n>  =  A | B | C | D
+
+
+======================================================================
+Quiz 1 - Product Training  (40 questions)
+======================================================================
+
+quiz1 Q1    What is the PRIMARY purpose of a Virtual Office?
+        A) Providing physical desk space to employees
+        B) Giving businesses a professional address without renting physical space
+        C) Offering only mail handling services
+        D) Running online meetings
+        ANSWER: ____
+
+quiz1 Q2    Which Virtual Office plan allows BOTH company registration AND GST registration?
+        A) Business Address Plan
+        B) GST Registration Plan
+        C) Company Registration Plan
+        D) All plans allow both
+        ANSWER: ____
+
+quiz1 Q3    A freelancer needs a professional address for their visiting card only. Which plan should you recommend?
+        A) Company Registration Plan
+        B) GST Registration Plan
+        C) Business Address Plan
+        D) Any plan works equally
+        ANSWER: ____
+
+quiz1 Q4    A startup wants to register their Private Limited company in Delhi. They have no commercial address. What do they need?
+        A) Business Address Plan
+        B) GST Registration Plan
+        C) Company Registration Plan
+        D) No plan needed – home address is fine
+        ANSWER: ____
+
+quiz1 Q5    Which of the following is NOT a use case for Virtual Office?
+        A) FSSAI Licence
+        B) RERA Licence
+        C) Getting a driving licence
+        D) Shops & Establishment Certificate
+        ANSWER: ____
+
+quiz1 Q6    A company expanding from Mumbai to Bengaluru needs a GST number in Karnataka. Which plan is most suitable?
+        A) Company Registration Plan only
+        B) GST Registration Plan
+        C) Business Address Plan
+        D) They don't need a Virtual Office
+        ANSWER: ____
+
+quiz1 Q7    Mail handling and package service is included in which plans?
+        A) Only Company Registration Plan
+        B) Only GST Registration Plan
+        C) Only Business Address Plan
+        D) All three plans
+        ANSWER: ____
+
+quiz1 Q8    Temporary signage is included in which plans?
+        A) All three plans
+        B) Company Registration Plan and GST Registration Plan only
+        C) Only Company Registration Plan
+        D) GST Registration Plan and Business Address Plan only
+        ANSWER: ____
+
+quiz1 Q9    An international company is setting up its first office in India. Which Virtual Office use case applies?
+        A) Official Correspondence only
+        B) GST Registration only
+        C) Company Registration – they need a commercial address to set up legally
+        D) They don't need a Virtual Office
+        ANSWER: ____
+
+quiz1 Q10   Before selling Virtual Office for FSSAI or RERA use cases, what must a sales agent do?
+        A) Directly sell without checking
+        B) Verify with the space partner that they support these use cases
+        C) Offer a discount
+        D) Ask the client to check the website
+        ANSWER: ____
+
+quiz1 Q11   What is an NOC in the context of Virtual Office?
+        A) A bill from the government for registration
+        B) A certificate from the space/property owner allowing address use
+        C) A type of GST registration form
+        D) A client identification document
+        ANSWER: ____
+
+quiz1 Q12   Which of the following best describes 'KYC' in the Virtual Office process?
+        A) A payment gateway process
+        B) Know Your Customer — collecting and verifying client identity documents
+        C) A government compliance audit
+        D) A type of service agreement with the space
+        ANSWER: ____
+
+quiz1 Q13   What is a Space-Client Agreement?
+        A) A government form for GST
+        B) A legal contract between the Virtual Office space and the client
+        C) A bank document
+        D) A type of NOC
+        ANSWER: ____
+
+quiz1 Q14   Which document proves that a property address is genuine?
+        A) NOC
+        B) Board Resolution
+        C) Utility Bill (electricity/water bill)
+        D) Name Approval Letter
+        ANSWER: ____
+
+quiz1 Q15   A 'Board Resolution' is typically required in which scenario?
+        A) When a sole proprietor registers for GST
+        B) When a company authorises a director to use the Virtual Office address
+        C) When the client pays via NEFT
+        D) When the client wants a refund
+        ANSWER: ____
+
+quiz1 Q16   What documents must a client provide for Company Registration via Virtual Office?
+        A) Only PAN Card
+        B) Name Approval Letter + Aadhaar & PAN of all directors
+        C) Only Aadhaar Card
+        D) Utility Bill and PAN Card
+        ANSWER: ____
+
+quiz1 Q17   GST stands for:
+        A) General Sales Tax
+        B) Goods and Services Tax
+        C) Government Service Tax
+        D) Gross Sales Transaction
+        ANSWER: ____
+
+quiz1 Q18   Which Indian portal is used to register for GST?
+        A) mca.gov.in
+        B) incometax.gov.in
+        C) gst.gov.in
+        D) india.gov.in
+        ANSWER: ____
+
+quiz1 Q19   If a client's GST application is rejected by the government, what should they do first?
+        A) Ask for an immediate refund
+        B) Wait 90 days and reapply
+        C) Upload the rejection letter on the auto-KYC dashboard / raise a support ticket
+        D) Cancel the Virtual Office plan
+        ANSWER: ____
+
+quiz1 Q20   A Landlord KYC document typically contains:
+        A) Only the company's bank details
+        B) ID proof and address proof of the property owner
+        C) Only the GST number of the landlord
+        D) A list of all tenants in the building
+        ANSWER: ____
+
+quiz1 Q21   Which pricing component does a coupon code discount apply to?
+        A) Total price including GST
+        B) Base price only
+        C) Documentation charges only
+        D) PG charges only
+        ANSWER: ____
+
+quiz1 Q22   When do the KYC and documentation activities officially begin for a Virtual Office order?
+        A) As soon as the client agrees verbally
+        B) When the sales agent fills the CRM
+        C) When the invoice is marked as 'Paid' in the system
+        D) After the client completes KYC
+        ANSWER: ____
+
+quiz1 Q23   How long does it typically take for offline (NEFT/RTGS) payments to reflect in the bank?
+        A) Instantly
+        B) 24–48 hours
+        C) 72 hours
+        D) 1 week
+        ANSWER: ____
+
+quiz1 Q24   What must a sales agent do immediately after a client completes payment?
+        A) Call the client for a review
+        B) Fill the VO Transaction Form
+        C) Notify the space partner
+        D) Send a payment confirmation email only
+        ANSWER: ____
+
+quiz1 Q25   At what stage can a client still get a refund?
+        A) At any time within 60 days
+        B) Before the draft agreement is signed and approved by the space
+        C) After 2 government rejections only
+        D) Only within 7 days of payment
+        ANSWER: ____
+
+quiz1 Q26   PG (Payment Gateway) charges are refundable in which scenario?
+        A) When client requests within 30 days
+        B) When government rejects the application
+        C) PG charges are NEVER refundable
+        D) Only if the space cancels the service
+        ANSWER: ____
+
+quiz1 Q27   For non-WeWork documentation, the client must complete KYC within:
+        A) 30 days of payment
+        B) 60 days of payment
+        C) 90 days of payment
+        D) 7 days of payment
+        ANSWER: ____
+
+quiz1 Q28   How long does WeWork documentation typically take (if no errors)?
+        A) 5–7 working days
+        B) 30 minutes
+        C) 24 hours
+        D) 2 working days
+        ANSWER: ____
+
+quiz1 Q29   Which payment mode is typically NOT accepted for Virtual Office plans?
+        A) UPI
+        B) NEFT/RTGS
+        C) Cheque made out to the client's own company
+        D) Credit/Debit card via payment link
+        ANSWER: ____
+
+quiz1 Q30   If a client pays via online payment gateway, when is the invoice generated?
+        A) Manually by the sales agent after 24 hours
+        B) Automatically upon payment confirmation
+        C) Only after KYC is complete
+        D) After the space partner approves
+        ANSWER: ____
+
+quiz1 Q31   During a GST verification drive, what do authorities primarily check?
+        A) Physical presence of company staff at the office
+        B) Active legal agreements (NOC, Space-Client Agreement)
+        C) The client's GST turnover
+        D) Number of employees at the space
+        ANSWER: ____
+
+quiz1 Q32   Which of these is a valid reason a GST application may be rejected?
+        A) The client used a Virtual Office address
+        B) Incomplete or mismatched documents submitted during registration
+        C) The client belongs to a service industry
+        D) The Virtual Office is in a coworking space
+        ANSWER: ____
+
+quiz1 Q33   For a physical verification, who MUST be present at the space?
+        A) The sales agent from myHQ
+        B) A myHQ operations team member
+        C) A company representative of the client's own business
+        D) The coworking space manager
+        ANSWER: ____
+
+quiz1 Q34   Non-WeWork coworking displays company information during verification using:
+        A) Temporary A4 paper signage
+        B) Digital boards with company names, GST numbers, and logos
+        C) Permanent painted signage
+        D) No signage — only document verification
+        ANSWER: ____
+
+quiz1 Q35   If a client wants permanent signage at the space, what should the sales agent do?
+        A) Include it in any plan automatically
+        B) Charge a fixed ₹5,000 extra
+        C) Confirm with the space first and choose the add-on
+        D) Tell the client permanent signage is not possible
+        ANSWER: ____
+
+quiz1 Q36   A client's GST application is rejected twice. What is the refund eligibility?
+        A) Full refund with no deductions
+        B) Refund minus ₹2,000 operational charge, subject to conditions
+        C) No refund under any circumstances
+        D) Refund only if rejection was myHQ's fault
+        ANSWER: ____
+
+quiz1 Q37   Support tickets for non-WeWork Virtual Office issues should be raised at:
+        A) contactwwvo@myhq.in
+        B) support@myhq.in
+        C) supportvo@myhq.in
+        D) info@myhq.in
+        ANSWER: ____
+
+quiz1 Q38   What happens if a client does not complete KYC within 60 days of payment?
+        A) They automatically get an extension
+        B) They are not eligible for a refund
+        C) Documentation is cancelled and money forfeited
+        D) They need to repurchase the plan
+        ANSWER: ____
+
+quiz1 Q39   Support tickets for WeWork Virtual Office issues should be raised at:
+        A) supportvo@myhq.in
+        B) support@myhq.in
+        C) contactwwvo@myhq.in
+        D) info@myhq.in
+        ANSWER: ____
+
+quiz1 Q40   Which of the following correctly explains the 'Business Address Plan'?
+        A) It includes company registration documents
+        B) It includes GST registration documents only
+        C) It provides a premium address for correspondence — no company or GST registration documents
+        D) It includes both company and GST registration
+        ANSWER: ____
+
+======================================================================
+Quiz 2 - Product  (30 questions)
+======================================================================
+
+quiz2 Q1    What is the core advantage a Virtual Office gives a business, as defined ?
+        A) A discounted physical office on a short lease
+        B) The advantages of a professional office address without the cost of renting physical space
+        C) Free legal representation for company registration
+        D) A guaranteed business loan from partner banks
+        ANSWER: ____
+
+quiz2 Q2    Under MCA guidelines, which type of address is NOT permitted for legally registering a company in India?
+        A) A commercial address
+        B) A virtual office address
+        C) A home / non-commercial address
+        D) A coworking space address
+        ANSWER: ____
+
+quiz2 Q3    Above what annual turnover threshold does GST registration become mandatory for a business (outside North-Eastern states)?
+        A) ₹10 lakh
+        B) ₹15 lakh
+        C) ₹20 lakh
+        D) ₹50 lakh
+        ANSWER: ____
+
+quiz2 Q4    A client says: 'I just need a premium address for my website and visiting cards, nothing else.' Which core buying reason does this represent?
+        A) Company Registration
+        B) GST Registration
+        C) Official Correspondence
+        D) FSSAI Licensing
+        ANSWER: ____
+
+quiz2 Q5    Which of these is explicitly listed as another government license/registration use case for a Virtual Office address (beyond company & GST)?
+        A) Passport renewal
+        B) FSSAI Licence
+        C) Voter ID registration
+        D) Driving licence renewal
+        ANSWER: ____
+
+quiz2 Q6    What does APOB stand for in the context of Virtual Office use cases?
+        A) Additional Place of Business
+        B) Approved Place of Billing
+        C) Authorized Person of Business
+        D) Annual Proof of Business
+        ANSWER: ____
+
+quiz2 Q7    What does VPOB stand for?
+        A) Verified Provider of Business
+        B) Virtual Place of Business
+        C) Vendor Point of Billing
+        D) Valid Proof of Business
+        ANSWER: ____
+
+quiz2 Q8    An ops executive is about to confirm to a client that their plan covers an RERA licence application. What should they do FIRST, per training?
+        A) Confirm it immediately since all plans cover this
+        B) Refuse the request outright
+        C) Always verify with the specific space partner before promising this
+        D) Ask the client to apply without any address proof
+        ANSWER: ____
+
+quiz2 Q9    Which client segment is described as needing a Virtual Office because 'a home address on invoices reduces client confidence'?
+        A) Large & Expanding Companies
+        B) Home-Based & Seasonal Businesses
+        C) International Companies Entering India
+        D) Freelancers & Professionals
+        ANSWER: ____
+
+quiz2 Q10   Why would a Large & Expanding Company need a Virtual Office when entering a new state, per the training?
+        A) They need a local GST registration in each state, and Virtual Office avoids needing a physical branch office
+        B) It is legally required for hiring employees in a new state
+        C) It replaces the need for a Certificate of Incorporation
+        D) It is mandatory for opening a current bank account
+        ANSWER: ____
+
+quiz2 Q11   Which Virtual Office plan is referred to as the 'Master Plan' in the training material?
+        A) Business Address Plan
+        B) GST Registration Plan
+        C) Company Registration Plan
+        D) APOB Plan
+        ANSWER: ____
+
+quiz2 Q12   A client already has a CIN (i.e., an existing incorporated company) but now needs GST registration in a new state. Which plan should be recommended?
+        A) Company Registration Plan
+        B) GST Registration Plan
+        C) Business Address Plan
+        D) None — this isn't supported
+        ANSWER: ____
+
+quiz2 Q13   Can documents from the GST Registration Plan be used for company registration on the MCA portal?
+        A) Yes, always
+        B) Only for LLPs
+        C) No — these documents are not valid for company registration
+        D) Only with an additional affidavit
+        ANSWER: ____
+
+quiz2 Q14   Which plan is explicitly recommended for freelancers, coaches, and consultants who only need branding/correspondence, NOT legal registration?
+        A) Company Registration Plan
+        B) GST Registration Plan
+        C) Business Address Plan
+        D) APOB/VPOB Plan
+        ANSWER: ____
+
+quiz2 Q15   Which of these is included in the Business Address Plan?
+        A) Govt-compliant company registration documents
+        B) Govt-compliant GST registration documents
+        C) Temporary signage
+        D) Mail & package handling
+        ANSWER: ____
+
+quiz2 Q16   According to the Plan Comparison table, which plan(s) include Temporary Signage?
+        A) Only the Business Address Plan
+        B) Company Reg Plan and GST Reg Plan, but NOT Business Address Plan
+        C) All three plans
+        D) None of the plans
+        ANSWER: ____
+
+quiz2 Q17   Which feature is common to ALL THREE Virtual Office plans, per the comparison table?
+        A) Company Registration
+        B) Temporary Signage
+        C) Mail Handling
+        D) GST Registration
+        ANSWER: ____
+
+quiz2 Q18   A new business is starting from scratch and needs company registration, GST registration, AND a mailing address — all three. Which single plan covers all of this?
+        A) Business Address Plan
+        B) GST Registration Plan
+        C) Company Registration Plan
+        D) It requires two separate plans
+        ANSWER: ____
+
+quiz2 Q19   Which plan is positioned as the lowest-cost of the three?
+        A) Company Registration Plan
+        B) GST Registration Plan
+        C) Business Address Plan
+        D) All three are priced identically
+        ANSWER: ____
+
+quiz2 Q20   A client asks for GST registration documents only and explicitly does NOT need company registration. Recommending the Company Registration Plan to them would be:
+        A) Correct, since it's the safest default
+        B) Incorrect — the GST Registration Plan is the right fit, as it is slightly less expensive and matches their actual need
+        C) Irrelevant, since all plans are interchangeable
+        D) Correct only if the client is in Delhi
+        ANSWER: ____
+
+quiz2 Q21   Which document proves that a property address is genuine?
+        A) NOC
+        B) Board Resolution
+        C) Utility Bill (electricity/water bill)
+        D) Name Approval Letter
+        ANSWER: ____
+
+quiz2 Q22   How many cities / locations does myHQ Virtual Office claim PAN India coverage across?
+        A) 100+ Locations, 10+ Cities
+        B) 160+ Locations, 20+ Cities
+        C) 50+ Locations, 5+ Cities
+        D) 200+ Locations, 30+ Cities
+        ANSWER: ____
+
+quiz2 Q23   Which onboarding process feature is highlighted as a compliance/convenience advantage of myHQ?
+        A) Physical paperwork couriered to head office
+        B) In-person notarization required at every location
+        C) Digital KYC & fully paperless onboarding
+        D) 30-day manual verification process
+        ANSWER: ____
+
+quiz2 Q24   myHQ Virtual Office is backed by which parent organization, per the training material?
+        A) ANAROCK
+        B) JLL
+        C) CBRE
+        D) Knight Frank
+        ANSWER: ____
+
+quiz2 Q25   What unique identifier does a business receive upon successful GST registration?
+        A) CIN
+        B) DIN
+        C) GSTIN (15-digit)
+        D) PAN
+        ANSWER: ____
+
+quiz2 Q26   What is the correct sequence to register for GST, per the training material?
+        A) Get GSTIN -> Create User ID -> Fill REG-01 -> Get ARN
+        B) Create User ID on gst.gov.in -> Fill GST REG-01 -> Upload documents -> Receive ARN -> Get GSTIN
+        C) Upload documents -> Get GSTIN -> Fill REG-01 -> Create User ID
+        D) File SPICe form -> Get DIN -> Get GSTIN
+        ANSWER: ____
+
+quiz2 Q27   What does a business receive upon successful Company Registration via the MCA?
+        A) GSTIN and ARN
+        B) Certificate of Incorporation and a unique CIN
+        C) Shops & Establishment Certificate only
+        D) FSSAI Licence number
+        ANSWER: ____
+
+quiz2 Q28   What is required for all directors as part of the Company Registration process, per the training material?
+        A) GSTIN for each director
+        B) Director Identification Number (DIN)
+        C) FSSAI registration
+        D) RERA licence
+        ANSWER: ____
+
+quiz2 Q29   Which government portal is used specifically for Company Registration filings (RUN, SPICe, MOA/AOA)?
+        A) gst.gov.in
+        B) incometax.gov.in
+        C) mca.gov.in
+        D) udyamregistration.gov.in
+        ANSWER: ____
+
+quiz2 Q30   A client wants to use their Virtual Office address on their website, letterhead, and Google Business Profile, but is NOT registering a company or applying for GST. What is this use case officially called in the training?
+        A) Company Registration
+        B) Official Correspondence / Mailing Address
+        C) GST Registration
+        D) Shops & Establishment Certificate
+        ANSWER: ____
+
+======================================================================
+Company Registration Plan  (50 questions)
+======================================================================
+
+cr Q1    What is the Company Registration Plan also known as?
+        A) Basic Plan
+        B) The Master Plan
+        C) Correspondence Plan
+        D) Lite Plan
+        ANSWER: ____
+
+cr Q2    The Company Registration Plan can be used for:
+        A) GST only
+        B) Correspondence only
+        C) Company + GST + mailing
+        D) Signage only
+        ANSWER: ____
+
+cr Q3    Who is the Company Registration Plan best for?
+        A) Freelancers branding only
+        B) New businesses setting up from scratch
+        C) Clients needing only an address
+        D) Coworking desk users
+        ANSWER: ____
+
+cr Q4    Can a client use this plan to change registered address on MCA?
+        A) No
+        B) Yes
+        C) Only for LLP
+        D) Only WeWork
+        ANSWER: ____
+
+cr Q5    Is GST registration allowed under this plan?
+        A) No
+        B) Yes
+        C) Only in Delhi
+        D) Only offline
+        ANSWER: ____
+
+cr Q6    Is company registration allowed under this plan?
+        A) No
+        B) Yes
+        C) Only Pvt Ltd
+        D) Only OPC
+        ANSWER: ____
+
+cr Q7    Which signage is included in this plan?
+        A) Permanent only
+        B) Temporary signage
+        C) No signage
+        D) Digital LED only
+        ANSWER: ____
+
+cr Q8    Is mail & package handling included?
+        A) No
+        B) Yes
+        C) Extra cost only
+        D) WeWork only
+        ANSWER: ____
+
+cr Q9    This plan is described as the one that:
+        A) Covers nothing
+        B) Covers everything
+        C) Covers GST only
+        D) Covers mailing only
+        ANSWER: ____
+
+cr Q10   Compared to other plans, the Company Registration Plan is:
+        A) Cheapest
+        B) Most comprehensive/highest value
+        C) Same as GST plan
+        D) Address only
+        ANSWER: ____
+
+cr Q11   A new Pvt Ltd company should be recommended which plan?
+        A) Business Address
+        B) GST Plan
+        C) Company Registration Plan
+        D) None
+        ANSWER: ____
+
+cr Q12   Documents from this plan are valid for company registration on:
+        A) gst.gov.in
+        B) mca.gov.in
+        C) myhq.in
+        D) digilocker
+        ANSWER: ____
+
+cr Q13   Which document grants permission to use the address for registration?
+        A) Cancelled cheque
+        B) NOC
+        C) Invoice
+        D) Passbook
+        ANSWER: ____
+
+cr Q14   Which confirms the address is real and active?
+        A) NOC
+        B) Utility Bill
+        C) Board Resolution
+        D) PAN
+        ANSWER: ____
+
+cr Q15   For a leased space, this plan also provides:
+        A) Nothing extra
+        B) Master Agreement + Master NOC
+        C) Only signage
+        D) Only utility bill
+        ANSWER: ____
+
+cr Q16   What must a NEW company client provide (Pvt Ltd)?
+        A) MOA & AOA
+        B) Name Approval Letter + Director KYC + Cancelled Cheque
+        C) COI only
+        D) GST cert only
+        ANSWER: ____
+
+cr Q17   For an EXISTING Pvt Ltd using this plan, required docs include:
+        A) Only Aadhaar
+        B) MOA, AOA, COI, Company PAN, Director KYC
+        C) Only cheque
+        D) Passport only
+        ANSWER: ____
+
+cr Q18   KYC must be completed within how many days (60-day rule)?
+        A) 30
+        B) 45
+        C) 60
+        D) 90
+        ANSWER: ____
+
+cr Q19   What is the pricing formula?
+        A) Base only
+        B) Base + PG + Documentation + 18% GST
+        C) Base + 5% GST
+        D) Base + doc only
+        ANSWER: ____
+
+cr Q20   Discounts apply only on:
+        A) GST
+        B) Documentation
+        C) Base price
+        D) PG charges
+        ANSWER: ____
+
+cr Q21   Minimum ticket size for any plan is:
+        A) ₹2,000
+        B) ₹5,000
+        C) ₹8,500
+        D) ₹10,000
+        ANSWER: ____
+
+cr Q22   For a new company, which portal generates the Name Approval Letter?
+        A) GST portal
+        B) MCA RUN process
+        C) Bank portal
+        D) DigiLocker
+        ANSWER: ____
+
+cr Q23   Which entities can register via this plan?
+        A) Only Pvt Ltd
+        B) Pvt Ltd, LLP, OPC, Partnership, Proprietor, etc.
+        C) Only LLP
+        D) Only Trust
+        ANSWER: ____
+
+cr Q24   After incorporation, a company receives a unique:
+        A) GSTIN
+        B) CIN
+        C) ARN
+        D) DIN only
+        ANSWER: ____
+
+cr Q25   WeWork KYC auto-approval timeline (minimum):
+        A) 15 minutes
+        B) 1 hour
+        C) 1 day
+        D) 5 days
+        ANSWER: ____
+
+cr Q26   Non-WeWork documentation timeline post-KYC:
+        A) 15 min
+        B) 1 hour
+        C) 4–5 working days
+        D) 30 days
+        ANSWER: ____
+
+cr Q27   Refund is possible before:
+        A) Payment
+        B) Draft agreement is signed & approved
+        C) KYC
+        D) Verification
+        ANSWER: ____
+
+cr Q28   Operational charge deducted on eligible refund:
+        A) ₹500
+        B) ₹1,000
+        C) ₹2,000
+        D) ₹5,000
+        ANSWER: ____
+
+cr Q29   Which charges are never refunded?
+        A) Base
+        B) PG + documentation charges
+        C) GST only
+        D) All
+        ANSWER: ____
+
+cr Q30   This plan supports official correspondence use?
+        A) No
+        B) Yes
+        C) Only WeWork
+        D) Only Delhi
+        ANSWER: ____
+
+cr Q31   Which document defines internal company rules?
+        A) MOA
+        B) AOA
+        C) COI
+        D) NOC
+        ANSWER: ____
+
+cr Q32   Which document defines company objectives/scope?
+        A) AOA
+        B) MOA
+        C) Board Resolution
+        D) Cheque
+        ANSWER: ____
+
+cr Q33   COI is issued by:
+        A) GST dept
+        B) MCA/RoC
+        C) Bank
+        D) Space
+        ANSWER: ____
+
+cr Q34   Board Resolution authorizes:
+        A) Address change
+        B) A signatory to act for the company
+        C) GST filing
+        D) Signage
+        ANSWER: ____
+
+cr Q35   Cancelled cheque is used to verify:
+        A) Identity
+        B) Bank account details
+        C) Address
+        D) Turnover
+        ANSWER: ____
+
+cr Q36   Can foreign nationals use this plan to register in India?
+        A) No
+        B) Yes, with standard KYC (Passport as ID)
+        C) Only NRIs
+        D) Only with GST
+        ANSWER: ____
+
+cr Q37   Is a physical office required if the plan is active?
+        A) Yes
+        B) No
+        C) Only for GST
+        D) Only WeWork
+        ANSWER: ____
+
+cr Q38   Same address usable by multiple companies?
+        A) No
+        B) Yes, each with own agreement & GSTIN
+        C) Only two
+        D) Owned only
+        ANSWER: ____
+
+cr Q39   Does myHQ handle the MCA incorporation filing itself?
+        A) Yes
+        B) No, client/CA does it
+        C) Only Pvt Ltd
+        D) Only WeWork
+        ANSWER: ____
+
+cr Q40   Which space type is preferred for lower rejection risk?
+        A) Leased
+        B) Owned
+        C) Shared
+        D) Rented
+        ANSWER: ____
+
+cr Q41   Leads arrive on which CRM?
+        A) Salesforce
+        B) Zoho CRM
+        C) HubSpot
+        D) Freshsales
+        ANSWER: ____
+
+cr Q42   Recommended lead contact time:
+        A) 1 hour
+        B) 15 minutes
+        C) 24 hours
+        D) Same week
+        ANSWER: ____
+
+cr Q43   After payment, the next mandatory step is:
+        A) Refund
+        B) Fill VO Transaction Form
+        C) Cancel
+        D) Sign agreement only
+        ANSWER: ____
+
+cr Q44   Where does the client complete KYC (non-WeWork)?
+        A) By email
+        B) Self-serve auto-KYC dashboard
+        C) At branch
+        D) By post
+        ANSWER: ____
+
+cr Q45   Multiple cities require:
+        A) One plan total
+        B) One plan per city per registration type
+        C) No extra plan
+        D) Only owned spaces
+        ANSWER: ____
+
+cr Q46   Is this plan transferable to another entity?
+        A) Yes
+        B) No
+        C) With fee
+        D) Same city only
+        ANSWER: ____
+
+cr Q47   A company changing its registered address on MCA should buy:
+        A) Business Address Plan
+        B) Company Registration Plan
+        C) GST Plan
+        D) None
+        ANSWER: ____
+
+cr Q48   Which case upheld VO for GST registration?
+        A) CIT vs Sreekrishna Textiles (Kerala HC)
+        B) MCA vs WeWork
+        C) GST vs Coworking
+        D) ANAROCK case
+        ANSWER: ____
+
+cr Q49   Notarised documents add how long to the timeline?
+        A) 1 day
+        B) 2 days
+        C) 4–5 business days
+        D) No change
+        ANSWER: ____
+
+cr Q50   The Company Registration Plan covers how many core use cases?
+        A) One
+        B) Two
+        C) All three
+        D) None
+        ANSWER: ____
+
+======================================================================
+GST Registration Plan  (50 questions)
+======================================================================
+
+gst Q1    The GST Registration Plan is best for businesses that are:
+        A) Not yet incorporated
+        B) Already incorporated (with CIN) needing GST
+        C) Freelancers branding only
+        D) Trusts only
+        ANSWER: ____
+
+gst Q2    Can GST Plan documents be used for company registration?
+        A) Yes
+        B) No
+        C) Only LLP
+        D) Only WeWork
+        ANSWER: ____
+
+gst Q3    The GST Plan can be used for:
+        A) Company reg only
+        B) GST registration + mailing
+        C) Correspondence only
+        D) Signage only
+        ANSWER: ____
+
+gst Q4    Compared to the Company Registration Plan, the GST Plan is:
+        A) More expensive
+        B) Slightly less expensive
+        C) Same price
+        D) Free
+        ANSWER: ____
+
+gst Q5    A common use for the GST Plan is:
+        A) New company setup
+        B) Expanding company needing GST in a new state
+        C) Branding only
+        D) Trust setup
+        ANSWER: ____
+
+gst Q6    GST Plan documents are valid on the MCA portal for company registration?
+        A) Yes
+        B) No
+        C) Only Pvt Ltd
+        D) Only Delhi
+        ANSWER: ____
+
+gst Q7    Is temporary signage included in the GST Plan?
+        A) No
+        B) Yes
+        C) Extra cost
+        D) WeWork only
+        ANSWER: ____
+
+gst Q8    Is mail & package handling included?
+        A) No
+        B) Yes
+        C) Extra cost
+        D) No, never
+        ANSWER: ____
+
+gst Q9    Can the GST Plan be used as a correspondence address?
+        A) No
+        B) Yes
+        C) Only WeWork
+        D) Only owned
+        ANSWER: ____
+
+gst Q10   GST turnover threshold (general states):
+        A) ₹10 lakh
+        B) ₹20 lakh
+        C) ₹40 lakh
+        D) ₹1 crore
+        ANSWER: ____
+
+gst Q11   GST threshold for special/NE states:
+        A) ₹5 lakh
+        B) ₹10 lakh
+        C) ₹20 lakh
+        D) ₹40 lakh
+        ANSWER: ____
+
+gst Q12   Number of digits in a GSTIN:
+        A) 10
+        B) 12
+        C) 15
+        D) 16
+        ANSWER: ____
+
+gst Q13   GST registration portal is:
+        A) mca.gov.in
+        B) gst.gov.in
+        C) myhq.in
+        D) digilocker
+        ANSWER: ____
+
+gst Q14   The GST form filled with business details is:
+        A) SPICe
+        B) GST REG-01
+        C) RUN
+        D) DIR-3
+        ANSWER: ____
+
+gst Q15   After GST submission, the client receives an:
+        A) CIN
+        B) ARN
+        C) DIN
+        D) COI
+        ANSWER: ____
+
+gst Q16   GST registration allows claiming:
+        A) Refunds always
+        B) Input Tax Credit
+        C) Free signage
+        D) Lower rent
+        ANSWER: ____
+
+gst Q17   For a separate state presence, a company needs:
+        A) One GSTIN nationwide
+        B) A separate GSTIN in each state
+        C) No GSTIN
+        D) Only PAN
+        ANSWER: ____
+
+gst Q18   E-commerce operators need GST registration:
+        A) Only above ₹20L
+        B) Regardless of turnover
+        C) Never
+        D) Only interstate
+        ANSWER: ____
+
+gst Q19   Which document grants permission to use the address?
+        A) Cheque
+        B) NOC
+        C) PAN
+        D) Invoice
+        ANSWER: ____
+
+gst Q20   Which confirms the address is real/active?
+        A) NOC
+        B) Utility Bill
+        C) Board Resolution
+        D) Cheque
+        ANSWER: ____
+
+gst Q21   For leased spaces, the GST Plan also provides:
+        A) Nothing
+        B) Master Agreement + Master NOC
+        C) Only signage
+        D) Only NOC
+        ANSWER: ____
+
+gst Q22   An existing Pvt Ltd needing GST must provide:
+        A) Only Aadhaar
+        B) MOA, AOA, COI, Company PAN, Director KYC, Board Resolution
+        C) Only cheque
+        D) Passport
+        ANSWER: ____
+
+gst Q23   A proprietor needing GST provides:
+        A) MOA & AOA
+        B) Director KYC (Aadhaar + PAN) + Cancelled Cheque
+        C) COI
+        D) Partnership Deed
+        ANSWER: ____
+
+gst Q24   If client has an existing MSME/GST cert, they must:
+        A) Hide it
+        B) Provide it as well
+        C) Ignore it
+        D) Cancel it
+        ANSWER: ____
+
+gst Q25   Types of GST numbers include:
+        A) Regular, Composition, E-Commerce
+        B) Only Regular
+        C) Only Composition
+        D) Personal GST
+        ANSWER: ____
+
+gst Q26   Composition GST applies up to turnover of:
+        A) ₹50 lakh
+        B) ₹1 crore
+        C) ₹1.5 crore
+        D) ₹5 crore
+        ANSWER: ____
+
+gst Q27   Document Verification by GST authority checks:
+        A) Only signage
+        B) NOC, Agreement, Utility Bill, name/address consistency
+        C) Only PAN
+        D) Only bank
+        ANSWER: ____
+
+gst Q28   Digital Verification checks:
+        A) Only signage
+        B) Google Maps, website/social, contact responsiveness
+        C) Only NOC
+        D) Only cheque
+        ANSWER: ____
+
+gst Q29   Physical Verification checks:
+        A) Bank balance
+        B) Signage, occupancy, authorization to use address
+        C) Only PAN
+        D) Turnover only
+        ANSWER: ____
+
+gst Q30   Under GST 2.0, registration approval is:
+        A) Document-only
+        B) Risk-based and validation-driven
+        C) Automatic
+        D) Manual only
+        ANSWER: ____
+
+gst Q31   A weak digital footprint is a trigger area for:
+        A) Document verification
+        B) Digital verification
+        C) No verification
+        D) Refund
+        ANSWER: ____
+
+gst Q32   Shared addresses & inaccessible premises trigger:
+        A) Digital
+        B) Physical verification
+        C) Document
+        D) None
+        ANSWER: ____
+
+gst Q33   Clients can request which images for compliance?
+        A) Selfies
+        B) Geo-tagged images
+        C) Stock photos
+        D) None
+        ANSWER: ____
+
+gst Q34   Geo-tagged image requests are raised at:
+        A) sales@myhq.in
+        B) supportvo@myhq.in
+        C) mca.gov.in
+        D) gst.gov.in
+        ANSWER: ____
+
+gst Q35   How does WeWork represent VO presence in GST drives?
+        A) Physical signage
+        B) System-based: open areas, phone booths, meeting rooms
+        C) Digital LED only
+        D) Dedicated floor
+        ANSWER: ____
+
+gst Q36   How does AltF show signage?
+        A) A4 paper
+        B) No signage
+        C) Digital signage with name, GST no., logo
+        D) Steel board only
+        ANSWER: ____
+
+gst Q37   During GST drives, authorities primarily examine:
+        A) Physical occupancy
+        B) Active legal agreements
+        C) Selfies
+        D) Bank statements
+        ANSWER: ____
+
+gst Q38   Safe VO capacity estimate per location:
+        A) 10%
+        B) 25% of seat capacity
+        C) 50%
+        D) 100%
+        ANSWER: ____
+
+gst Q39   Pricing formula for the GST Plan:
+        A) Base only
+        B) Base + PG + Documentation + 18% GST
+        C) Base + 5%
+        D) Base + doc
+        ANSWER: ____
+
+gst Q40   Discounts apply only on:
+        A) GST
+        B) Documentation
+        C) Base price
+        D) PG
+        ANSWER: ____
+
+gst Q41   Minimum ticket size:
+        A) ₹2,000
+        B) ₹5,000
+        C) ₹8,500
+        D) ₹10,000
+        ANSWER: ____
+
+gst Q42   Non-WeWork documentation TAT post-KYC:
+        A) 15 min
+        B) 1 hour
+        C) 4–5 working days
+        D) 30 days
+        ANSWER: ____
+
+gst Q43   WeWork auto-approval minimum:
+        A) 15 minutes
+        B) 1 hour
+        C) 1 day
+        D) 5 days
+        ANSWER: ____
+
+gst Q44   Refund is possible before:
+        A) Payment
+        B) Draft agreement signed & approved
+        C) KYC
+        D) Verification
+        ANSWER: ____
+
+gst Q45   Rejection letters must be submitted within:
+        A) 30 days
+        B) 45 days
+        C) 60 days
+        D) 90 days
+        ANSWER: ____
+
+gst Q46   Refund eligible after how many govt rejections?
+        A) One
+        B) Two
+        C) Three
+        D) Five
+        ANSWER: ____
+
+gst Q47   E-commerce GST registration via VO is:
+        A) Not allowed
+        B) Allowed with correct GST category compliance
+        C) Only WeWork
+        D) Only Delhi
+        ANSWER: ____
+
+gst Q48   APOB stands for:
+        A) Additional Place of Business
+        B) Annual Plan of Business
+        C) Address Proof of Business
+        D) Advance Pay on Booking
+        ANSWER: ____
+
+gst Q49   Can a client get GST in multiple states via VO?
+        A) No
+        B) Yes, one VO/GSTIN per state
+        C) Only two states
+        D) Owned only
+        ANSWER: ____
+
+gst Q50   Is the GST Plan transferable to another entity?
+        A) Yes
+        B) No
+        C) With fee
+        D) Same city
+        ANSWER: ____
+
+======================================================================
+Business Address Plan  (50 questions)
+======================================================================
+
+ba Q1    The Business Address Plan is best for:
+        A) New companies
+        B) Established businesses/freelancers/consultants needing branding
+        C) GST-only clients
+        D) Trusts
+        ANSWER: ____
+
+ba Q2    Can the Business Address Plan be used for company registration?
+        A) Yes
+        B) No
+        C) Only LLP
+        D) Only WeWork
+        ANSWER: ____
+
+ba Q3    Can it be used for GST registration?
+        A) Yes
+        B) No
+        C) Only NE states
+        D) Only Delhi
+        ANSWER: ____
+
+ba Q4    What is this plan used for?
+        A) Legal registration
+        B) Mailing and correspondence only
+        C) Signage
+        D) GST filing
+        ANSWER: ____
+
+ba Q5    Among the three plans, the Business Address Plan is the:
+        A) Most expensive
+        B) Lowest-cost
+        C) Same as GST
+        D) Free
+        ANSWER: ____
+
+ba Q6    Is signage provided with this plan?
+        A) Yes, permanent
+        B) Yes, temporary
+        C) No signage
+        D) Digital only
+        ANSWER: ____
+
+ba Q7    Are government registration documents provided?
+        A) Yes
+        B) No
+        C) Only NOC
+        D) Only utility bill
+        ANSWER: ____
+
+ba Q8    Is an NOC provided under this plan?
+        A) Yes
+        B) No
+        C) Only leased
+        D) Only owned
+        ANSWER: ____
+
+ba Q9    Is a Utility Bill provided under this plan?
+        A) Yes
+        B) No
+        C) Extra cost
+        D) WeWork only
+        ANSWER: ____
+
+ba Q10   Is mail & package handling included?
+        A) No
+        B) Yes
+        C) Extra cost
+        D) No, never
+        ANSWER: ____
+
+ba Q11   Is the Space-Client Agreement provided?
+        A) No
+        B) Yes
+        C) Only leased
+        D) Only owned
+        ANSWER: ____
+
+ba Q12   The premium address can be used on:
+        A) MCA filings
+        B) Website, letterheads, visiting cards, Google My Business
+        C) GST returns
+        D) Company incorporation
+        ANSWER: ____
+
+ba Q13   Ideal customers for this plan include:
+        A) New Pvt Ltd
+        B) Freelancers, coaches, consultants
+        C) E-commerce GST sellers
+        D) Foreign companies registering
+        ANSWER: ____
+
+ba Q14   Does this plan help a home-based business look credible?
+        A) No
+        B) Yes
+        C) Only WeWork
+        D) Only Delhi
+        ANSWER: ____
+
+ba Q15   'Mailing address' means:
+        A) You work there daily
+        B) Your business's permanent correspondence address
+        C) A GST number
+        D) A desk
+        ANSWER: ____
+
+ba Q16   With this plan, letters & packages are:
+        A) Discarded
+        B) Received and stored safely at the space
+        C) Forwarded to MCA
+        D) Returned
+        ANSWER: ____
+
+ba Q17   Clients can collect mail by:
+        A) Only courier
+        B) In person or request courier delivery
+        C) Email only
+        D) Cannot collect
+        ANSWER: ____
+
+ba Q18   Which is NOT included in the Business Address Plan?
+        A) Mail handling
+        B) Correspondence address
+        C) NOC & registration documents
+        D) Address use on website
+        ANSWER: ____
+
+ba Q19   A freelancer wanting only client trust (no registration) should buy:
+        A) Company Plan
+        B) GST Plan
+        C) Business Address Plan
+        D) None
+        ANSWER: ____
+
+ba Q20   Pricing formula:
+        A) Base only
+        B) Base + PG + Documentation + 18% GST
+        C) Base + 5%
+        D) Base + doc
+        ANSWER: ____
+
+ba Q21   Discounts apply only on:
+        A) GST
+        B) Documentation
+        C) Base price
+        D) PG
+        ANSWER: ____
+
+ba Q22   Minimum ticket size:
+        A) ₹2,000
+        B) ₹5,000
+        C) ₹8,500
+        D) ₹10,000
+        ANSWER: ____
+
+ba Q23   Can this plan be upgraded if the client later needs GST?
+        A) No, must buy the appropriate plan
+        B) Auto-upgrades
+        C) Free upgrade
+        D) Never
+        ANSWER: ____
+
+ba Q24   This plan provides which of the following?
+        A) Temporary signage
+        B) Premium correspondence address
+        C) NOC
+        D) Utility Bill
+        ANSWER: ____
+
+ba Q25   A coach branding their practice would use this plan on:
+        A) GST returns
+        B) Email signatures and visiting cards
+        C) MCA forms
+        D) Bank GST filing
+        ANSWER: ____
+
+ba Q26   Does this plan make the client's home address private?
+        A) No
+        B) Yes, business uses the VO address instead
+        C) Only WeWork
+        D) Only Delhi
+        ANSWER: ____
+
+ba Q27   Online payment is preferred because it:
+        A) Avoids GST
+        B) Confirms instantly, no manual follow-up
+        C) Is cheaper base
+        D) Removes doc charges
+        ANSWER: ____
+
+ba Q28   Offline NEFT/RTGS reflects in:
+        A) Instant
+        B) 24–48 hours
+        C) 1 week
+        D) 21 days
+        ANSWER: ____
+
+ba Q29   After payment, the rep must:
+        A) Refund
+        B) Fill the VO Transaction Form
+        C) Cancel
+        D) Sign for client
+        ANSWER: ____
+
+ba Q30   Refund possible before:
+        A) Payment
+        B) Draft agreement signed & approved
+        C) KYC
+        D) Verification
+        ANSWER: ____
+
+ba Q31   Operational deduction on eligible refund:
+        A) ₹500
+        B) ₹1,000
+        C) ₹2,000
+        D) ₹5,000
+        ANSWER: ____
+
+ba Q32   PG & documentation charges are:
+        A) Refundable
+        B) Never refunded
+        C) Half refunded
+        D) Refunded after 1 yr
+        ANSWER: ____
+
+ba Q33   Plan validity is typically:
+        A) 1 month
+        B) 6 months
+        C) 1 year
+        D) Lifetime
+        ANSWER: ____
+
+ba Q34   If the client does not renew:
+        A) Address stays serviced
+        B) Space no longer honours agreement/mail/signage
+        C) Free extension
+        D) Auto-renew
+        ANSWER: ____
+
+ba Q35   Mail for out-of-city clients is:
+        A) Discarded
+        B) Stored; client notified via email/WhatsApp
+        C) Returned
+        D) Forwarded free
+        ANSWER: ____
+
+ba Q36   Support email for non-WeWork queries:
+        A) sales@myhq.in
+        B) supportvo@myhq.in
+        C) help@myhq.in
+        D) ww@myhq.in
+        ANSWER: ____
+
+ba Q37   First response SLA on a ticket:
+        A) 1 hour
+        B) 2 hours
+        C) 1 day
+        D) 2 days
+        ANSWER: ____
+
+ba Q38   Is the plan transferable to another entity?
+        A) Yes
+        B) No
+        C) With fee
+        D) Same city
+        ANSWER: ____
+
+ba Q39   Can a client buy this plan in multiple cities?
+        A) No
+        B) Yes, separate plan per city
+        C) Only two
+        D) Owned only
+        ANSWER: ____
+
+ba Q40   Hidden charges in this plan?
+        A) Many
+        B) None — all disclosed upfront
+        C) Only GST hidden
+        D) Only PG hidden
+        ANSWER: ____
+
+ba Q41   Does this plan allow daily desk use at the space?
+        A) Yes
+        B) No (VO does not include workspace use)
+        C) Only WeWork
+        D) Only Delhi
+        ANSWER: ____
+
+ba Q42   Some spaces may allow, at extra cost:
+        A) Free desks
+        B) Limited meeting room/day-pass access
+        C) Free signage
+        D) GST filing
+        ANSWER: ____
+
+ba Q43   This plan builds credibility with:
+        A) Only MCA
+        B) Clients, banks, investors
+        C) Only GST dept
+        D) Only WeWork
+        ANSWER: ____
+
+ba Q44   Which document is NOT part of this plan?
+        A) Correspondence address
+        B) Mail handling
+        C) NOC
+        D) Address on letterheads
+        ANSWER: ____
+
+ba Q45   A seasonal/pop-up business benefits because the plan is:
+        A) Expensive
+        B) Flexible and affordable
+        C) Only annual
+        D) Only Pvt Ltd
+        ANSWER: ____
+
+ba Q46   Can a Google My Business profile use this address?
+        A) No
+        B) Yes
+        C) Only WeWork
+        D) Only Delhi
+        ANSWER: ____
+
+ba Q47   This plan is for legal registration?
+        A) Yes
+        B) No
+        C) Only GST
+        D) Only company
+        ANSWER: ____
+
+ba Q48   Sample documents before purchase are:
+        A) Unavailable
+        B) Available for download on the myHQ website
+        C) WeWork only
+        D) Paid
+        ANSWER: ____
+
+ba Q49   Which firm backs myHQ Virtual Office?
+        A) Regus
+        B) ANAROCK
+        C) WeWork
+        D) MCA
+        ANSWER: ____
+
+ba Q50   If a client later needs registration, the rep should:
+        A) Refuse
+        B) Recommend Company or GST Plan accordingly
+        C) Upgrade free
+        D) Cancel
+        ANSWER: ____
