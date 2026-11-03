@@ -665,7 +665,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 <header class="topbar" id="topbar">
   <div class="topbar-left">
     <span class="topbar-logo">myHQ</span>
-    <span class="topbar-chapter" id="chapterLabel">VO &middot; Chapter 1</span>
+    <span class="topbar-chapter" id="chapterLabel">VO &middot; Chapter 3</span>
   </div>
   <div class="topbar-center">Sales Conduct &amp; Standards</div>
   <div class="topbar-right">
@@ -680,9 +680,12 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 <!-- SLIDE MODE -->
 <div id="slide-mode">
 <div class="slides" id="slides">
-<div class="screen active">
-<div class="vo-wrap"><div class="vo-cover"><div class="vo-eyebrow">myHQ Virtual Office &middot; Chapter 3</div><h1>Sales Conduct &amp; Standards<em>.</em></h1><p class="vo-cover-sub">Six standards, three things that end careers, and the line between urgency and pressure.</p><div class="vo-cover-meta"><div class="vo-cover-stat"><div class="vo-cover-num">6</div><div class="vo-cover-lbl">Slides</div></div><div class="vo-cover-stat"><div class="vo-cover-num">2</div><div class="vo-cover-lbl">Reading sections</div></div></div></div></div>
-<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+<div class="screen screen-hero active">
+  <div class="hero-eyebrow">myHQ Virtual Office · Chapter 3</div>
+  <h1 class="hero-title" data-editable="vch3-cover-headline">Three things that<br><em>end careers</em>.</h1>
+  <p class="hero-sub" data-editable="vch3-cover-sub">Six standards, non-negotiable. Most conduct issues are not bad intent &mdash; they are a representative who promised something they did not control.</p>
+  <div class="hero-stats"><div class="hero-stat"><div class="hero-stat-num">6</div><div class="hero-stat-lbl">Sales standards</div></div><div class="hero-stat"><div class="hero-stat-num">3</div><div class="hero-stat-lbl">Zero-tolerance breaches</div></div><div class="hero-stat"><div class="hero-stat-num">0</div><div class="hero-stat-lbl">Guarantees you may give</div></div></div>
+  <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
 </div>
 <div class="screen">
 <div class="vo-wrap"><div class="vo-eyebrow">5 &middot; Sales conduct</div>
@@ -1097,6 +1100,33 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 </script>
+
+<style>
+/* -- VO chapter covers -- the AM screen-hero idiom, tokens only -- */
+.screen-hero { background: var(--white); display: flex; align-items: center;
+  justify-content: center; flex-direction: column;
+  padding: clamp(32px,5vw,80px) clamp(28px,6vw,120px); text-align: center; }
+.hero-eyebrow { font-size: 11px; font-weight: 800; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--blue); margin-bottom: 22px; }
+.hero-title { font-size: clamp(2.6rem,5.4vw,5rem); font-weight: 800;
+  line-height: 1.02; letter-spacing: -0.045em; color: var(--ink);
+  margin-bottom: 20px; }
+.hero-title em { font-style: normal; color: var(--blue); }
+.hero-sub { font-size: clamp(14px,1.4vw,17px); color: var(--body);
+  line-height: 1.7; max-width: 56ch; margin-bottom: 38px; }
+.hero-stats { display: flex; gap: clamp(28px,5vw,64px); align-items: flex-start;
+  padding-top: 26px; border-top: 1px solid var(--hairline); }
+.hero-stat { text-align: center; }
+.hero-stat-num { font-size: clamp(20px,2.2vw,28px); font-weight: 800;
+  color: var(--blue); letter-spacing: -0.03em; line-height: 1.1; }
+.hero-stat-lbl { font-size: 11px; font-weight: 600; color: var(--muted);
+  letter-spacing: 0.06em; text-transform: uppercase; margin-top: 6px; }
+@media (max-width: 640px) {
+  .hero-stats { gap: 22px; }
+  .hero-stat-lbl { font-size: 9.5px; letter-spacing: 0.04em; }
+}
+</style>
+
 </body>
 </html>
 

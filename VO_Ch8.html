@@ -665,156 +665,16 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 <header class="topbar" id="topbar">
   <div class="topbar-left">
     <span class="topbar-logo">myHQ</span>
-    <span class="topbar-chapter" id="chapterLabel">VO &middot; Chapter 1</span>
+    <span class="topbar-chapter" id="chapterLabel">VO &middot; Chapter 8</span>
   </div>
   <div class="topbar-center">FAQs &amp; Objection Handling</div>
   <div class="topbar-right">
     <a class="hub-btn" href="hub.html" title="Back to Hub"><i class="fa-solid fa-house"></i></a>
-    <span class="screen-counter" id="screenCounter">1 / 5</span>
-    <button class="read-btn" id="btnRead" onclick="setMode('read')">
-      <i class="fa-solid fa-book-open"></i>&nbsp;Read Full Chapter
-    </button>
   </div>
 </header>
 
 <!-- SLIDE MODE -->
-<div id="slide-mode">
-<div class="slides" id="slides">
-<div class="screen active">
-<div class="vo-wrap"><div class="vo-cover"><div class="vo-eyebrow">myHQ Virtual Office &middot; Chapter 8</div><h1>FAQs &amp; objection <em>handling</em>.</h1><p class="vo-cover-sub">Ninety-one questions clients actually ask, in three tiers &mdash; from basic legality through to the objections that decide a sale. Every one has an answer you can use on the call.</p><div class="vo-cover-meta"><div class="vo-cover-stat"><div class="vo-cover-num">27</div><div class="vo-cover-lbl">Tier 1 &middot; informatory</div></div><div class="vo-cover-stat"><div class="vo-cover-num">19</div><div class="vo-cover-lbl">Tier 2 &middot; process</div></div><div class="vo-cover-stat"><div class="vo-cover-num">45</div><div class="vo-cover-lbl">Tier 3 &middot; objections</div></div></div></div></div>
-<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
-</div>
-<div class="screen">
-<div class="vo-wrap"><div class="vo-eyebrow">Tier 1 &middot; Basic &amp; informatory</div><h2>27 questions, 3 themes</h2><p class="vo-lead">Is it legal? Will MCA and the banks accept it? What do the plans include, and what does it cost? These come early in a call and are answered with facts, not persuasion.</p><div class="vo-chips"><div class="vo-chip">Legality &amp; Virtual Office Fundamentals <span class="vo-chip-n">9</span></div><div class="vo-chip">Plan Options &amp; Features <span class="vo-chip-n">14</span></div><div class="vo-chip">Pricing &amp; Payment Options <span class="vo-chip-n">4</span></div></div><div class="vo-note"><strong>On the call:</strong> The Kerala High Court recognised virtual office addresses in CIT vs. Sreekrishna Textiles. myHQ records a 95%+ success rate across 10,000+ registrations.</div></div>
-<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
-</div>
-<div class="screen">
-<div class="vo-wrap"><div class="vo-eyebrow">Tier 2 &middot; Process &amp; registration</div><h2>19 questions, 3 themes</h2><p class="vo-lead">Timelines, visiting hours, what happens after payment, how cancellation works. The client has decided they want it and now wants to know how it runs.</p><div class="vo-chips"><div class="vo-chip">Registration Process &amp; Timeline <span class="vo-chip-n">9</span></div><div class="vo-chip">Pricing &amp; Payment - Tier 2 <span class="vo-chip-n">8</span></div><div class="vo-chip">Subscription &amp; Cancellation <span class="vo-chip-n">2</span></div></div><div class="vo-note"><strong>On the call:</strong> Most of these are answered by the process in Chapter 5. If you know the fulfilment flow, you can answer every question in this tier without checking.</div></div>
-<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
-</div>
-<div class="screen">
-<div class="vo-wrap"><div class="vo-eyebrow">Tier 3 &middot; Sales objections</div><h2>45 questions, 18 themes</h2><p class="vo-lead">Nineteen themes, from hidden costs and competitor comparison to GST officer visits and worst-case scenarios. These decide whether the sale closes.</p><div class="vo-chips"><div class="vo-chip">Premium Documentation &amp; Speed <span class="vo-chip-n">2</span></div><div class="vo-chip">Support &amp; Guarantee Claims <span class="vo-chip-n">3</span></div><div class="vo-chip">Government Approval &amp; Liability <span class="vo-chip-n">3</span></div><div class="vo-chip">Comparative Value Proposition <span class="vo-chip-n">3</span></div><div class="vo-chip">Business Case &amp; Financial Justification <span class="vo-chip-n">3</span></div><div class="vo-chip">Wework &amp; Address Considerations <span class="vo-chip-n">2</span></div><div class="vo-chip">Alternate Use Cases <span class="vo-chip-n">3</span></div><div class="vo-chip">Gst Verification &amp; Officer Visits <span class="vo-chip-n">6</span></div><div class="vo-chip">Timeline &amp; Competition <span class="vo-chip-n">1</span></div></div><div class="vo-note"><strong>On the call:</strong> Never counter an objection by guaranteeing an outcome you do not control. Chapter 3 covers why that ends careers; this chapter gives you the honest answer instead.</div></div>
-<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
-</div>
-<div class="screen">
-<div class="vo-wrap"><div class="vo-cover"><div class="vo-eyebrow">End of chapter 8</div><h1>Chapter <em>complete</em>.</h1><p class="vo-cover-sub">The full bank of 91 objections, with answers, is in the reading view. Work through Tier 3 before your first live call.</p><div class="vo-cover-meta"><div class="vo-cover-stat"><div class="vo-cover-num">&rarr;</div><div class="vo-cover-lbl">Next: Chapter 9 &middot; Mock Calls</div></div></div></div></div>
-</div>
-</div>
-<div class="dot-nav" id="dotNav"></div>
-<div class="key-hint" id="keyHint"><i class="fa-solid fa-arrow-left"></i><i class="fa-solid fa-arrow-right"></i>&nbsp;to navigate</div>
-</div>
-
-<style>
-/* ── VO CHAPTER ── screens built on the shared .screen frame ── */
-.vo-wrap { width: 100%; max-width: 1180px; margin: 0 auto; padding: 44px 48px; height: 100%; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; }
-.vo-eyebrow { font-size: 11px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 10px; }
-.vo-h2 { font-size: 2.1rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.12; color: var(--ink); margin-bottom: 12px; }
-.vo-h2 em { font-style: normal; color: var(--blue); }
-.vo-lede { font-size: 15px; color: var(--body); line-height: 1.7; max-width: 860px; margin-bottom: 22px; }
-
-/* the script box - the thing reps actually read out */
-.vo-script { background: rgba(30,34,170,0.05); border-left: 3px solid var(--blue); border-radius: 0 8px 8px 0; padding: 14px 18px; margin-bottom: 20px; }
-.vo-script-label { font-size: 10px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 5px; }
-.vo-script-text { font-size: 14px; color: var(--ink); line-height: 1.65; font-style: italic; }
-
-/* protocol cards - the A/B/C/D variations under each stage */
-.vo-protos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-.vo-protos.cols-3 { grid-template-columns: repeat(3, 1fr); }
-.vo-protos.cols-4 { grid-template-columns: repeat(4, 1fr); }
-.vo-proto { border: 1px solid var(--hairline); border-radius: 8px; padding: 13px 15px; background: var(--white); }
-.vo-proto-tag { font-size: 10px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px; }
-.vo-proto-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 5px; line-height: 1.3; }
-.vo-proto-body { font-size: 12px; color: var(--body); line-height: 1.55; }
-
-/* the 11-stage call flow */
-.vo-flow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 9px; }
-.vo-step { border: 1px solid var(--hairline); border-radius: 8px; padding: 11px 10px; background: var(--white); position: relative; }
-.vo-step-num { width: 20px; height: 20px; border-radius: 50%; background: var(--blue); color: var(--white); font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-bottom: 7px; }
-.vo-step-name { font-size: 11.5px; font-weight: 700; color: var(--ink); line-height: 1.25; margin-bottom: 3px; }
-.vo-step-sub { font-size: 10px; color: var(--muted); line-height: 1.4; }
-
-/* two-column compare (fresh vs follow-up, owned vs leased) */
-.vo-two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.vo-col { border: 1px solid var(--hairline); border-radius: 10px; overflow: hidden; }
-.vo-col-head { padding: 11px 16px; font-size: 12px; font-weight: 800; letter-spacing: 0.02em; }
-.vo-col-head.blue { background: var(--blue); color: var(--white); }
-.vo-col-head.soft { background: #F5F6FB; color: var(--ink); }
-.vo-col-body { padding: 13px 16px; }
-.vo-ol { list-style: none; counter-reset: v; }
-.vo-ol li { counter-increment: v; font-size: 12.5px; color: var(--body); line-height: 1.5; padding: 4px 0 4px 26px; position: relative; }
-.vo-ol li::before { content: counter(v); position: absolute; left: 0; top: 4px; width: 17px; height: 17px; border-radius: 50%; background: rgba(30,34,170,0.09); color: var(--blue); font-size: 9.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
-
-/* RCA blocks - the discovery questions */
-.vo-rca { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; }
-.vo-rca-card { border: 1px solid var(--hairline); border-radius: 10px; padding: 15px 16px; background: var(--white); }
-.vo-rca-head { font-size: 12px; font-weight: 800; color: var(--blue); margin-bottom: 9px; }
-.vo-q { font-size: 12px; color: var(--body); line-height: 1.5; padding: 4px 0 4px 15px; position: relative; }
-.vo-q::before { content: ''; position: absolute; left: 0; top: 10px; width: 5px; height: 5px; border-radius: 50%; background: var(--blue); opacity: 0.45; }
-
-/* the seven plan paths */
-.vo-paths { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px; }
-.vo-path { border: 1px solid var(--hairline); border-radius: 9px; padding: 12px 13px; background: var(--white); }
-.vo-path-num { font-size: 10px; font-weight: 800; color: var(--white); background: var(--blue); border-radius: 4px; padding: 2px 6px; display: inline-block; margin-bottom: 6px; }
-.vo-path-name { font-size: 12.5px; font-weight: 700; color: var(--ink); line-height: 1.25; margin-bottom: 5px; }
-.vo-path-trigger { font-size: 11px; color: var(--body); line-height: 1.45; margin-bottom: 7px; }
-.vo-path-plan { font-size: 10.5px; font-weight: 700; color: var(--blue); border-top: 1px solid var(--hairline); padding-top: 6px; }
-
-/* customer-type cards */
-.vo-types { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-.vo-type { border-radius: 9px; padding: 13px 12px; color: var(--white); }
-.vo-type-name { font-size: 12px; font-weight: 800; margin-bottom: 5px; letter-spacing: 0.02em; }
-.vo-type-quote { font-size: 11px; line-height: 1.45; opacity: 0.93; margin-bottom: 8px; font-style: italic; }
-.vo-type-close { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; }
-
-/* tables */
-.vo-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-.vo-table th { background: var(--blue); color: var(--white); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 9px 13px; text-align: left; }
-.vo-table th:not(:first-child), .vo-table td:not(:first-child) { text-align: center; }
-.vo-table td { padding: 9px 13px; border-bottom: 1px solid var(--hairline); color: var(--body); }
-.vo-table tr:nth-child(even) td { background: #FAFBFF; }
-.vo-table td:first-child { font-weight: 600; color: var(--ink); }
-
-/* callouts */
-.vo-warn { background: rgba(255,184,72,0.14); border-left: 3px solid var(--amber); border-radius: 0 6px 6px 0; padding: 11px 15px; font-size: 12.5px; color: var(--ink); line-height: 1.55; margin-top: 14px; }
-.vo-warn strong { color: #9A6A00; }
-.vo-coach { background: rgba(190,229,194,0.25); border-left: 3px solid #4CAF74; border-radius: 0 6px 6px 0; padding: 11px 15px; font-size: 12.5px; color: var(--ink); line-height: 1.55; margin-top: 10px; }
-.vo-coach strong { color: #2a7d3f; }
-
-/* process steps */
-.vo-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.vo-pstep { border: 1px solid var(--hairline); border-radius: 9px; padding: 13px 14px; background: var(--white); }
-.vo-pstep-n { font-size: 20px; font-weight: 800; color: rgba(30,34,170,0.22); line-height: 1; margin-bottom: 6px; }
-.vo-pstep-t { font-size: 12.5px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
-.vo-pstep-b { font-size: 11.5px; color: var(--body); line-height: 1.5; }
-
-/* doc requirement cards (slides 22-23) */
-.vo-docs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; }
-.vo-doc { background: var(--blue); color: var(--white); border-radius: 9px; padding: 15px 16px; }
-.vo-doc-head { font-size: 13px; font-weight: 800; margin-bottom: 10px; line-height: 1.25; }
-.vo-doc li { list-style: none; font-size: 11.5px; line-height: 1.5; padding: 3px 0 3px 14px; position: relative; opacity: 0.95; }
-.vo-doc li::before { content: ''; position: absolute; left: 0; top: 10px; width: 4px; height: 4px; border-radius: 50%; background: var(--white); opacity: 0.7; }
-
-/* cover */
-.vo-cover { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; height: 100%; }
-.vo-cover h1 { font-size: 3.2rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1.05; color: var(--ink); margin-bottom: 16px; }
-.vo-cover h1 em { font-style: normal; color: var(--blue); }
-.vo-cover-sub { font-size: 17px; color: var(--body); line-height: 1.6; max-width: 620px; margin-bottom: 26px; }
-.vo-cover-meta { display: flex; gap: 28px; border-top: 1px solid var(--hairline); padding-top: 18px; }
-.vo-cover-stat { }
-.vo-cover-num { font-size: 1.6rem; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
-.vo-cover-lbl { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; }
-
-@media (max-width: 1100px) {
-  .vo-flow { grid-template-columns: repeat(4, 1fr); }
-  .vo-paths, .vo-types { grid-template-columns: repeat(2, 1fr); }
-  .vo-rca, .vo-docs, .vo-steps { grid-template-columns: 1fr; }
-  .vo-protos, .vo-protos.cols-3, .vo-protos.cols-4 { grid-template-columns: 1fr; }
-  .vo-two { grid-template-columns: 1fr; }
-  .vo-wrap { padding: 0 24px; }
-}
-</style>
-
-<div id="read-mode" class="hidden" style="margin-top:52px;">
+<div id="read-mode" style="margin-top:52px;">
   <div class="r-layout">
     <aside class="r-sidebar">
       <div class="r-toc-label">VO &middot; Chapter 8</div>
@@ -1042,17 +902,21 @@ Issued by the property owner to the space operator. It allows the operator to us
 })();
 
 /* ── MODE TOGGLE ── */
-let currentMode = 'slide';
+let currentMode = 'read';
 
 function setMode(mode) {
+  /* Chapter 8 has no slides: the reading view is the whole page. */
+  return;
   currentMode = mode;
   const isSlide = mode === 'slide';
   document.getElementById('slide-mode').style.display = isSlide ? '' : 'none';
   const readEl = document.getElementById('read-mode');
   readEl.classList.toggle('hidden', isSlide);
   document.body.style.overflow = isSlide ? 'hidden' : 'auto';
-  document.getElementById('screenCounter').style.display = isSlide ? '' : 'none';
-  document.getElementById('dotNav').style.display = isSlide ? '' : 'none';
+  const sc = document.getElementById('screenCounter');
+  if (sc) sc.style.display = isSlide ? '' : 'none';
+  const dn = document.getElementById('dotNav');
+  if (dn) dn.style.display = isSlide ? '' : 'none';
   const keyHintEl = document.getElementById('keyHint'); if (keyHintEl) keyHintEl.style.display = isSlide ? '' : 'none';
   const chapterLabelEl = document.getElementById('chapterLabel');
   if (chapterLabelEl) chapterLabelEl.style.display = isSlide ? '' : 'none';
@@ -1074,6 +938,7 @@ let animating = false;
 
 function buildDots() {
   const nav = document.getElementById('dotNav');
+  if (!nav) return;            // Chapter 8 has no slide deck
   nav.innerHTML = '';
   for (let i = 0; i < TOTAL; i++) {
     const d = document.createElement('div');
@@ -1084,7 +949,9 @@ function buildDots() {
 }
 
 function updateCounter() {
-  document.getElementById('screenCounter').textContent = `${current + 1} / ${TOTAL}`;
+  const cnt = document.getElementById('screenCounter');
+  if (!cnt) return;            // Chapter 8 has no slide deck
+  cnt.textContent = `${current + 1} / ${TOTAL}`;
   const chap = document.getElementById('chapterLabel');
   if (chap) chap.style.display = current === 0 ? '' : 'none';
 }

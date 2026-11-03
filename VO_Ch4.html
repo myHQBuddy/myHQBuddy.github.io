@@ -665,7 +665,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 <header class="topbar" id="topbar">
   <div class="topbar-left">
     <span class="topbar-logo">myHQ</span>
-    <span class="topbar-chapter" id="chapterLabel">VO &middot; Chapter 1</span>
+    <span class="topbar-chapter" id="chapterLabel">VO &middot; Chapter 4</span>
   </div>
   <div class="topbar-center">The Product</div>
   <div class="topbar-right">
@@ -680,9 +680,12 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 <!-- SLIDE MODE -->
 <div id="slide-mode">
 <div class="slides" id="slides">
-<div class="screen active">
-<div class="vo-wrap"><div class="vo-cover"><div class="vo-eyebrow">myHQ Virtual Office &middot; Chapter 4</div><h1>The Product<em>.</em></h1><p class="vo-cover-sub">Registration concepts and the document chain every application depends on.</p><div class="vo-cover-meta"><div class="vo-cover-stat"><div class="vo-cover-num">5</div><div class="vo-cover-lbl">Slides</div></div><div class="vo-cover-stat"><div class="vo-cover-num">3</div><div class="vo-cover-lbl">Reading sections</div></div></div></div></div>
-<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+<div class="screen screen-hero active">
+  <div class="hero-eyebrow">myHQ Virtual Office · Chapter 4</div>
+  <h1 class="hero-title" data-editable="vch4-cover-headline">What the client<br>is <em>actually</em> buying.</h1>
+  <p class="hero-sub" data-editable="vch4-cover-sub">Company registration, GST and correspondence &mdash; the three concepts behind every plan, and the document chain that every application fails without.</p>
+  <div class="hero-stats"><div class="hero-stat"><div class="hero-stat-num">3</div><div class="hero-stat-lbl">Plans</div></div><div class="hero-stat"><div class="hero-stat-num">NOC</div><div class="hero-stat-lbl">The document that decides it</div></div><div class="hero-stat"><div class="hero-stat-num">70</div><div class="hero-stat-lbl">Questions in this chapter</div></div></div>
+  <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
 </div>
 <div class="screen">
 <div class="vo-wrap"><div class="vo-eyebrow">6 &middot; Registration concepts</div>
@@ -880,6 +883,10 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 <section class="section" id="r-assess" style="margin-top:60px;padding-top:44px;border-top:2px solid var(--hairline);">
 <div class="section-num">Assessment</div>
 <h2 class="section-title">Chapter questions</h2>
+<div class="vo-tabs">
+<button class="vo-tab on" data-k="quiz1" type="button" onclick="showTab('r-assess','quiz1')">Quiz 1<span class="vo-tab-n">40</span></button>
+<button class="vo-tab" data-k="quiz2" type="button" onclick="showTab('r-assess','quiz2')">Quiz 2<span class="vo-tab-n">30</span></button>
+</div>
 <div class="vo-quiz" id="quiz-quiz1">
 <div class="vo-quiz-head"><h3>Quiz 1 · Product training</h3><p>40 questions, one mark each. Pass mark 80%.</p></div>
 <div class="vo-quiz-sec">Plans &amp; Use Cases</div>
@@ -928,7 +935,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 <div class="mcq-q" id="mcq_quiz1_40" data-type="single" data-correct="-1"><div class="aq-q-header"><span class="aq-q-num">Q40</span><span class="aq-q-status" id="mcq_quiz1_40-status"></span></div><p class="aq-q-text" data-editable="mcq_quiz1_-q40">Which of the following correctly explains the 'Business Address Plan'?</p><div class="mcq-hint">Select one</div><div class="mcq-options"><label class="mcq-opt" onclick="selectOpt(this,40)"><input type="radio" name="mcq_quiz1_40"><span class="mcq-badge">A</span><span class="mcq-opt-text" data-editable="mcq_quiz1_-q40-oA">It includes company registration documents</span></label><label class="mcq-opt" onclick="selectOpt(this,40)"><input type="radio" name="mcq_quiz1_40"><span class="mcq-badge">B</span><span class="mcq-opt-text" data-editable="mcq_quiz1_-q40-oB">It includes GST registration documents only</span></label><label class="mcq-opt" onclick="selectOpt(this,40)"><input type="radio" name="mcq_quiz1_40"><span class="mcq-badge">C</span><span class="mcq-opt-text" data-editable="mcq_quiz1_-q40-oC">It provides a premium address for correspondence — no company or GST registration documents</span></label><label class="mcq-opt" onclick="selectOpt(this,40)"><input type="radio" name="mcq_quiz1_40"><span class="mcq-badge">D</span><span class="mcq-opt-text" data-editable="mcq_quiz1_-q40-oD">It includes both company and GST registration</span></label></div><div class="mcq-explain" id="mcq_quiz1_40-exp"></div></div>
 <div class="aq-footer"><span class="aq-footer-note">Answers are recorded against your profile.</span><button class="aq-submit-btn" type="button" onclick="submitQuiz('quiz1')">Submit Quiz 1 · Product training</button></div>
 </div>
-<div class="vo-quiz" id="quiz-quiz2">
+<div class="vo-quiz" id="quiz-quiz2" hidden>
 <div class="vo-quiz-head"><h3>Quiz 2 · Product</h3><p>30 questions, one mark each. Pass mark 80%.</p></div>
 <div class="mcq-q" id="mcq_quiz2_1" data-type="single" data-correct="-1"><div class="aq-q-header"><span class="aq-q-num">Q1</span><span class="aq-q-status" id="mcq_quiz2_1-status"></span></div><p class="aq-q-text" data-editable="mcq_quiz2_-q1">What is the core advantage a Virtual Office gives a business, as defined ?</p><div class="mcq-hint">Select one</div><div class="mcq-options"><label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="mcq_quiz2_1"><span class="mcq-badge">A</span><span class="mcq-opt-text" data-editable="mcq_quiz2_-q1-oA">A discounted physical office on a short lease</span></label><label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="mcq_quiz2_1"><span class="mcq-badge">B</span><span class="mcq-opt-text" data-editable="mcq_quiz2_-q1-oB">The advantages of a professional office address without the cost of renting physical space</span></label><label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="mcq_quiz2_1"><span class="mcq-badge">C</span><span class="mcq-opt-text" data-editable="mcq_quiz2_-q1-oC">Free legal representation for company registration</span></label><label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="mcq_quiz2_1"><span class="mcq-badge">D</span><span class="mcq-opt-text" data-editable="mcq_quiz2_-q1-oD">A guaranteed business loan from partner banks</span></label></div><div class="mcq-explain" id="mcq_quiz2_1-exp"></div></div>
 <div class="mcq-q" id="mcq_quiz2_2" data-type="single" data-correct="-1"><div class="aq-q-header"><span class="aq-q-num">Q2</span><span class="aq-q-status" id="mcq_quiz2_2-status"></span></div><p class="aq-q-text" data-editable="mcq_quiz2_-q2">Under MCA guidelines, which type of address is NOT permitted for legally registering a company in India?</p><div class="mcq-hint">Select one</div><div class="mcq-options"><label class="mcq-opt" onclick="selectOpt(this,2)"><input type="radio" name="mcq_quiz2_2"><span class="mcq-badge">A</span><span class="mcq-opt-text" data-editable="mcq_quiz2_-q2-oA">A commercial address</span></label><label class="mcq-opt" onclick="selectOpt(this,2)"><input type="radio" name="mcq_quiz2_2"><span class="mcq-badge">B</span><span class="mcq-opt-text" data-editable="mcq_quiz2_-q2-oB">A virtual office address</span></label><label class="mcq-opt" onclick="selectOpt(this,2)"><input type="radio" name="mcq_quiz2_2"><span class="mcq-badge">C</span><span class="mcq-opt-text" data-editable="mcq_quiz2_-q2-oC">A home / non-commercial address</span></label><label class="mcq-opt" onclick="selectOpt(this,2)"><input type="radio" name="mcq_quiz2_2"><span class="mcq-badge">D</span><span class="mcq-opt-text" data-editable="mcq_quiz2_-q2-oD">A coworking space address</span></label></div><div class="mcq-explain" id="mcq_quiz2_2-exp"></div></div>
@@ -1278,6 +1285,67 @@ function submitQuiz(key) {
     note.textContent = answered + ' of ' + qs.length +
       ' answered. Saved \u2014 answer key not yet loaded, so this is not scored.';
   }
+}
+</script>
+
+
+<style>
+/* -- VO chapter covers -- the AM screen-hero idiom, tokens only -- */
+.screen-hero { background: var(--white); display: flex; align-items: center;
+  justify-content: center; flex-direction: column;
+  padding: clamp(32px,5vw,80px) clamp(28px,6vw,120px); text-align: center; }
+.hero-eyebrow { font-size: 11px; font-weight: 800; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--blue); margin-bottom: 22px; }
+.hero-title { font-size: clamp(2.6rem,5.4vw,5rem); font-weight: 800;
+  line-height: 1.02; letter-spacing: -0.045em; color: var(--ink);
+  margin-bottom: 20px; }
+.hero-title em { font-style: normal; color: var(--blue); }
+.hero-sub { font-size: clamp(14px,1.4vw,17px); color: var(--body);
+  line-height: 1.7; max-width: 56ch; margin-bottom: 38px; }
+.hero-stats { display: flex; gap: clamp(28px,5vw,64px); align-items: flex-start;
+  padding-top: 26px; border-top: 1px solid var(--hairline); }
+.hero-stat { text-align: center; }
+.hero-stat-num { font-size: clamp(20px,2.2vw,28px); font-weight: 800;
+  color: var(--blue); letter-spacing: -0.03em; line-height: 1.1; }
+.hero-stat-lbl { font-size: 11px; font-weight: 600; color: var(--muted);
+  letter-spacing: 0.06em; text-transform: uppercase; margin-top: 6px; }
+@media (max-width: 640px) {
+  .hero-stats { gap: 22px; }
+  .hero-stat-lbl { font-size: 9.5px; letter-spacing: 0.04em; }
+}
+</style>
+
+
+<style>
+/* -- assessment tabs -- tokens only -- */
+.vo-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 26px;
+  border-bottom: 1px solid var(--hairline); }
+.vo-tab { appearance: none; background: none; border: none; cursor: pointer;
+  font-family: var(--sans); font-size: 13.5px; font-weight: 700;
+  color: var(--muted); padding: 11px 16px 13px; border-bottom: 2px solid transparent;
+  margin-bottom: -1px; transition: color var(--transition),
+  border-color var(--transition); white-space: nowrap; }
+.vo-tab:hover { color: var(--ink); }
+.vo-tab.on { color: var(--blue); border-bottom-color: var(--blue); }
+.vo-tab-n { font-size: 11px; font-weight: 600; color: var(--muted);
+  margin-left: 6px; }
+.vo-tab.on .vo-tab-n { color: var(--blue); }
+.vo-quiz[hidden] { display: none; }
+@media (max-width: 640px) {
+  .vo-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .vo-tab { padding: 10px 12px 12px; font-size: 12.5px; }
+}
+</style>
+<script>
+function showTab(scope, key) {
+  var root = document.getElementById(scope);
+  if (!root) return;
+  root.querySelectorAll('.vo-quiz').forEach(function(q) {
+    q.hidden = (q.id !== 'quiz-' + key);
+  });
+  root.querySelectorAll('.vo-tab').forEach(function(t) {
+    t.classList.toggle('on', t.getAttribute('data-k') === key);
+  });
 }
 </script>
 

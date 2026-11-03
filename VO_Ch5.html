@@ -665,7 +665,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 <header class="topbar" id="topbar">
   <div class="topbar-left">
     <span class="topbar-logo">myHQ</span>
-    <span class="topbar-chapter" id="chapterLabel">VO &middot; Chapter 1</span>
+    <span class="topbar-chapter" id="chapterLabel">VO &middot; Chapter 5</span>
   </div>
   <div class="topbar-center">The Process</div>
   <div class="topbar-right">
@@ -680,9 +680,12 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 <!-- SLIDE MODE -->
 <div id="slide-mode">
 <div class="slides" id="slides">
-<div class="screen active">
-<div class="vo-wrap"><div class="vo-cover"><div class="vo-eyebrow">myHQ Virtual Office &middot; Chapter 5</div><h1>The Process<em>.</em></h1><p class="vo-cover-sub">Lead to payment, fulfilment and KYC, how the government verifies, and where support sits.</p><div class="vo-cover-meta"><div class="vo-cover-stat"><div class="vo-cover-num">8</div><div class="vo-cover-lbl">Slides</div></div><div class="vo-cover-stat"><div class="vo-cover-num">5</div><div class="vo-cover-lbl">Reading sections</div></div></div></div></div>
-<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+<div class="screen screen-hero active">
+  <div class="hero-eyebrow">myHQ Virtual Office · Chapter 5</div>
+  <h1 class="hero-title" data-editable="vch5-cover-headline">Lead to documents,<br>without a <em>gap</em>.</h1>
+  <p class="hero-sub" data-editable="vch5-cover-sub">The end-to-end flow: how a sale is made, how payment clears, how fulfilment and KYC run, and how the government verifies what you sold.</p>
+  <div class="hero-stats"><div class="hero-stat"><div class="hero-stat-num">60</div><div class="hero-stat-lbl">Days to complete KYC</div></div><div class="hero-stat"><div class="hero-stat-num">3</div><div class="hero-stat-lbl">Verification types</div></div><div class="hero-stat"><div class="hero-stat-num">180</div><div class="hero-stat-lbl">Questions in this chapter</div></div></div>
+  <button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
 </div>
 <div class="screen">
 <div class="vo-wrap"><div class="vo-eyebrow">8 &middot; Sales &amp; payment flow</div>
@@ -944,6 +947,12 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 <section class="section" id="r-assess" style="margin-top:60px;padding-top:44px;border-top:2px solid var(--hairline);">
 <div class="section-num">Assessment</div>
 <h2 class="section-title">Chapter questions and scenarios</h2>
+<div class="vo-tabs">
+<button class="vo-tab on" data-k="cr" type="button" onclick="showTab('r-assess','cr')">Company Registration<span class="vo-tab-n">50</span></button>
+<button class="vo-tab" data-k="gst" type="button" onclick="showTab('r-assess','gst')">GST Registration<span class="vo-tab-n">50</span></button>
+<button class="vo-tab" data-k="ba" type="button" onclick="showTab('r-assess','ba')">Business Address<span class="vo-tab-n">50</span></button>
+<button class="vo-tab" data-k="scenarios" type="button" onclick="showTab('r-assess','scenarios')">Scenarios<span class="vo-tab-n">30</span></button>
+</div>
 <div class="vo-quiz" id="quiz-cr">
 <div class="vo-quiz-head"><h3>Company Registration Plan</h3><p>50 questions.</p></div>
 <div class="mcq-q" id="mcq_cr_1" data-type="single" data-correct="-1"><div class="aq-q-header"><span class="aq-q-num">Q1</span><span class="aq-q-status" id="mcq_cr_1-status"></span></div><p class="aq-q-text" data-editable="mcq_cr_-q1">What is the Company Registration Plan also known as?</p><div class="mcq-hint">Select one</div><div class="mcq-options"><label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="mcq_cr_1"><span class="mcq-badge">A</span><span class="mcq-opt-text" data-editable="mcq_cr_-q1-oA">Basic Plan</span></label><label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="mcq_cr_1"><span class="mcq-badge">B</span><span class="mcq-opt-text" data-editable="mcq_cr_-q1-oB">The Master Plan</span></label><label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="mcq_cr_1"><span class="mcq-badge">C</span><span class="mcq-opt-text" data-editable="mcq_cr_-q1-oC">Correspondence Plan</span></label><label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="mcq_cr_1"><span class="mcq-badge">D</span><span class="mcq-opt-text" data-editable="mcq_cr_-q1-oD">Lite Plan</span></label></div><div class="mcq-explain" id="mcq_cr_1-exp"></div></div>
@@ -998,7 +1007,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 <div class="mcq-q" id="mcq_cr_50" data-type="single" data-correct="-1"><div class="aq-q-header"><span class="aq-q-num">Q50</span><span class="aq-q-status" id="mcq_cr_50-status"></span></div><p class="aq-q-text" data-editable="mcq_cr_-q50">The Company Registration Plan covers how many core use cases?</p><div class="mcq-hint">Select one</div><div class="mcq-options"><label class="mcq-opt" onclick="selectOpt(this,50)"><input type="radio" name="mcq_cr_50"><span class="mcq-badge">A</span><span class="mcq-opt-text" data-editable="mcq_cr_-q50-oA">One</span></label><label class="mcq-opt" onclick="selectOpt(this,50)"><input type="radio" name="mcq_cr_50"><span class="mcq-badge">B</span><span class="mcq-opt-text" data-editable="mcq_cr_-q50-oB">Two</span></label><label class="mcq-opt" onclick="selectOpt(this,50)"><input type="radio" name="mcq_cr_50"><span class="mcq-badge">C</span><span class="mcq-opt-text" data-editable="mcq_cr_-q50-oC">All three</span></label><label class="mcq-opt" onclick="selectOpt(this,50)"><input type="radio" name="mcq_cr_50"><span class="mcq-badge">D</span><span class="mcq-opt-text" data-editable="mcq_cr_-q50-oD">None</span></label></div><div class="mcq-explain" id="mcq_cr_50-exp"></div></div>
 <div class="aq-footer"><span class="aq-footer-note">Answers are recorded against your profile.</span><button class="aq-submit-btn" type="button" onclick="submitQuiz('cr')">Submit Company Registration Plan</button></div>
 </div>
-<div class="vo-quiz" id="quiz-gst">
+<div class="vo-quiz" id="quiz-gst" hidden>
 <div class="vo-quiz-head"><h3>GST Registration Plan</h3><p>50 questions.</p></div>
 <div class="mcq-q" id="mcq_gst_1" data-type="single" data-correct="-1"><div class="aq-q-header"><span class="aq-q-num">Q1</span><span class="aq-q-status" id="mcq_gst_1-status"></span></div><p class="aq-q-text" data-editable="mcq_gst_-q1">The GST Registration Plan is best for businesses that are:</p><div class="mcq-hint">Select one</div><div class="mcq-options"><label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="mcq_gst_1"><span class="mcq-badge">A</span><span class="mcq-opt-text" data-editable="mcq_gst_-q1-oA">Not yet incorporated</span></label><label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="mcq_gst_1"><span class="mcq-badge">B</span><span class="mcq-opt-text" data-editable="mcq_gst_-q1-oB">Already incorporated (with CIN) needing GST</span></label><label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="mcq_gst_1"><span class="mcq-badge">C</span><span class="mcq-opt-text" data-editable="mcq_gst_-q1-oC">Freelancers branding only</span></label><label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="mcq_gst_1"><span class="mcq-badge">D</span><span class="mcq-opt-text" data-editable="mcq_gst_-q1-oD">Trusts only</span></label></div><div class="mcq-explain" id="mcq_gst_1-exp"></div></div>
 <div class="mcq-q" id="mcq_gst_2" data-type="single" data-correct="-1"><div class="aq-q-header"><span class="aq-q-num">Q2</span><span class="aq-q-status" id="mcq_gst_2-status"></span></div><p class="aq-q-text" data-editable="mcq_gst_-q2">Can GST Plan documents be used for company registration?</p><div class="mcq-hint">Select one</div><div class="mcq-options"><label class="mcq-opt" onclick="selectOpt(this,2)"><input type="radio" name="mcq_gst_2"><span class="mcq-badge">A</span><span class="mcq-opt-text" data-editable="mcq_gst_-q2-oA">Yes</span></label><label class="mcq-opt" onclick="selectOpt(this,2)"><input type="radio" name="mcq_gst_2"><span class="mcq-badge">B</span><span class="mcq-opt-text" data-editable="mcq_gst_-q2-oB">No</span></label><label class="mcq-opt" onclick="selectOpt(this,2)"><input type="radio" name="mcq_gst_2"><span class="mcq-badge">C</span><span class="mcq-opt-text" data-editable="mcq_gst_-q2-oC">Only LLP</span></label><label class="mcq-opt" onclick="selectOpt(this,2)"><input type="radio" name="mcq_gst_2"><span class="mcq-badge">D</span><span class="mcq-opt-text" data-editable="mcq_gst_-q2-oD">Only WeWork</span></label></div><div class="mcq-explain" id="mcq_gst_2-exp"></div></div>
@@ -1052,7 +1061,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 <div class="mcq-q" id="mcq_gst_50" data-type="single" data-correct="-1"><div class="aq-q-header"><span class="aq-q-num">Q50</span><span class="aq-q-status" id="mcq_gst_50-status"></span></div><p class="aq-q-text" data-editable="mcq_gst_-q50">Is the GST Plan transferable to another entity?</p><div class="mcq-hint">Select one</div><div class="mcq-options"><label class="mcq-opt" onclick="selectOpt(this,50)"><input type="radio" name="mcq_gst_50"><span class="mcq-badge">A</span><span class="mcq-opt-text" data-editable="mcq_gst_-q50-oA">Yes</span></label><label class="mcq-opt" onclick="selectOpt(this,50)"><input type="radio" name="mcq_gst_50"><span class="mcq-badge">B</span><span class="mcq-opt-text" data-editable="mcq_gst_-q50-oB">No</span></label><label class="mcq-opt" onclick="selectOpt(this,50)"><input type="radio" name="mcq_gst_50"><span class="mcq-badge">C</span><span class="mcq-opt-text" data-editable="mcq_gst_-q50-oC">With fee</span></label><label class="mcq-opt" onclick="selectOpt(this,50)"><input type="radio" name="mcq_gst_50"><span class="mcq-badge">D</span><span class="mcq-opt-text" data-editable="mcq_gst_-q50-oD">Same city</span></label></div><div class="mcq-explain" id="mcq_gst_50-exp"></div></div>
 <div class="aq-footer"><span class="aq-footer-note">Answers are recorded against your profile.</span><button class="aq-submit-btn" type="button" onclick="submitQuiz('gst')">Submit GST Registration Plan</button></div>
 </div>
-<div class="vo-quiz" id="quiz-ba">
+<div class="vo-quiz" id="quiz-ba" hidden>
 <div class="vo-quiz-head"><h3>Business Address Plan</h3><p>50 questions.</p></div>
 <div class="mcq-q" id="mcq_ba_1" data-type="single" data-correct="-1"><div class="aq-q-header"><span class="aq-q-num">Q1</span><span class="aq-q-status" id="mcq_ba_1-status"></span></div><p class="aq-q-text" data-editable="mcq_ba_-q1">The Business Address Plan is best for:</p><div class="mcq-hint">Select one</div><div class="mcq-options"><label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="mcq_ba_1"><span class="mcq-badge">A</span><span class="mcq-opt-text" data-editable="mcq_ba_-q1-oA">New companies</span></label><label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="mcq_ba_1"><span class="mcq-badge">B</span><span class="mcq-opt-text" data-editable="mcq_ba_-q1-oB">Established businesses/freelancers/consultants needing branding</span></label><label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="mcq_ba_1"><span class="mcq-badge">C</span><span class="mcq-opt-text" data-editable="mcq_ba_-q1-oC">GST-only clients</span></label><label class="mcq-opt" onclick="selectOpt(this,1)"><input type="radio" name="mcq_ba_1"><span class="mcq-badge">D</span><span class="mcq-opt-text" data-editable="mcq_ba_-q1-oD">Trusts</span></label></div><div class="mcq-explain" id="mcq_ba_1-exp"></div></div>
 <div class="mcq-q" id="mcq_ba_2" data-type="single" data-correct="-1"><div class="aq-q-header"><span class="aq-q-num">Q2</span><span class="aq-q-status" id="mcq_ba_2-status"></span></div><p class="aq-q-text" data-editable="mcq_ba_-q2">Can the Business Address Plan be used for company registration?</p><div class="mcq-hint">Select one</div><div class="mcq-options"><label class="mcq-opt" onclick="selectOpt(this,2)"><input type="radio" name="mcq_ba_2"><span class="mcq-badge">A</span><span class="mcq-opt-text" data-editable="mcq_ba_-q2-oA">Yes</span></label><label class="mcq-opt" onclick="selectOpt(this,2)"><input type="radio" name="mcq_ba_2"><span class="mcq-badge">B</span><span class="mcq-opt-text" data-editable="mcq_ba_-q2-oB">No</span></label><label class="mcq-opt" onclick="selectOpt(this,2)"><input type="radio" name="mcq_ba_2"><span class="mcq-badge">C</span><span class="mcq-opt-text" data-editable="mcq_ba_-q2-oC">Only LLP</span></label><label class="mcq-opt" onclick="selectOpt(this,2)"><input type="radio" name="mcq_ba_2"><span class="mcq-badge">D</span><span class="mcq-opt-text" data-editable="mcq_ba_-q2-oD">Only WeWork</span></label></div><div class="mcq-explain" id="mcq_ba_2-exp"></div></div>
@@ -1106,7 +1115,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 <div class="mcq-q" id="mcq_ba_50" data-type="single" data-correct="-1"><div class="aq-q-header"><span class="aq-q-num">Q50</span><span class="aq-q-status" id="mcq_ba_50-status"></span></div><p class="aq-q-text" data-editable="mcq_ba_-q50">If a client later needs registration, the rep should:</p><div class="mcq-hint">Select one</div><div class="mcq-options"><label class="mcq-opt" onclick="selectOpt(this,50)"><input type="radio" name="mcq_ba_50"><span class="mcq-badge">A</span><span class="mcq-opt-text" data-editable="mcq_ba_-q50-oA">Refuse</span></label><label class="mcq-opt" onclick="selectOpt(this,50)"><input type="radio" name="mcq_ba_50"><span class="mcq-badge">B</span><span class="mcq-opt-text" data-editable="mcq_ba_-q50-oB">Recommend Company or GST Plan accordingly</span></label><label class="mcq-opt" onclick="selectOpt(this,50)"><input type="radio" name="mcq_ba_50"><span class="mcq-badge">C</span><span class="mcq-opt-text" data-editable="mcq_ba_-q50-oC">Upgrade free</span></label><label class="mcq-opt" onclick="selectOpt(this,50)"><input type="radio" name="mcq_ba_50"><span class="mcq-badge">D</span><span class="mcq-opt-text" data-editable="mcq_ba_-q50-oD">Cancel</span></label></div><div class="mcq-explain" id="mcq_ba_50-exp"></div></div>
 <div class="aq-footer"><span class="aq-footer-note">Answers are recorded against your profile.</span><button class="aq-submit-btn" type="button" onclick="submitQuiz('ba')">Submit Business Address Plan</button></div>
 </div>
-<div class="vo-quiz" id="quiz-scenarios">
+<div class="vo-quiz" id="quiz-scenarios" hidden>
 <div class="vo-quiz-head"><h3>Scenario assessment</h3><p>30 scenarios, 10 marks each. Each one is marked by hand, so answer in full sentences where the part calls for it.</p></div>
 <div class="vo-sc"><div class="vo-sc-head"><span class="aq-q-num">Scenario 1</span><div class="vo-sc-meta"><span class="vo-sc-chip"><b>State</b> Delhi</span><span class="vo-sc-chip"><b>Location</b> Connaught Place</span><span class="vo-sc-chip"><b>Entity</b> New Private Limited Company</span><span class="vo-sc-chip"><b>Timeline</b> 1 Hour</span><span class="vo-sc-chip"><b>Requirement</b> GST + Company Registration</span><span class="vo-sc-chip"><b>Budget</b> ₹27,000</span></div></div><div class="vo-sc-part"><label>1.1 &nbsp;Space recommendation</label><div class="vo-sc-hint">Space Name &ndash; Locality &ndash; City</div><textarea rows="2" id="sc1_1" placeholder=""></textarea></div><div class="vo-sc-part"><label>1.2 &nbsp;Documents client will receive</label><div class="vo-sc-hint">One per line</div><textarea rows="4" id="sc1_2" placeholder=""></textarea></div><div class="vo-sc-part"><label>1.3 &nbsp;KYC documents required</label><div class="vo-sc-hint">As per entity type, one per line</div><textarea rows="4" id="sc1_3" placeholder=""></textarea></div><div class="vo-sc-part"><label>1.4 &nbsp;Pricing breakup</label><div class="vo-sc-hint">Base / Documentation / PG / GST 18% / Total</div><textarea rows="4" id="sc1_4" placeholder=""></textarea></div><div class="vo-sc-part"><label>1.5 &nbsp;Cost justification</label><div class="vo-sc-hint">Only if the budget is lower than your price</div><textarea rows="4" id="sc1_5" placeholder=""></textarea></div></div>
 <div class="vo-sc"><div class="vo-sc-head"><span class="aq-q-num">Scenario 2</span><div class="vo-sc-meta"><span class="vo-sc-chip"><b>State</b> Maharashtra</span><span class="vo-sc-chip"><b>Location</b> Mumbai (BKC)</span><span class="vo-sc-chip"><b>Entity</b> Existing Private Limited Company</span><span class="vo-sc-chip"><b>Timeline</b> 4–5 Days</span><span class="vo-sc-chip"><b>Requirement</b> GST Registration</span><span class="vo-sc-chip"><b>Budget</b> ₹17,000</span></div></div><div class="vo-sc-part"><label>2.1 &nbsp;Space recommendation</label><div class="vo-sc-hint">Space Name &ndash; Locality &ndash; City</div><textarea rows="2" id="sc2_1" placeholder=""></textarea></div><div class="vo-sc-part"><label>2.2 &nbsp;Documents client will receive</label><div class="vo-sc-hint">One per line</div><textarea rows="4" id="sc2_2" placeholder=""></textarea></div><div class="vo-sc-part"><label>2.3 &nbsp;KYC documents required</label><div class="vo-sc-hint">As per entity type, one per line</div><textarea rows="4" id="sc2_3" placeholder=""></textarea></div><div class="vo-sc-part"><label>2.4 &nbsp;Pricing breakup</label><div class="vo-sc-hint">Base / Documentation / PG / GST 18% / Total</div><textarea rows="4" id="sc2_4" placeholder=""></textarea></div><div class="vo-sc-part"><label>2.5 &nbsp;Cost justification</label><div class="vo-sc-hint">Only if the budget is lower than your price</div><textarea rows="4" id="sc2_5" placeholder=""></textarea></div></div>
@@ -1456,6 +1465,67 @@ function submitQuiz(key) {
     note.textContent = answered + ' of ' + qs.length +
       ' answered. Saved \u2014 answer key not yet loaded, so this is not scored.';
   }
+}
+</script>
+
+
+<style>
+/* -- VO chapter covers -- the AM screen-hero idiom, tokens only -- */
+.screen-hero { background: var(--white); display: flex; align-items: center;
+  justify-content: center; flex-direction: column;
+  padding: clamp(32px,5vw,80px) clamp(28px,6vw,120px); text-align: center; }
+.hero-eyebrow { font-size: 11px; font-weight: 800; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--blue); margin-bottom: 22px; }
+.hero-title { font-size: clamp(2.6rem,5.4vw,5rem); font-weight: 800;
+  line-height: 1.02; letter-spacing: -0.045em; color: var(--ink);
+  margin-bottom: 20px; }
+.hero-title em { font-style: normal; color: var(--blue); }
+.hero-sub { font-size: clamp(14px,1.4vw,17px); color: var(--body);
+  line-height: 1.7; max-width: 56ch; margin-bottom: 38px; }
+.hero-stats { display: flex; gap: clamp(28px,5vw,64px); align-items: flex-start;
+  padding-top: 26px; border-top: 1px solid var(--hairline); }
+.hero-stat { text-align: center; }
+.hero-stat-num { font-size: clamp(20px,2.2vw,28px); font-weight: 800;
+  color: var(--blue); letter-spacing: -0.03em; line-height: 1.1; }
+.hero-stat-lbl { font-size: 11px; font-weight: 600; color: var(--muted);
+  letter-spacing: 0.06em; text-transform: uppercase; margin-top: 6px; }
+@media (max-width: 640px) {
+  .hero-stats { gap: 22px; }
+  .hero-stat-lbl { font-size: 9.5px; letter-spacing: 0.04em; }
+}
+</style>
+
+
+<style>
+/* -- assessment tabs -- tokens only -- */
+.vo-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 26px;
+  border-bottom: 1px solid var(--hairline); }
+.vo-tab { appearance: none; background: none; border: none; cursor: pointer;
+  font-family: var(--sans); font-size: 13.5px; font-weight: 700;
+  color: var(--muted); padding: 11px 16px 13px; border-bottom: 2px solid transparent;
+  margin-bottom: -1px; transition: color var(--transition),
+  border-color var(--transition); white-space: nowrap; }
+.vo-tab:hover { color: var(--ink); }
+.vo-tab.on { color: var(--blue); border-bottom-color: var(--blue); }
+.vo-tab-n { font-size: 11px; font-weight: 600; color: var(--muted);
+  margin-left: 6px; }
+.vo-tab.on .vo-tab-n { color: var(--blue); }
+.vo-quiz[hidden] { display: none; }
+@media (max-width: 640px) {
+  .vo-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .vo-tab { padding: 10px 12px 12px; font-size: 12.5px; }
+}
+</style>
+<script>
+function showTab(scope, key) {
+  var root = document.getElementById(scope);
+  if (!root) return;
+  root.querySelectorAll('.vo-quiz').forEach(function(q) {
+    q.hidden = (q.id !== 'quiz-' + key);
+  });
+  root.querySelectorAll('.vo-tab').forEach(function(t) {
+    t.classList.toggle('on', t.getAttribute('data-k') === key);
+  });
 }
 </script>
 
