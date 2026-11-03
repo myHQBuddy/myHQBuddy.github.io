@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VO Chapter 8: FAQs &amp; Objection Handling | myHQ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" as="style">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" as="style">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<!-- Firebase v9 compat -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<style>
+/* ── TOKENS (identical to Where We Play) ── */
+:root {
+  --blue:       #1E22AA;
+  --blue-dark:  #161a8b;
+  --green:      #BEE5C2;
+  --coral:      #FF7351;
+  --amber:      #FFB848;
+  --ink:        #0B0F2C;
+  --body:       #4A4D63;
+  --muted:      #94909C;
+  --white:      #FFFFFF;
+  --hairline:   rgba(11,15,44,0.10);
+  --sans:       'Manrope', system-ui, sans-serif;
+  --radius:     8px;
+  --ease:       cubic-bezier(0.22,1,0.36,1);
+  --transition: 0.25s var(--ease);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--sans); background: var(--white); color: var(--ink); overflow: auto; font-size: 16px; line-height: 1.6; }
+
+/* ── TOP BAR ── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; height: 52px; z-index: 100;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--hairline);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar-logo { font-size: 15px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.topbar-chapter { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+.topbar-center { font-size: 18px; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; position: absolute; left: 50%; transform: translateX(-50%); }
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+.screen-counter { font-size: 11px; font-weight: 600; color: var(--muted); font-variant-numeric: tabular-nums; }
+.read-btn {
+  font-size: 11px; font-weight: 700; color: var(--white); background: var(--blue);
+  padding: 6px 14px; border-radius: var(--radius); text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: var(--transition); cursor: pointer; border: none; font-family: var(--sans);
+}
+.read-btn:hover { background: var(--blue-dark); }
+.hub-btn {
+  font-size: 14px; color: var(--blue); background: transparent;
+  width: 32px; height: 32px; border-radius: var(--radius);
+  border: 1px solid rgba(30,34,170,0.3);
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: var(--transition); text-decoration: none;
+}
+.hub-btn:hover { background: rgba(30,34,170,0.06); border-color: var(--blue); }
+
+/* ── SLIDES ── */
+.dot-nav { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 100; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--hairline); border: 1.5px solid rgba(11,15,44,0.2); cursor: pointer; transition: var(--transition); }
+.dot.active { background: var(--blue); border-color: var(--blue); transform: scale(1.3); }
+.key-hint { position: absolute; bottom: 18px; right: 48px; font-size: 11px; font-weight: 500; color: var(--muted); display: flex; align-items: center; gap: 6px; transition: opacity 0.5s; z-index: 100; }
+.key-hint.hidden { opacity: 0; pointer-events: none; }
+
+.slides { position: absolute; transform-origin: top left; }
+.screen { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); transform: translateY(20px); overflow: hidden; }
+.screen.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+.screen.exit-up { opacity: 0; transform: translateY(-20px); }
+
+.screen-next-btn {
+  position: absolute; bottom: 40px; right: 56px;
+  background: transparent; color: var(--muted); border: 1px solid var(--hairline);
+  font-size: 11px; font-weight: 700; font-family: var(--sans);
+  padding: 7px 14px; border-radius: var(--radius); cursor: pointer;
+  display: flex; align-items: center; gap: 6px; transition: var(--transition);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.screen-next-btn:hover { color: var(--blue); border-color: rgba(30,34,170,0.3); }
+.screen-next-btn--light { color: rgba(255,255,255,0.4); border-color: rgba(255,255,255,0.15); }
+.screen-next-btn--light:hover { color: var(--green); border-color: rgba(190,229,194,0.4); }
+
+/* ── SCREEN 0: INTRO VIDEO ── */
+.screen-video { background: var(--white); }
+.screen-video-inner { display: grid; grid-template-columns: 1fr 1fr; height: 100%; align-items: center; padding: 0 80px; gap: 64px; }
+.s0-eyebrow { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+.s0-eyebrow::before { content: ''; width: 9px; height: 9px; background: var(--blue); border-radius: 50%; display: block; }
+.s0-headline { font-size: 4rem; font-weight: 800; line-height: 1.08; letter-spacing: -0.04em; color: var(--ink); margin-bottom: 24px; }
+.s0-headline em { font-style: normal; color: var(--blue); }
+.s0-sub { font-size: 1.1rem; color: var(--body); line-height: 1.7; margin-bottom: 32px; white-space: nowrap; }
+.s0-vision { display: flex; flex-direction: column; gap: 8px; max-width: 100%; margin-top: 4px; width: 100%; }
+.s0-vision-label { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); display: flex; align-items: center; gap: 10px; }
+.s0-vision-label::before { display: none; }
+.s0-vision-text { font-size: 1.3rem; font-weight: 500; color: var(--ink); line-height: 1.4; letter-spacing: -0.02em; display: inline-block; background: rgba(30,34,170,0.07); border: 1px solid rgba(30,34,170,0.15); border-radius: var(--radius); padding: 18px 24px; width: 100%; }
+.s0-vision-text strong { font-weight: 800; color: var(--blue); }
+.s0-thumb { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: var(--radius); overflow: hidden; cursor: pointer; box-shadow: 0 16px 48px rgba(11,15,44,0.18); }
+.s0-thumb-bg { position: absolute; inset: 0; background: var(--ink); display: flex; align-items: center; justify-content: center; }
+.s0-play-circle { width: 80px; height: 80px; background: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(11,15,44,0.25); transition: var(--transition); }
+.s0-thumb:hover .s0-play-circle { transform: scale(1.1); background: var(--green); }
+.s0-play-circle i { font-size: 28px; color: var(--blue); margin-left: 5px; }
+.s0-play-label { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.1em; white-space: nowrap; }
+
+/* ── SCREEN 1: FOUNDATION ── */
+.screen-foundation { background: var(--white); }
+.screen-center-wrap { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 80px; }
+.s1-eyebrow { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em; color: var(--blue); margin-bottom: 28px; }
+.s1-stat-headline { line-height: 1; margin-bottom: 20px; }
+.s1-year { font-size: 13rem; font-weight: 800; color: var(--ink); letter-spacing: -0.04em; }
+.s1-year-sub { font-size: 2.6rem; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; }
+.s1-vision { font-size: 1.7rem; font-weight: 700; color: var(--body); margin-bottom: 48px; max-width: 56ch; font-style: italic; }
+.s1-facts { display: grid; grid-template-columns: repeat(4, auto); gap: 0; border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; max-width: 900px; }
+.s1-fact { padding: 20px 28px; border-right: 1px solid var(--hairline); text-align: left; }
+.s1-fact:last-child { border-right: none; }
+.s1-fact-num { font-size: 1.7rem; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; margin-bottom: 4px; }
+.s1-fact-lbl { font-size: 13px; color: var(--muted); line-height: 1.4; }
+
+/* ── SCREEN 1/2: THE ORIGIN ── */
+.screen-origin { background: var(--white); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 28px 80px 90px; gap: 20px; }
+.s2-eyebrow-dark { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); text-align: center; }
+.s2-headline { font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); text-align: center; line-height: 1.12; max-width: 760px; }
+.s2-headline span { color: var(--blue); }
+.s2-timeline { display: flex; align-items: stretch; gap: 0; width: 100%; max-width: 1100px; }
+.s2-tl-node { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; padding-top: 0; }
+.s2-tl-sub { flex: 1; }
+.s2-tl-node:not(:last-child)::after { content: ''; position: absolute; top: 22px; left: calc(50% + 26px); right: calc(-50% + 26px); height: 1px; background: var(--hairline); }
+.s2-tl-dot { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--blue); background: rgba(30,34,170,0.06); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 13px; font-weight: 800; color: var(--blue); }
+.s2-tl-node--highlight .s2-tl-dot { background: var(--blue); color: var(--white); border-color: var(--blue); }
+.s2-tl-year { font-size: 13px; font-weight: 800; color: var(--blue); margin-bottom: 6px; letter-spacing: 0.04em; }
+.s2-tl-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 7px; }
+.s2-tl-sub { font-size: 13px; color: var(--muted); line-height: 1.55; max-width: 160px; }
+.s2-tl-node--highlight .s2-tl-title { color: var(--blue); }
+.s2-investors { display: flex; align-items: center; gap: 10px; justify-content: center; padding: 6px 20px; border: 1px solid var(--hairline); border-radius: var(--radius); background: rgba(30,34,170,0.03); }
+.s2-investors-label { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-right: 6px; }
+.s2-investor-tag { font-size: 12px; font-weight: 700; color: var(--blue); padding: 3px 10px; border-radius: 4px; background: rgba(30,34,170,0.06); white-space: nowrap; }
+.s2-investor-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--hairline); }
+
+/* ── SCREEN 3: BUILDING SCALE ── */
+.screen-build { background: var(--white); display: flex; flex-direction: column; justify-content: center; padding: 64px 80px; gap: 40px; }
+.s3-header { text-align: center; }
+.s3-eyebrow { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 12px; }
+.s3-title { font-size: 3.4rem; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); }
+.s3-sub { font-size: 1.1rem; color: var(--body); margin-top: 10px; }
+.s3-milestones { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; align-items: start; }
+.s3-card { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 24px 20px; background: #f7f8ff; display: flex; flex-direction: column; gap: 12px; position: relative; }
+.s3-card--highlight { background: var(--blue); border-color: var(--blue); }
+.s3-card-year { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.04em; color: var(--blue); line-height: 1; }
+.s3-card--highlight .s3-card-year { color: var(--green); }
+.s3-card-title { font-size: 13px; font-weight: 800; color: var(--ink); text-transform: uppercase; letter-spacing: 0.06em; }
+.s3-card--highlight .s3-card-title { color: var(--white); }
+.s3-card-event { font-size: 14px; color: var(--body); line-height: 1.55; }
+.s3-card--highlight .s3-card-event { color: rgba(255,255,255,0.75); }
+.s3-card-investor { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; padding: 6px 12px; border-radius: 4px; background: rgba(30,34,170,0.08); font-size: 13px; font-weight: 600; color: var(--blue); }
+.s3-card--highlight .s3-card-investor { background: rgba(255,255,255,0.15); color: var(--white); }
+.s3-card-investor i { font-size: 11px; }
+.s3-card--covid { background: #fff8f0; border-color: #ffd4b8; border-top: 3px solid var(--coral); }
+.s3-card--covid .s3-card-year { color: var(--coral); }
+.s3-card--covid .s3-card-title { color: var(--coral); }
+.s3-card--covid .s3-card-investor { background: rgba(255,115,81,0.08); color: var(--coral); }
+
+/* ── SCREEN 4: THREE VERTICALS ── */
+.screen-verticals { display: flex; flex-direction: column; justify-content: center; padding: 56px 80px; gap: 36px; background: var(--white); }
+.s4-header { text-align: center; }
+.s4-eyebrow { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 12px; }
+.s4-title { font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); }
+.s4-sub { font-size: 1.1rem; color: var(--body); margin-top: 10px; }
+.s4-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+.s4-card { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 28px 24px; display: flex; flex-direction: column; gap: 16px; }
+.s4-card--am { border-top: 4px solid var(--blue); }
+.s4-card--vo { border-top: 4px solid var(--blue); }
+.s4-card--od { border-top: 4px solid var(--blue); }
+.s4-card--blue { border-top: 4px solid var(--blue); }
+.s4-card-icon { width: 52px; height: 52px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 24px; }
+.s4-icon--coral { background: rgba(255,115,81,0.1); color: var(--coral); }
+.s4-icon--blue { background: rgba(30,34,170,0.1); color: var(--blue); }
+.s4-icon--amber { background: rgba(255,184,72,0.15); color: #c97d00; }
+.s4-card-tag { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.s4-card-title { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
+.s4-card-desc { font-size: 14px; color: var(--body); line-height: 1.6; flex: 1; }
+.s4-card-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 4px; background: rgba(0,0,0,0.04); color: var(--muted); }
+.s4-offices { font-size: 12px; font-weight: 400; color: var(--muted); text-align: center; letter-spacing: 0.01em; }
+.s4-offices strong { color: var(--muted); font-weight: 400; }
+
+/* ── SCREEN 5: TEAM ── */
+.screen-team { background: var(--white); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 80px 72px; gap: 16px; overflow: hidden; height: 100%; box-sizing: border-box; min-height: 0; }
+.s5t-header { text-align: center; }
+.s5t-eyebrow { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 6px; }
+.s5t-title { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); }
+.s5t-sub { font-size: 1rem; color: var(--body); margin-top: 8px; }
+.s5t-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.s5t-founders { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.s5t-pnl { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.s5t-card { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 20px 18px; display: flex; align-items: flex-start; gap: 16px; background: #f7f8ff; }
+.s5t-card--founder { background: var(--blue); border-color: var(--blue); }
+.s5t-avatar { width: 52px; height: 52px; border-radius: 50%; background: rgba(30,34,170,0.12); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; color: var(--blue); flex-shrink: 0; }
+.s5t-card--founder .s5t-avatar { background: rgba(255,255,255,0.15); color: var(--white); }
+.s5t-info { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.s5t-name { font-size: 17px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
+.s5t-card--founder .s5t-name { color: var(--white); }
+.s5t-role { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--blue); }
+.s5t-card--founder .s5t-role { color: var(--green); }
+.s5t-vertical-tag { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 9px; border-radius: 3px; display: inline-block; width: fit-content; }
+.s5t-tag--am { background: rgba(255,115,81,0.1); color: var(--coral); }
+.s5t-tag--vo { background: rgba(30,34,170,0.08); color: var(--blue); }
+.s5t-tag--od { background: rgba(255,184,72,0.15); color: #c97d00; }
+.s5t-tag--mkt { background: rgba(190,229,194,0.3); color: #2a7a30; }
+.s5t-tag--green { background: rgba(190,229,194,0.2); color: var(--green); }
+.s5t-prev { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.s5t-card--founder .s5t-prev { color: rgba(255,255,255,0.6); }
+.s5t-re { font-size: 13px; font-weight: 700; color: var(--body); }
+.s5t-card--founder .s5t-re { color: rgba(255,255,255,0.8); }
+
+/* ── NEW TEAM LAYOUT (matching image) ── */
+.s5t-two-panel { display: flex; align-items: stretch; gap: 16px; width: 100%; height: 420px; }
+.s5t-panel { border: 1.5px solid var(--blue); border-radius: 12px; padding: 0; background: var(--white); overflow: hidden; display: inline-flex; }
+.s5t-panel img { display: block; width: 100%; height: auto; max-height: 75vh; object-fit: contain; }
+.s5t-panel-label { font-size: 12px; font-weight: 700; font-style: italic; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; }
+.s5t-people-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.s5t-person { display: flex; align-items: flex-start; gap: 12px; }
+.s5t-panel--left { flex: 1.15; flex-direction: column; padding: 24px 28px; display: flex; }
+.s5t-panel--right { flex: 0.85; flex-direction: column; padding: 24px 28px; display: flex; gap: 0; justify-content: flex-start; }
+.s5t-bg-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: repeat(3,1fr); gap: 14px; flex: 1; }
+.s5t-photo { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--hairline); background: rgba(30,34,170,0.08); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; color: var(--blue); flex-shrink: 0; overflow: hidden; }
+.s5t-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.s5t-person-name { font-size: 14px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 2px; }
+.s5t-person-role { font-size: 11px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.s5t-person-prev { font-size: 12px; color: var(--muted); line-height: 1.45; }
+/* Background logos */
+.s5t-logo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.s5t-logo-item { display: flex; align-items: center; justify-content: center; padding: 10px 8px; border: 1px solid var(--hairline); border-radius: 6px; min-height: 48px; }
+.s5t-logo-text { font-size: 14px; font-weight: 800; color: var(--ink); text-align: center; letter-spacing: -0.02em; line-height: 1.2; }
+.s5t-logo-text.goldman { font-size: 13px; }
+.s5t-logo-text.adobe { color: #FF0000; }
+.s5t-logo-text.sp { color: #C41230; font-size: 13px; }
+.s5t-logo-text.helion { color: #e6a817; }
+.s5t-logo-text.msft { font-size: 12px; }
+.s5t-logo-item.inst { border-color: rgba(30,34,170,0.15); background: rgba(30,34,170,0.03); }
+.s5t-logo-text.inst { font-size: 11px; font-weight: 700; color: var(--blue); text-align: center; }
+
+/* ── SCREEN 6: ORG PYRAMID ── */
+.screen-org { background: var(--white); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 48px 60px; gap: 8px; overflow: hidden; }
+.s6-title { font-size: 2.6rem; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); text-align: center; }
+.s6-pyramid { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; max-width: 1000px; }
+.s6-tier { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; padding: 22px 32px; text-align: center; }
+.s6-tier--1 { width: 35%; background: #1E22AA; }
+.s6-tier--2 { width: 57%; background: #3B40C4; }
+.s6-tier--3 { width: 78%; background: #7178D8; }
+.s6-tier--4 { width: 100%; background: #AEB2E8; }
+.s6-tier-title { font-size: 1.3rem; font-weight: 800; color: var(--white); letter-spacing: -0.01em; }
+.s6-tier-desig { font-size: 0.9rem; font-weight: 500; color: rgba(255,255,255,0.82); }
+.s6-tier-meta  { font-size: 0.9rem; font-weight: 700; color: var(--green); }
+
+/* ── SCREEN 7: SCALE & CLIENTS ── */
+/* All px values are fixed relative to 1440×900 canvas — scaleSlides() handles viewport scaling */
+.screen-scale { background: var(--white); overflow: hidden; display: flex; flex-direction: column; padding: 18px 36px 24px; height: 100%; box-sizing: border-box; }
+#s7-canvas { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 20px; }
+.s7-title { font-size: 20px; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); flex-shrink: 0; margin-bottom: 4px; }
+.s7-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; width: 100%; flex-shrink: 0; }
+.s7-stat { border: 1px solid var(--hairline); border-radius: var(--radius); background: #f7f8ff; display: flex; align-items: flex-start; gap: 8px; padding: 10px; }
+.s7-stat-icon { font-size: 14px; flex-shrink: 0; margin-top: 2px; width: 26px; text-align: center; }
+.s7-stat-num { font-size: 14px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 1px; }
+.s7-stat-lbl { font-size: 11px; color: var(--body); line-height: 1.3; font-weight: 500; }
+
+/* ── SCREEN 7: LOGO GRID ── */
+.s7-logo-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; align-items: stretch; margin-top: 0; }
+#read-mode .s7-logo-panels { grid-template-columns: 1fr; }
+.s7-logo-panel { padding: 6px 8px 10px; background: #fff; border: 1px solid var(--hairline); border-radius: var(--radius); display: flex; flex-direction: column; }
+.s7-lp-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; flex-shrink: 0; }
+.s7-lp-title { font-size: 16px; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.s7-lp-sub { font-size: 11px; color: var(--body); margin-bottom: 6px; font-weight: 500; flex-shrink: 0; }
+.s7-lp-divider { width: 100%; height: 1.5px; background: repeating-linear-gradient(90deg, var(--blue) 0, var(--blue) 6px, transparent 6px, transparent 12px); margin-bottom: 8px; opacity: 0.35; flex-shrink: 0; }
+.s7-lp-myHQ-icon { width: 30px; height: 30px; object-fit: contain; }
+.s7-sub-panels { display: grid; gap: 6px; flex: 1; min-height: 0; align-items: stretch; }
+.s7-sub-panels--clientele { grid-template-columns: 7fr 5fr; }
+.s7-sub-panels--partners { grid-template-columns: 1fr 1fr; }
+.s7-sub-panel { padding: 4px 8px 8px; border: 1px solid var(--hairline); border-radius: var(--radius); display: flex; flex-direction: column; }
+.s7-sp-label { font-size: 11px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; flex-shrink: 0; }
+.s7-logo-grid { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; flex: 1; align-content: space-around; }
+.s7-logo-img { height: 42px; width: auto; max-width: 165px; object-fit: contain; }
+.s7-logo-img--lg { height: 48px; max-width: 195px; }
+.s7-logo-img--xl { height: 54px; max-width: 240px; }
+.s7-sub-panels--partners-right { grid-template-rows: 1fr 1fr; }
+.s7-partner-grid { display: grid; gap: 8px; }
+.s7-partner-grid--cw { grid-template-columns: 1fr 1fr; }
+.s7-partner-grid--right { grid-template-rows: 1fr 1fr; }
+.s7-enterprises-grid { display: grid; grid-template-columns: repeat(3,1fr); row-gap: 1px; align-items: center; justify-items: center; flex: 1; align-content: flex-start; }
+.s7-enterprises-grid .s7-logo-img { height: 51px; max-width: 180px; }
+.s7-gccs-row { display: flex; align-items: center; flex-wrap: wrap; flex: 1; align-content: center; justify-content: space-around; width: 100%; }
+.s7-gccs-row .s7-logo-img { height: 34px; max-width: 140px; }
+/* Full chapter (read-mode) logo sizes */
+#read-mode .s7-logo-img { height: clamp(36px,5vw,56px); max-width: 160px; }
+#read-mode .s7-logo-img--lg { height: clamp(42px,5.5vw,64px); max-width: 190px; }
+#read-mode .s7-logo-img--xl { height: clamp(48px,6vw,72px); max-width: 220px; }
+#read-mode .s7-enterprises-grid .s7-logo-img { height: clamp(36px,5vw,56px); max-width: 160px; }
+#read-mode .s7-gccs-row .s7-logo-img { height: clamp(42px,5.5vw,64px); max-width: 200px; }
+.s7-logo-badge { font-size: 11px; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; border: 1px solid var(--hairline); border-radius: 4px; padding: 3px 8px; white-space: nowrap; }
+
+/* ── SCREEN 8: AMBITION ── */
+.screen-ambition { background: var(--white); display: flex; flex-direction: column; padding: 28px 56px 24px; gap: 10px; overflow: hidden; }
+.s5-headline { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); line-height: 1.25; flex-shrink: 0; }
+.s5-headline span { color: var(--blue); }
+.s5-subtext { font-size: 16px; color: var(--body); line-height: 1.55; flex-shrink: 0; }
+.s5-subtext strong { color: var(--ink); font-weight: 800; }
+.s5-subtext em { font-style: italic; color: var(--blue); font-weight: 600; }
+.s5-body { display: grid; grid-template-columns: 1fr 200px; gap: 20px; align-items: center; flex: 1; min-height: 0; overflow: visible; }
+.s5-growth { overflow: visible; }
+.ambition-chart { width: 100%; position: relative; font-family: Manrope,system-ui,sans-serif; overflow: visible; }
+.ambition-bar-row { display: flex; align-items: flex-end; width: 100%; gap: 0.8%; overflow: visible; }
+.ambition-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; }
+.ambition-val { width: 100%; text-align: center; font-size: 11px; line-height: 1.2; margin-bottom: 2px; white-space: nowrap; }
+.ambition-bar { width: 100%; border-radius: 3px 3px 0 0; box-sizing: border-box; }
+.ambition-label-row { display: flex; width: 100%; gap: 0.8%; margin-top: 4px; }
+.ambition-label { flex: 1; text-align: center; font-size: 11px; }
+.ambition-canvas { position: absolute; top: 0; left: 0; width: 100%; pointer-events: none; }
+.s5-driven { border: 1.5px solid var(--hairline); border-radius: var(--radius); padding: 16px 14px; display: flex; flex-direction: column; gap: 12px; }
+.s5-driven-title { font-size: 13px; font-weight: 800; color: var(--ink); }
+.s5-driven-item { display: flex; align-items: center; gap: 12px; }
+.s5-driven-chevron { width: 0; height: 0; border-top: 7px solid transparent; border-bottom: 7px solid transparent; border-left: 12px solid var(--blue); flex-shrink: 0; }
+.s5-driven-text { font-size: 12px; font-weight: 600; color: var(--body); line-height: 1.4; }
+
+/* ── READ MODE ── */
+#read-mode { margin-top: 52px; }
+#read-mode .topbar-logo { font-size: 15px; }
+.r-layout { display: flex; width: 100%; max-width: 100%; margin: 0; padding: 0 40px 80px; align-items: flex-start; box-sizing: border-box; }
+.r-sidebar { width: 220px; flex-shrink: 0; position: sticky; top: 72px; padding: 32px 20px 0 0; max-height: calc(100vh - 72px); overflow-y: auto; }
+.r-toc-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 10px; }
+.toc-link { display: block; font-size: 12px; font-weight: 500; color: var(--muted); text-decoration: none; padding: 7px 10px; border-radius: 6px; margin-bottom: 2px; transition: all 0.15s; border-left: 2px solid transparent; }
+.toc-link:hover { color: var(--ink); background: rgba(0,0,0,0.04); }
+.toc-link.active { color: var(--blue); font-weight: 700; border-left-color: var(--blue); background: rgba(30,34,170,0.05); }
+.r-content { flex: 1; min-width: 0; padding: 40px 0 0 40px; }
+
+.r-section { margin-bottom: 72px; }
+.r-section-eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.r-section-eyebrow::before { content: ''; width: 8px; height: 8px; background: var(--blue); border-radius: 50%; }
+.r-section-title { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); margin-bottom: 6px; }
+.r-section-sub { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
+.r-body { font-size: 15px; color: var(--body); line-height: 1.75; margin-bottom: 14px; }
+
+/* Timeline */
+.tl-wrap { position: relative; }
+.tl-item { border-top: 1px solid var(--hairline); }
+.tl-item:last-child { border-bottom: 1px solid var(--hairline); }
+.tl-head { display: grid; grid-template-columns: 120px 1fr auto; gap: 20px; align-items: baseline; padding: 20px 0; cursor: pointer; transition: background 0.15s; }
+.tl-head:hover .tl-event { color: var(--blue); }
+.tl-year-col { display: flex; flex-direction: column; gap: 2px; }
+.tl-year { font-size: 1.1rem; font-weight: 800; color: var(--ink); letter-spacing: -0.03em; }
+.tl-phase { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.tl-event { font-size: 1rem; font-weight: 600; color: var(--ink); line-height: 1.35; transition: color 0.15s; }
+.tl-toggle { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--hairline); background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.25s var(--ease); flex-shrink: 0; }
+.tl-toggle svg { width: 12px; height: 12px; stroke: var(--muted); fill: none; stroke-width: 2.5; transition: transform 0.4s var(--ease); }
+.tl-item.open .tl-toggle { background: var(--blue); border-color: var(--blue); }
+.tl-item.open .tl-toggle svg { stroke: var(--white); transform: rotate(45deg); }
+.tl-body { max-height: 0; overflow: hidden; transition: max-height 0.55s var(--ease); }
+.tl-item.open .tl-body { max-height: 1000px; }
+.tl-body-inner { padding: 0 0 28px 140px; max-width: 680px; }
+.tl-detail p { font-size: 14px; color: var(--body); line-height: 1.7; margin-bottom: 12px; }
+.tl-detail p strong { color: var(--ink); font-weight: 600; }
+.tl-detail p em { color: var(--muted); }
+
+/* Timeline sub-components */
+.tl-funding { display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: rgba(30,34,170,0.04); border-left: 3px solid var(--blue); border-radius: 0 var(--radius) var(--radius) 0; margin: 14px 0; }
+.tl-funding-year { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--blue); display: block; margin-bottom: 2px; }
+.tl-funding-names { font-size: 13px; color: var(--ink); font-weight: 500; }
+.tl-funding-icon { width: 32px; height: 32px; border-radius: 50%; background: rgba(30,34,170,0.08); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.tl-funding-icon svg { width: 14px; height: 14px; stroke: var(--blue); fill: none; }
+
+.tl-dyk { margin: 14px 0; border: 1px solid var(--hairline); border-radius: var(--radius); background: rgba(255,184,72,0.04); overflow: hidden; }
+.tl-dyk-trigger { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: transparent; border: none; cursor: pointer; text-align: left; font-family: var(--sans); }
+.tl-dyk-icon { width: 24px; height: 24px; border-radius: 50%; background: var(--amber); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: var(--ink); flex-shrink: 0; }
+.tl-dyk-teaser { font-size: 13px; font-weight: 600; color: var(--ink); }
+.tl-dyk-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #a06800; display: block; margin-bottom: 1px; }
+.tl-dyk-chevron { margin-left: auto; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: var(--muted); transition: transform 0.3s var(--ease); }
+.tl-dyk-chevron svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+.tl-dyk.open .tl-dyk-chevron { transform: rotate(180deg); }
+.tl-dyk-body { max-height: 0; overflow: hidden; transition: max-height 0.4s var(--ease); padding: 0 16px; }
+.tl-dyk.open .tl-dyk-body { max-height: 300px; padding: 0 16px 14px; }
+.tl-dyk-body p { font-size: 13px; color: var(--body); line-height: 1.7; }
+.tl-dyk-body p strong { color: var(--ink); font-weight: 600; }
+
+.tl-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.tl-badge { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 10px; border-radius: 4px; border: 1px solid; }
+.badge-teal { background: rgba(150,230,220,0.15); color: #0d5d52; border-color: rgba(150,230,220,0.5); }
+.badge-mint { background: rgba(190,229,194,0.2); color: #2e7d36; border-color: rgba(190,229,194,0.5); }
+.badge-blue { background: rgba(30,34,170,0.06); color: var(--blue); border-color: rgba(30,34,170,0.2); }
+.badge-amber { background: rgba(255,184,72,0.1); color: #a06800; border-color: rgba(255,184,72,0.3); }
+.badge-white { background: var(--white); color: var(--ink); border-color: var(--hairline); }
+
+/* Verticals grid (inside timeline) */
+.r-verticals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 16px 0; }
+.r-vertical-card { padding: 16px 18px; background: var(--white); border: 1px solid var(--hairline); border-radius: var(--radius); cursor: pointer; transition: all 0.2s var(--ease); }
+.r-vertical-card:hover { border-color: var(--ink); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(11,15,44,0.06); }
+.r-vertical-name { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.r-vertical-desc { font-size: 12px; color: var(--body); line-height: 1.5; }
+
+/* Team section */
+.r-team-note { padding: 20px; border: 1px dashed var(--hairline); border-radius: var(--radius); background: rgba(30,34,170,0.02); display: flex; align-items: flex-start; gap: 14px; }
+.r-team-note i { color: var(--blue); margin-top: 2px; }
+.r-team-note-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+/* Org pyramid */
+.r-org-pyramid { display: flex; flex-direction: column; gap: 8px; margin: 20px 0; }
+.r-org-tier { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 16px 20px; transition: all 0.2s var(--ease); cursor: pointer; }
+.r-org-tier:hover { border-color: var(--ink); background: rgba(11,15,44,0.01); }
+.r-org-tier-1 { width: 100%; border-left: 3px solid var(--amber); }
+.r-org-tier-2 { width: 92%; align-self: center; border-left: 3px solid var(--coral); }
+.r-org-tier-3 { width: 84%; align-self: center; border-left: 3px solid var(--blue); }
+.r-org-tier-4 { width: 76%; align-self: center; border-left: 3px solid var(--green); }
+.r-org-num { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 4px; }
+.r-org-name { font-size: 17px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; margin-bottom: 4px; }
+.r-org-desc { font-size: 13px; color: var(--body); }
+
+/* Stats row */
+.r-stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; margin: 24px 0; }
+.r-stat { padding: 20px; border-right: 1px solid var(--hairline); }
+.r-stat:last-child { border-right: none; }
+.r-stat-num { font-size: 1.6rem; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; margin-bottom: 2px; }
+.r-stat-lbl { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+.hidden { display: none !important; }
+
+/* ── SUCCESS STORY GRID (read mode) ── */
+.ss-grid-header { display: grid; grid-template-columns: 140px 1fr 40px 1fr; align-items: center; margin: 28px 0 8px; padding: 0 0 8px; border-bottom: 1px solid var(--hairline); }
+.ss-grid-row    { display: grid; grid-template-columns: 140px 1fr 40px 1fr; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--hairline); position: relative; }
+.ss-divider-line { position: absolute; left: calc(140px + ((100% - 140px - 40px) / 2) + 20px - 1px); top: 0; bottom: 0; width: 2px; border-left: 2px dashed rgba(30,34,170,0.2); z-index: 0; }
+.ss-avatar { width: 60px; height: 60px; border-radius: 50%; border: 3px solid var(--blue); overflow: hidden; flex-shrink: 0; }
+.ss-dot    { width: 18px; height: 18px; border-radius: 50%; background: var(--blue); border: 3px solid #fff; box-shadow: 0 0 0 2px var(--blue); flex-shrink: 0; }
+
+/* ── ORG CHART FUNCTION GRID ── */
+.oc-fn-grid { display: grid; grid-template-columns: 1fr 1fr; row-gap: 36px; column-gap: 36px; width: 100%; max-width: 520px; margin-top: 40px; }
+
+/* ── RESPONSIVE BREAKPOINTS ── */
+
+/* ── ≤1280px: large laptops ── */
+@media (max-width: 1280px) {
+  .s5t-pnl { grid-template-columns: repeat(2, 1fr); }
+  .s5-body { grid-template-columns: 1fr; }
+}
+
+/* ── ≤1024px: small laptops & tablets landscape ── */
+@media (max-width: 1024px) {
+  .screen-video-inner { grid-template-columns: 1fr; text-align: center; }
+
+  .s1-facts { grid-template-columns: repeat(2, 1fr); }
+  .s1-fact { border-right: none; border-bottom: 1px solid var(--hairline); }
+  .s1-fact:nth-child(odd) { border-right: 1px solid var(--hairline); }
+  .s1-fact:last-child { border-bottom: none; }
+
+  .s2-timeline { overflow-x: auto; }
+  .s2-tl-node { min-width: 140px; }
+
+  .s3-milestones { grid-template-columns: repeat(2, 1fr); }
+  .s4-cards { grid-template-columns: repeat(2, 1fr); }
+
+  /* Slide 5 team — scale down to fit fixed-height viewport */
+  .screen-team { overflow-y: auto; padding: 14px 36px 56px; gap: 8px; }
+  .s5t-title { font-size: 1.6rem; }
+  .s5t-two-panel { height: 380px; gap: 8px; }
+  .s5t-panel--left  { padding: 12px 14px; }
+  .s5t-panel--right { padding: 12px 14px; }
+  .s5t-people-grid  { gap: 8px !important; }
+  .s5t-person       { gap: 8px !important; }
+  .s5t-photo        { width: 34px !important; height: 34px !important; }
+  .s5t-person-name  { font-size: 12px !important; }
+  .s5t-person-role  { font-size: 9px !important; }
+  .s5t-person-prev  { font-size: 10px !important; }
+  .s5t-bg-grid      { gap: 8px; }
+
+  /* Slide 6 stats — layout handled by scaleSlides() transform, no overrides needed */
+
+  /* Read mode timeline */
+  .tl-head { grid-template-columns: 80px 1fr auto; gap: 12px; }
+
+  /* Read mode success stories */
+  .ss-grid-header { grid-template-columns: 100px 1fr 32px 1fr; }
+  .ss-grid-row    { grid-template-columns: 100px 1fr 32px 1fr; padding: 14px 0; }
+  .ss-divider-line { left: calc(100px + ((100% - 100px - 32px) / 2) + 16px - 1px); }
+
+  /* Read mode general */
+  .r-stats-row { grid-template-columns: repeat(2, 1fr); }
+  .r-verticals-grid { grid-template-columns: 1fr; }
+}
+
+/* ── ≤768px: tablets portrait ── */
+@media (max-width: 768px) {
+  .s1-facts { grid-template-columns: 1fr; }
+  .s1-fact  { border-right: none; }
+  .s1-fact:nth-child(odd) { border-right: none; }
+
+  .s3-milestones { grid-template-columns: 1fr; }
+  .s4-cards      { grid-template-columns: 1fr; }
+
+  .s5t-grid     { grid-template-columns: 1fr; }
+  .s5t-founders { grid-template-columns: 1fr; }
+  .s5t-pnl      { grid-template-columns: 1fr; }
+  .s5t-two-panel   { height: 340px; }
+  .s5t-photo       { width: 28px !important; height: 28px !important; }
+  .s5t-person-name { font-size: 11px !important; }
+  .s5t-person-prev { display: none; }
+
+  /* s7 layout handled by scaleSlides() transform */
+
+  /* Read mode timeline */
+  .tl-head { grid-template-columns: 60px 1fr auto; gap: 8px; padding: 14px 0; }
+  .tl-year { font-size: 0.85rem; }
+
+  /* Read mode success stories — stack vertically */
+  .ss-grid-header { display: none; }
+  .ss-grid-row    { grid-template-columns: 1fr; gap: 12px; }
+  .ss-divider-line { display: none; }
+
+  /* Org chart function grid — tighter gaps */
+  .oc-fn-grid { column-gap: 10px; row-gap: 10px; }
+
+  .r-stats-row    { grid-template-columns: repeat(2, 1fr); }
+  .book-team-grid { grid-template-columns: 1fr; }
+  .book-verticals { grid-template-columns: 1fr; }
+  .book-stats     { grid-template-columns: repeat(2, 1fr); }
+  .book-org-facts { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+
+<style>
+/* ── BOOK READ MODE ADDITIONS ── */
+.section { margin-bottom: 72px; }
+.section-num { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 6px; }
+.section-title { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.03em; color: var(--ink); line-height: 1.15; margin-bottom: 16px; }
+.section-body { font-size: 15px; color: var(--body); line-height: 1.78; margin-bottom: 14px; }
+.section-outcome { font-size: 12px; color: var(--blue); font-weight: 600; margin-bottom: 20px; padding: 10px 16px; background: rgba(30,34,170,0.05); border-left: 3px solid var(--blue); border-radius: 0 6px 6px 0; }
+.section-outcome span { opacity: 0.6; }
+.takeaway { background: rgba(190,229,194,0.22); border-left: 3px solid #4CAF74; border-radius: 0 6px 6px 0; padding: 13px 18px; font-size: 14px; font-weight: 600; color: var(--ink); margin: 22px 0 12px; }
+.takeaway::before { content: '✦  '; color: #4CAF74; }
+.next-up { font-size: 13px; color: var(--blue); font-weight: 600; display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+.bridge { display: flex; align-items: center; gap: 14px; margin: -16px 0 26px; color: var(--muted); font-size: 13px; font-weight: 500; }
+.bridge::before, .bridge::after { content: ''; flex: 1; height: 1px; background: var(--hairline); }
+.visual { margin: 24px 0; }
+
+/* Book timeline — always expanded, no toggle */
+.btl { display: flex; flex-direction: column; position: relative; padding-left: 32px; }
+.btl::before { content: ''; position: absolute; left: 4px; top: 8px; bottom: 8px; width: 1.5px; background: var(--hairline); }
+.btl-item { position: relative; padding: 0 0 36px 28px; }
+.btl-item:last-child { padding-bottom: 0; }
+.btl-dot { position: absolute; left: -5px; top: 5px; width: 11px; height: 11px; border-radius: 50%; background: var(--white); border: 2px solid var(--blue); }
+.btl-item:last-child .btl-dot { background: var(--blue); }
+.btl-year { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--blue); margin-bottom: 5px; }
+.btl-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 6px; letter-spacing: -0.01em; }
+.btl-body { font-size: 14px; color: var(--body); line-height: 1.7; }
+.btl-funding { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: rgba(30,34,170,0.04); border-left: 3px solid var(--blue); border-radius: 0 var(--radius) var(--radius) 0; margin: 10px 0; }
+.btl-funding-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--blue); margin-bottom: 2px; }
+.btl-funding-name { font-size: 13px; color: var(--ink); font-weight: 500; }
+.btl-dyk { margin: 12px 0; padding: 14px 16px; background: rgba(255,184,72,0.06); border: 1px solid rgba(255,184,72,0.25); border-radius: var(--radius); }
+.btl-dyk-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #a06800; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.btl-dyk-label::before { content: '?'; width: 18px; height: 18px; background: var(--amber); border-radius: 50%; font-size: 11px; font-weight: 800; color: var(--ink); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.btl-dyk-text { font-size: 13px; color: var(--body); line-height: 1.65; }
+.btl-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+
+/* Team cards — book style, always expanded */
+.book-team-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin: 20px 0; }
+.book-team-card { border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; }
+.book-team-banner { height: 120px; overflow: hidden; background: rgba(30,34,170,0.06); display: flex; align-items: center; justify-content: center; }
+.book-team-banner img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.book-team-initials { font-size: 2rem; font-weight: 800; color: var(--blue); }
+.book-team-body { padding: 16px 18px; }
+.book-team-name { font-size: 16px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; margin-bottom: 3px; }
+.book-team-role { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--blue); margin-bottom: 10px; }
+.book-team-bio { font-size: 13px; color: var(--body); line-height: 1.65; margin-bottom: 10px; }
+.book-team-meta { display: flex; flex-direction: column; gap: 4px; padding-top: 10px; border-top: 1px solid var(--hairline); }
+.book-team-meta-row { font-size: 12px; color: var(--muted); }
+.book-team-meta-row strong { color: var(--ink); font-weight: 600; }
+.book-team-tag { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 8px; border-radius: 4px; background: rgba(30,34,170,0.08); color: var(--blue); margin-bottom: 6px; }
+.book-team-avatar { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; border: 2px solid var(--hairline); flex-shrink: 0; background: rgba(30,34,170,0.06); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; color: var(--blue); }
+.book-team-avatar img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.book-team-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.book-team-header-text { flex: 1; }
+
+/* Org pyramid — book style, widths stepped, all details shown */
+.book-org { display: flex; flex-direction: column; gap: 8px; margin: 24px 0; }
+.book-org-tier { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--hairline); align-self: center; }
+.book-org-tier-1 { width: 100%; border-left: 4px solid var(--amber); }
+.book-org-tier-2 { width: 92%; border-left: 4px solid var(--coral); }
+.book-org-tier-3 { width: 84%; border-left: 4px solid var(--blue); }
+.book-org-tier-4 { width: 76%; border-left: 4px solid #4CAF74; }
+.book-org-header { display: grid; grid-template-columns: 1fr auto; align-items: start; padding: 16px 20px 12px; background: #fafbff; border-bottom: 1px solid var(--hairline); }
+.book-org-name { font-size: 16px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; }
+.book-org-desig { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.book-org-num { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.book-org-facts { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; }
+.book-org-fact { padding: 12px 16px; border-right: 1px solid var(--hairline); }
+.book-org-fact:last-child { border-right: none; }
+.book-org-fact-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 4px; }
+.book-org-fact-value { font-size: 12px; color: var(--body); line-height: 1.5; }
+.book-org-fact-value strong { color: var(--ink); font-weight: 700; }
+
+/* Mind map — static tree, fully expanded */
+.book-mm { display: flex; flex-direction: column; align-items: center; gap: 0; margin: 24px 0; }
+.book-mm-root { background: var(--blue); color: var(--white); font-size: 18px; font-weight: 800; padding: 18px 48px; border-radius: 14px; letter-spacing: -0.02em; }
+.book-mm-vline { width: 2px; height: 28px; background: rgba(30,34,170,0.2); }
+.book-mm-dept-row { display: flex; justify-content: center; gap: 12px; width: 100%; }
+.book-mm-dept-col { display: flex; flex-direction: column; align-items: center; flex: 1; max-width: 200px; }
+.book-mm-hbar { height: 2px; background: rgba(30,34,170,0.15); width: 100%; margin: 0; }
+.book-mm-dept { background: var(--white); border: 1.5px solid rgba(30,34,170,0.2); color: var(--blue); font-size: 13px; font-weight: 700; padding: 12px 16px; border-radius: 10px; text-align: center; width: 100%; }
+.book-mm-sub-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; width: 100%; }
+.book-mm-sub { background: #f4f5ff; border: 1px solid var(--hairline); color: var(--ink); font-size: 12px; font-weight: 600; padding: 8px 12px; border-radius: 7px; text-align: center; }
+
+/* Stat cards */
+.book-stats { display: grid; grid-template-columns: repeat(5,1fr); gap: 0; border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; margin: 20px 0; }
+.book-stat { padding: 16px; border-right: 1px solid var(--hairline); }
+.book-stat:last-child { border-right: none; }
+.book-stat-num { font-size: 1.4rem; font-weight: 800; color: var(--blue); letter-spacing: -0.03em; margin-bottom: 3px; }
+.book-stat-lbl { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+/* Verticals */
+.book-verticals { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin: 20px 0; }
+.book-vertical { padding: 20px 18px; border-radius: var(--radius); border: 1px solid var(--hairline); display: flex; flex-direction: column; gap: 8px; }
+.book-vertical--am { border-top: 3px solid var(--blue); }
+.book-vertical--vo { border-top: 3px solid var(--blue); }
+.book-vertical--od { border-top: 3px solid var(--blue); }
+.book-vertical-icon { width: 40px; height: 40px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.book-vertical-name { font-size: 15px; font-weight: 800; color: var(--ink); }
+.book-vertical-desc { font-size: 13px; color: var(--body); line-height: 1.55; flex: 1; }
+.book-vertical-pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 4px; background: rgba(0,0,0,0.04); color: var(--muted); }
+
+/* Ambition chart embed */
+.book-ambition-chart { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 24px; background: #fafbff; margin: 20px 0; }
+
+/* ── Assessment ── */
+.aq-tracker { display: flex; align-items: center; gap: 14px; margin-bottom: 36px; padding: 16px 20px; background: #FAFBFF; border: 1px solid var(--hairline); border-radius: var(--radius); }
+.aq-tracker-bar { flex: 1; height: 6px; background: var(--hairline); border-radius: 99px; overflow: hidden; }
+.aq-tracker-fill { height: 100%; width: 0%; background: var(--blue); border-radius: 99px; transition: width 0.4s var(--ease); }
+.aq-tracker-label { font-size: 12px; font-weight: 700; color: var(--blue); white-space: nowrap; letter-spacing: 0.02em; }
+.aq-question { margin-bottom: 36px; padding: 24px 28px; border: 1px solid var(--hairline); border-radius: 12px; background: var(--white); transition: border-color 0.2s; }
+.aq-question.is-filled { border-color: rgba(30,34,170,0.35); }
+.aq-q-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.aq-q-num { font-size: 10px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue); background: rgba(30,34,170,0.08); padding: 3px 10px; border-radius: 99px; }
+.aq-q-status { font-size: 12px; font-weight: 600; color: var(--muted); }
+.aq-q-status.done { color: #2a7d3f; }
+.aq-q-text { font-size: 14px; color: var(--ink); line-height: 1.7; margin-bottom: 14px; font-weight: 500; }
+.aq-textarea { width: 100%; padding: 12px 16px; border: 1px solid var(--hairline); border-radius: 8px; font-family: var(--sans); font-size: 14px; color: var(--ink); line-height: 1.65; resize: vertical; min-height: 120px; transition: border-color 0.2s, box-shadow 0.2s; background: #FAFBFF; }
+.aq-textarea:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(30,34,170,0.1); background: var(--white); }
+.aq-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 24px; border-top: 1px solid var(--hairline); }
+.aq-footer-note { font-size: 13px; color: var(--muted); }
+.aq-submit-btn { padding: 10px 28px; background: var(--blue); color: var(--white); font-size: 13px; font-weight: 700; border: none; border-radius: var(--radius); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; transition: var(--transition); }
+.aq-submit-btn:hover:not(:disabled) { background: var(--blue-dark); }
+.aq-submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.aq-error { margin-top: 12px; padding: 12px 16px; background: #fff3f3; border: 1px solid #f5c6c6; border-radius: 8px; font-size: 13px; color: #c0392b; }
+.aq-submitted { text-align: center; padding: 48px 24px; border: 1px solid rgba(30,34,170,0.2); border-radius: 12px; background: #FAFBFF; margin-bottom: 24px; }
+.aq-submitted-icon { font-size: 40px; color: #2a7d3f; margin-bottom: 16px; }
+.aq-submitted-title { font-size: 20px; font-weight: 800; color: var(--ink); margin-bottom: 8px; }
+.aq-submitted-body { font-size: 14px; color: var(--body); line-height: 1.7; max-width: 440px; margin: 0 auto; }
+</style>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar" id="topbar">
+  <div class="topbar-left">
+    <span class="topbar-logo">myHQ</span>
+    <span class="topbar-chapter" id="chapterLabel">VO &middot; Chapter 1</span>
+  </div>
+  <div class="topbar-center">FAQs &amp; Objection Handling</div>
+  <div class="topbar-right">
+    <a class="hub-btn" href="hub.html" title="Back to Hub"><i class="fa-solid fa-house"></i></a>
+    <span class="screen-counter" id="screenCounter">1 / 5</span>
+    <button class="read-btn" id="btnRead" onclick="setMode('read')">
+      <i class="fa-solid fa-book-open"></i>&nbsp;Read Full Chapter
+    </button>
+  </div>
+</header>
+
+<!-- SLIDE MODE -->
+<div id="slide-mode">
+<div class="slides" id="slides">
+<div class="screen active">
+<div class="vo-wrap"><div class="vo-cover"><div class="vo-eyebrow">myHQ Virtual Office &middot; Chapter 8</div><h1>FAQs &amp; objection <em>handling</em>.</h1><p class="vo-cover-sub">Ninety-one questions clients actually ask, in three tiers &mdash; from basic legality through to the objections that decide a sale. Every one has an answer you can use on the call.</p><div class="vo-cover-meta"><div class="vo-cover-stat"><div class="vo-cover-num">27</div><div class="vo-cover-lbl">Tier 1 &middot; informatory</div></div><div class="vo-cover-stat"><div class="vo-cover-num">19</div><div class="vo-cover-lbl">Tier 2 &middot; process</div></div><div class="vo-cover-stat"><div class="vo-cover-num">45</div><div class="vo-cover-lbl">Tier 3 &middot; objections</div></div></div></div></div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+<div class="screen">
+<div class="vo-wrap"><div class="vo-eyebrow">Tier 1 &middot; Basic &amp; informatory</div><h2>27 questions, 3 themes</h2><p class="vo-lead">Is it legal? Will MCA and the banks accept it? What do the plans include, and what does it cost? These come early in a call and are answered with facts, not persuasion.</p><div class="vo-chips"><div class="vo-chip">Legality &amp; Virtual Office Fundamentals <span class="vo-chip-n">9</span></div><div class="vo-chip">Plan Options &amp; Features <span class="vo-chip-n">14</span></div><div class="vo-chip">Pricing &amp; Payment Options <span class="vo-chip-n">4</span></div></div><div class="vo-note"><strong>On the call:</strong> The Kerala High Court recognised virtual office addresses in CIT vs. Sreekrishna Textiles. myHQ records a 95%+ success rate across 10,000+ registrations.</div></div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+<div class="screen">
+<div class="vo-wrap"><div class="vo-eyebrow">Tier 2 &middot; Process &amp; registration</div><h2>19 questions, 3 themes</h2><p class="vo-lead">Timelines, visiting hours, what happens after payment, how cancellation works. The client has decided they want it and now wants to know how it runs.</p><div class="vo-chips"><div class="vo-chip">Registration Process &amp; Timeline <span class="vo-chip-n">9</span></div><div class="vo-chip">Pricing &amp; Payment - Tier 2 <span class="vo-chip-n">8</span></div><div class="vo-chip">Subscription &amp; Cancellation <span class="vo-chip-n">2</span></div></div><div class="vo-note"><strong>On the call:</strong> Most of these are answered by the process in Chapter 5. If you know the fulfilment flow, you can answer every question in this tier without checking.</div></div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+<div class="screen">
+<div class="vo-wrap"><div class="vo-eyebrow">Tier 3 &middot; Sales objections</div><h2>45 questions, 18 themes</h2><p class="vo-lead">Nineteen themes, from hidden costs and competitor comparison to GST officer visits and worst-case scenarios. These decide whether the sale closes.</p><div class="vo-chips"><div class="vo-chip">Premium Documentation &amp; Speed <span class="vo-chip-n">2</span></div><div class="vo-chip">Support &amp; Guarantee Claims <span class="vo-chip-n">3</span></div><div class="vo-chip">Government Approval &amp; Liability <span class="vo-chip-n">3</span></div><div class="vo-chip">Comparative Value Proposition <span class="vo-chip-n">3</span></div><div class="vo-chip">Business Case &amp; Financial Justification <span class="vo-chip-n">3</span></div><div class="vo-chip">Wework &amp; Address Considerations <span class="vo-chip-n">2</span></div><div class="vo-chip">Alternate Use Cases <span class="vo-chip-n">3</span></div><div class="vo-chip">Gst Verification &amp; Officer Visits <span class="vo-chip-n">6</span></div><div class="vo-chip">Timeline &amp; Competition <span class="vo-chip-n">1</span></div></div><div class="vo-note"><strong>On the call:</strong> Never counter an objection by guaranteeing an outcome you do not control. Chapter 3 covers why that ends careers; this chapter gives you the honest answer instead.</div></div>
+<button class="screen-next-btn" onclick="next()"><i class="fa-solid fa-arrow-right"></i></button>
+</div>
+<div class="screen">
+<div class="vo-wrap"><div class="vo-cover"><div class="vo-eyebrow">End of chapter 8</div><h1>Chapter <em>complete</em>.</h1><p class="vo-cover-sub">The full bank of 91 objections, with answers, is in the reading view. Work through Tier 3 before your first live call.</p><div class="vo-cover-meta"><div class="vo-cover-stat"><div class="vo-cover-num">&rarr;</div><div class="vo-cover-lbl">Next: Chapter 9 &middot; Mock Calls</div></div></div></div></div>
+</div>
+</div>
+<div class="dot-nav" id="dotNav"></div>
+<div class="key-hint" id="keyHint"><i class="fa-solid fa-arrow-left"></i><i class="fa-solid fa-arrow-right"></i>&nbsp;to navigate</div>
+</div>
+
+<style>
+/* ── VO CHAPTER ── screens built on the shared .screen frame ── */
+.vo-wrap { width: 100%; max-width: 1180px; margin: 0 auto; padding: 44px 48px; height: 100%; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; }
+.vo-eyebrow { font-size: 11px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 10px; }
+.vo-h2 { font-size: 2.1rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.12; color: var(--ink); margin-bottom: 12px; }
+.vo-h2 em { font-style: normal; color: var(--blue); }
+.vo-lede { font-size: 15px; color: var(--body); line-height: 1.7; max-width: 860px; margin-bottom: 22px; }
+
+/* the script box - the thing reps actually read out */
+.vo-script { background: rgba(30,34,170,0.05); border-left: 3px solid var(--blue); border-radius: 0 8px 8px 0; padding: 14px 18px; margin-bottom: 20px; }
+.vo-script-label { font-size: 10px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 5px; }
+.vo-script-text { font-size: 14px; color: var(--ink); line-height: 1.65; font-style: italic; }
+
+/* protocol cards - the A/B/C/D variations under each stage */
+.vo-protos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.vo-protos.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.vo-protos.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.vo-proto { border: 1px solid var(--hairline); border-radius: 8px; padding: 13px 15px; background: var(--white); }
+.vo-proto-tag { font-size: 10px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px; }
+.vo-proto-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 5px; line-height: 1.3; }
+.vo-proto-body { font-size: 12px; color: var(--body); line-height: 1.55; }
+
+/* the 11-stage call flow */
+.vo-flow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 9px; }
+.vo-step { border: 1px solid var(--hairline); border-radius: 8px; padding: 11px 10px; background: var(--white); position: relative; }
+.vo-step-num { width: 20px; height: 20px; border-radius: 50%; background: var(--blue); color: var(--white); font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-bottom: 7px; }
+.vo-step-name { font-size: 11.5px; font-weight: 700; color: var(--ink); line-height: 1.25; margin-bottom: 3px; }
+.vo-step-sub { font-size: 10px; color: var(--muted); line-height: 1.4; }
+
+/* two-column compare (fresh vs follow-up, owned vs leased) */
+.vo-two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.vo-col { border: 1px solid var(--hairline); border-radius: 10px; overflow: hidden; }
+.vo-col-head { padding: 11px 16px; font-size: 12px; font-weight: 800; letter-spacing: 0.02em; }
+.vo-col-head.blue { background: var(--blue); color: var(--white); }
+.vo-col-head.soft { background: #F5F6FB; color: var(--ink); }
+.vo-col-body { padding: 13px 16px; }
+.vo-ol { list-style: none; counter-reset: v; }
+.vo-ol li { counter-increment: v; font-size: 12.5px; color: var(--body); line-height: 1.5; padding: 4px 0 4px 26px; position: relative; }
+.vo-ol li::before { content: counter(v); position: absolute; left: 0; top: 4px; width: 17px; height: 17px; border-radius: 50%; background: rgba(30,34,170,0.09); color: var(--blue); font-size: 9.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+
+/* RCA blocks - the discovery questions */
+.vo-rca { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; }
+.vo-rca-card { border: 1px solid var(--hairline); border-radius: 10px; padding: 15px 16px; background: var(--white); }
+.vo-rca-head { font-size: 12px; font-weight: 800; color: var(--blue); margin-bottom: 9px; }
+.vo-q { font-size: 12px; color: var(--body); line-height: 1.5; padding: 4px 0 4px 15px; position: relative; }
+.vo-q::before { content: ''; position: absolute; left: 0; top: 10px; width: 5px; height: 5px; border-radius: 50%; background: var(--blue); opacity: 0.45; }
+
+/* the seven plan paths */
+.vo-paths { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px; }
+.vo-path { border: 1px solid var(--hairline); border-radius: 9px; padding: 12px 13px; background: var(--white); }
+.vo-path-num { font-size: 10px; font-weight: 800; color: var(--white); background: var(--blue); border-radius: 4px; padding: 2px 6px; display: inline-block; margin-bottom: 6px; }
+.vo-path-name { font-size: 12.5px; font-weight: 700; color: var(--ink); line-height: 1.25; margin-bottom: 5px; }
+.vo-path-trigger { font-size: 11px; color: var(--body); line-height: 1.45; margin-bottom: 7px; }
+.vo-path-plan { font-size: 10.5px; font-weight: 700; color: var(--blue); border-top: 1px solid var(--hairline); padding-top: 6px; }
+
+/* customer-type cards */
+.vo-types { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.vo-type { border-radius: 9px; padding: 13px 12px; color: var(--white); }
+.vo-type-name { font-size: 12px; font-weight: 800; margin-bottom: 5px; letter-spacing: 0.02em; }
+.vo-type-quote { font-size: 11px; line-height: 1.45; opacity: 0.93; margin-bottom: 8px; font-style: italic; }
+.vo-type-close { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; }
+
+/* tables */
+.vo-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.vo-table th { background: var(--blue); color: var(--white); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 9px 13px; text-align: left; }
+.vo-table th:not(:first-child), .vo-table td:not(:first-child) { text-align: center; }
+.vo-table td { padding: 9px 13px; border-bottom: 1px solid var(--hairline); color: var(--body); }
+.vo-table tr:nth-child(even) td { background: #FAFBFF; }
+.vo-table td:first-child { font-weight: 600; color: var(--ink); }
+
+/* callouts */
+.vo-warn { background: rgba(255,184,72,0.14); border-left: 3px solid var(--amber); border-radius: 0 6px 6px 0; padding: 11px 15px; font-size: 12.5px; color: var(--ink); line-height: 1.55; margin-top: 14px; }
+.vo-warn strong { color: #9A6A00; }
+.vo-coach { background: rgba(190,229,194,0.25); border-left: 3px solid #4CAF74; border-radius: 0 6px 6px 0; padding: 11px 15px; font-size: 12.5px; color: var(--ink); line-height: 1.55; margin-top: 10px; }
+.vo-coach strong { color: #2a7d3f; }
+
+/* process steps */
+.vo-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.vo-pstep { border: 1px solid var(--hairline); border-radius: 9px; padding: 13px 14px; background: var(--white); }
+.vo-pstep-n { font-size: 20px; font-weight: 800; color: rgba(30,34,170,0.22); line-height: 1; margin-bottom: 6px; }
+.vo-pstep-t { font-size: 12.5px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.vo-pstep-b { font-size: 11.5px; color: var(--body); line-height: 1.5; }
+
+/* doc requirement cards (slides 22-23) */
+.vo-docs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; }
+.vo-doc { background: var(--blue); color: var(--white); border-radius: 9px; padding: 15px 16px; }
+.vo-doc-head { font-size: 13px; font-weight: 800; margin-bottom: 10px; line-height: 1.25; }
+.vo-doc li { list-style: none; font-size: 11.5px; line-height: 1.5; padding: 3px 0 3px 14px; position: relative; opacity: 0.95; }
+.vo-doc li::before { content: ''; position: absolute; left: 0; top: 10px; width: 4px; height: 4px; border-radius: 50%; background: var(--white); opacity: 0.7; }
+
+/* cover */
+.vo-cover { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; height: 100%; }
+.vo-cover h1 { font-size: 3.2rem; font-weight: 800; letter-spacing: -0.04em; line-height: 1.05; color: var(--ink); margin-bottom: 16px; }
+.vo-cover h1 em { font-style: normal; color: var(--blue); }
+.vo-cover-sub { font-size: 17px; color: var(--body); line-height: 1.6; max-width: 620px; margin-bottom: 26px; }
+.vo-cover-meta { display: flex; gap: 28px; border-top: 1px solid var(--hairline); padding-top: 18px; }
+.vo-cover-stat { }
+.vo-cover-num { font-size: 1.6rem; font-weight: 800; color: var(--blue); letter-spacing: -0.02em; }
+.vo-cover-lbl { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; }
+
+@media (max-width: 1100px) {
+  .vo-flow { grid-template-columns: repeat(4, 1fr); }
+  .vo-paths, .vo-types { grid-template-columns: repeat(2, 1fr); }
+  .vo-rca, .vo-docs, .vo-steps { grid-template-columns: 1fr; }
+  .vo-protos, .vo-protos.cols-3, .vo-protos.cols-4 { grid-template-columns: 1fr; }
+  .vo-two { grid-template-columns: 1fr; }
+  .vo-wrap { padding: 0 24px; }
+}
+</style>
+
+<div id="read-mode" class="hidden" style="margin-top:52px;">
+  <div class="r-layout">
+    <aside class="r-sidebar">
+      <div class="r-toc-label">VO &middot; Chapter 8</div>
+<a href="#r-intro" class="toc-link" data-s="r-intro">Introduction</a>
+<a href="#r-tier1" class="toc-link" data-s="r-tier1">01 &middot; Basic &amp; Informatory Questions</a>
+<a href="#r-tier2" class="toc-link" data-s="r-tier2">02 &middot; Process and Registration Questions</a>
+<a href="#r-tier3" class="toc-link" data-s="r-tier3">03 &middot; Sales Objections &amp; Counter Answers</a>
+    </aside>
+    <div class="r-content">
+<section class="section" id="r-intro">
+<h2 class="section-title">Introduction</h2>
+<div class="section-outcome">How to use this chapter</div>
+<p class="section-body">This is the objection bank, not a script. Read the answer, then say it in your own words &mdash; a client can tell the difference. The answers here are the approved position: where one states a figure or a timeline, use that figure, and where a question asks you to guarantee a government outcome, the honest answer is the one given here.</p>
+</section>
+<section class="section" id="r-tier1">
+<div class="section-num">01</div>
+<h2 class="section-title">Basic &amp; Informatory Questions</h2>
+<div class="section-outcome">27 questions</div>
+<h3 class="vo-faq-group">Legality &amp; Virtual Office Fundamentals</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">Is a virtual office actually legal for company registration in India?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Yes. Virtual offices are legally accepted in India for company registration and GST registration.</p><p>The Kerala High Court, in CIT vs. Sreekrishna Textiles, recognised the use of virtual office addresses for GST registration.</p><p>myHQ spaces are verified for MCA and GST requirements. A virtual office can be used for company registration, GST registration, official correspondence, and other business requirements.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Will MCA, GST and banks accept a virtual office address for my company registration, GST registration and current account?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Yes. MCA and GST authorities accept virtual office addresses when the required documents and address are compliant.</p><p>Banks can also accept a virtual office address for opening a current account, depending on their requirements.</p><p>myHQ provides documents such as:</p><ul><li>Registered address certificate</li><li>Lease copy</li><li>Utility bill</li><li>Other required supporting documents</li></ul><p>More than 60% of myHQ clients have successfully opened current accounts with banks such as HDFC, ICICI, Axis, Kotak, and YES Bank.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">I have heard that virtual office addresses can get rejected during GST registration. How can you assure me that yours will be accepted?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>GST registration can be rejected if the address or documents are not properly verified.</p><p>Before onboarding a space, myHQ checks:</p><p>GSTIN</p><ul><li>Lease agreement</li><li>Physical presence of the space</li><li>Required compliance documents</li></ul><p>myHQ has recorded a 95%+ success rate across 10,000+ registrations.</p><p>Sample documents can also be shared so that your CA can check them before you make the payment.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">My CA told me that virtual office addresses can sometimes get rejected by MCA or banks. What would you say to that?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Your CA is right that rejection can happen in some cases.</p><p>The important point is that the quality and compliance of the address and documents matter.</p><p>myHQ partner spaces have:</p><ul><li>Valid lease agreements</li><li>Active GSTINs</li><li>Physical presence</li><li>Required supporting documents</li></ul><p>This is why myHQ has maintained a 95%+ success rate.</p><p>The main concern is not the virtual office model itself, but whether the address and documents are properly verified.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Are there any types of businesses or industries where a virtual office address may not be accepted?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Virtual office addresses can be used for most standard businesses for GST and company registration.</p><p>However, some regulated industries may require a physical premises inspection or additional government approvals.</p><p>Examples include:</p><p>NBFCs</p><ul><li>Pharma manufacturing</li><li>Food processing</li><li>Businesses that require specific government approvals</li></ul><p>For most service businesses, startups, and e-commerce businesses, a virtual office can be used.</p><p>Share your business type with us so we can check the requirement for your specific case.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">What is the actual difference between a virtual office and a registered office? Is there any additional compliance or risk involved?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>A virtual office is a service that provides a professional business address along with required documents and support.</p><p>A registered office is the official address of a company that is used for MCA and GST records.</p><p>A virtual office can be used as a registered office if the address and documents meet the required compliance standards.</p><p>The important thing is to use a properly verified address and valid documents.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">I already have a physical office. Why would I need a virtual office?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>If your physical office is in one city but your business operates in other states, you may need a GST registration in those states.</p><p>A virtual office can provide an address for GST registration in another state without renting a full physical office.</p><p>This can help businesses that are expanding into multiple states while keeping their costs lower.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">I can simply use my home address for GST registration. Why should I pay for a virtual office?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>You can use your home address if you have the required documents and permissions.</p><p>However, many landlords do not provide an NOC for business registration. This can create problems during GST registration.</p><p>Using a virtual office can provide:</p><ul><li>A professional commercial address</li><li>Required registration documents</li></ul><p>NOC</p><ul><li>Better privacy</li><li>Support during the registration process</li></ul><p>It also avoids the need to use your personal home address for business registration.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Is a virtual office the same thing as a virtual assistant service or a coworking space?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>No. These are different services.</p><p>Virtual Office: Provides a professional business address, mail handling, and compliance documents.</p><p>Virtual Assistant Service: Provides remote administrative or customer-support services.</p><p>Coworking Space: Provides a physical workspace, desk, internet, and office facilities.</p><p>A myHQ Virtual Office mainly provides the address and documents required for business purposes.</p><p>Meeting rooms and coworking facilities may be available separately at an additional cost.</p></div></details>
+<h3 class="vo-faq-group">Plan Options &amp; Features</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">If I already have a functional office, what additional value does a virtual office give me?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>If your physical office is in one city but you operate in other states, a Virtual Office can help you get GST registration in those states.</p><p>It can help with:</p><ul><li>Multi-state GST registration</li><li>Business expansion</li><li>Input tax credit in the relevant states</li><li>Managing interstate business operations</li></ul><p>This is a common use case for companies expanding into new states.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">I need a virtual office in a particular area, but you don't have a location there. What are my options?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>myHQ has 250+ verified locations across major cities such as:</p><ul><li>Delhi NCR</li></ul><p>Mumbai</p><p>Bengaluru</p><p>Hyderabad</p><p>Chennai</p><p>Pune</p><p>Kolkata</p><p>Ahmedabad</p><p>Jaipur</p><ul><li>And other locations</li></ul><p>If your preferred area is not available, we can check the closest available location that meets the required GST and MCA requirements.</p><p>Q13-Q14: What is the closest location you have to my preferred area? How far is that location?</p><p>This depends on your preferred area and the available locations.</p><p>We will check:</p><ul><li>Your preferred city or area</li><li>Available locations</li><li>Type of space</li><li>Whether the space is owned or leased</li><li>GST verification status</li></ul><p>Share your preferred location and we can check the closest suitable option.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">If I find a better location later, can I change my virtual office address during my subscription?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Yes. You can request a change of location before your renewal date.</p><p>The process is:</p><p>Contact the support team.</p><p>Select the new location.</p><p>New documents are prepared for the new address.</p><p>The address can then be updated in the relevant GST or company records.</p><p>There may be an additional charge depending on the new location.</p><p>For details, contact supportvo@myhq.in.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Can I start with one location and move to another location later without paying a penalty?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Yes. You can change your location before renewal.</p><p>There is no separate penalty for changing the location. However, if the new location costs more, you will need to pay the difference.</p><p>The required documentation for the new location will also be prepared.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">What is the actual difference between the Company Registration Plan, GST Registration Plan and Business Address Plan?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><ul><li>Company Registration Plan</li></ul><p>This is the most comprehensive plan. It supports:</p><ul><li>Company registration</li><li>GST registration</li><li>Official correspondence</li><li>Mail handling</li><li>Temporary signage</li></ul><p>It is suitable for a new business that needs company registration and GST registration.</p><ul><li>GST Registration Plan</li></ul><p>This plan supports:</p><ul><li>GST registration</li><li>Official correspondence</li><li>Mail handling</li><li>Temporary signage</li></ul><p>It does not include company registration.</p><p>It is suitable for an existing company that needs GST registration.</p><ul><li>Business Address Plan</li></ul><p>This plan provides a professional business address for:</p><ul><li>Business cards</li></ul><p>Letterheads</p><p>Website</p><ul><li>Official communication</li></ul><p>It does not support company or GST registration.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">If I only purchase the GST Registration Plan, can I also use that address for company registration?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>No.</p><p>The GST Registration Plan is only for GST registration and does not include company registration documentation.</p><p>If you need both company registration and GST registration, you need the Company Registration Plan.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Do I need to purchase the Company Registration Plan separately for company registration?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Yes.</p><p>Company registration is not included in the GST Registration Plan or Business Address Plan.</p><p>For company registration, you need the Company Registration Plan, which includes:</p><ul><li>Company registration</li></ul><p>GST</p><ul><li>Mail handling</li><li>Temporary signage</li></ul></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">I only need a business address right now. Why should I purchase the complete Company Registration Plan?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>You do not need to purchase the Company Registration Plan if you only need a professional business address.</p><p>In that case, the Business Address Plan is sufficient.</p><p>Choose the Company Registration Plan only if you need company registration or GST registration.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Can I use one virtual office address for company registration, GST registration and opening a bank account?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Yes.</p><p>One myHQ address can be used for:</p><ul><li>Company registration with MCA</li><li>GST registration</li><li>Current account opening</li><li>Official correspondence</li><li>Mail handling</li></ul><p>The same address and supporting documents can be used for these requirements, subject to the respective authority or bank's requirements.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Can two different companies use the same virtual office address?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Yes, two different companies can use the same myHQ address, subject to the applicable requirements.</p><p>Each company must:</p><ul><li>Be a separate legal entity</li><li>Have its own company registration number</li><li>Have a separate GST registration, where applicable</li></ul><p>Depending on the requirement, separate plans or addresses may be needed.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">If I start with a Business Address Plan, can I upgrade to a GST or Company Registration Plan later?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Yes.</p><p>You can upgrade from the Business Address Plan to a GST Registration Plan or Company Registration Plan.</p><p>The process is:</p><p>Contact support.</p><p>Select the required plan.</p><p>Pay the difference in price.</p><p>Additional documents are prepared for the upgraded plan.</p><p>There is no upgrade penalty. Only the additional plan charges apply.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">What exactly is included in the plan, and are there any additional charges I should know about?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Included in all plans:</p><ul><li>Professional commercial address</li><li>Space-Client Agreement</li></ul><p>NOC</p><ul><li>Utility Bill</li><li>Mail handling</li><li>Temporary signage during verification</li><li>Master Agreement</li><li>Master NOC</li></ul><p>Additional charges may include:</p><ul><li>Documentation charges</li><li>18% GST</li><li>1.75% payment gateway charges on online payments</li><li>Notarisation charges, if required</li><li>Permanent signage, if required</li><li>Meeting room or day-pass charges</li></ul><p>All applicable charges should be communicated before payment.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">What is the difference between a WeWork location and a non WeWork location?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Both WeWork and non-WeWork locations are verified myHQ partner spaces.</p><p>The main differences are:</p><p>WeWork locations:</p><ul><li>Premium branded spaces</li><li>Faster documentation</li><li>Around 1 business day for documentation</li><li>Higher brand recognition</li></ul><p>Non-WeWork locations:</p><ul><li>Regular commercial offices</li><li>Standard documentation timeline of around 5–7 business days</li><li>More cost-effective</li></ul><p>Both are compliance-verified spaces.</p><p>The WeWork premium mainly relates to the brand, speed, and overall workspace experience.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">What does a WeWork address offer that a regular commercial office address doesn't?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>A WeWork address can provide:</p><ul><li>Strong brand recognition</li><li>Faster documentation</li><li>Premium business image</li><li>Standardised workspace experience</li><li>Access to meeting rooms and facilities at additional cost</li></ul><p>For GST and MCA registration, the key requirement is compliance. The WeWork brand itself does not automatically provide a different approval process.</p></div></details>
+<h3 class="vo-faq-group">Pricing &amp; Payment Options</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">Honestly, your service feels expensive. What exactly am I paying extra for?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>The price covers more than just the address.</p><p>You are paying for:</p><ul><li>Compliance verification of the space</li><li>Proper documentation</li><li>Support during the registration process</li><li>On-ground support at the location</li><li>Support in case of government queries</li><li>Faster documentation options</li><li>Post-sales support</li></ul><p>The objective is to reduce problems related to documentation, verification, and the registration process.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Can you clearly explain what is included in the price and what isn't?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Included in the base price:</p><ul><li>Professional business address</li><li>Space-Client Agreement</li></ul><p>NOC</p><ul><li>Utility Bill</li><li>Mail handling</li><li>Temporary signage during GST verification</li><li>Master Agreement and Master NOC for leased spaces</li><li>Company registration documents under the Company Registration Plan</li></ul><p>Additional charges:</p><ul><li>Documentation charges</li><li>18% GST</li><li>2% payment gateway charges for online payments</li><li>Notarisation, if required</li><li>Permanent signage, if required</li><li>Meeting rooms and day passes</li></ul><p>Handled separately by the customer/CA/CS:</p><ul><li>MCA company incorporation filing</li><li>GST application filing</li><li>GST return filing</li></ul></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Why do I have to pay a separate payment gateway charge? Can't that be included in the total price?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>The payment gateway charge is the transaction fee charged by the payment processor for online payments.</p><p>You have two options:</p><p>Online payment: Faster processing but includes the payment gateway charge.</p><p>NEFT/RTGS: No payment gateway charge, but processing may take an additional 24–48 hours.</p><p>So, the choice depends on whether you prefer faster processing or avoiding the gateway charge.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">What documents will I receive after making the payment?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>After payment and KYC approval, you receive the required documents, such as:</p><ul><li>Space-Client Agreement</li></ul><p>NOC</p><ul><li>Utility Bill</li><li>Master Agreement, if the space is leased</li><li>Master NOC, if the space is leased</li></ul><p>Company registration documents, if you purchase the Company Registration Plan</p><p>Timeline:</p><ul><li>Standard spaces: 5–7 business days after KYC approval</li><li>WeWork spaces: 15mins. after KYC approval</li></ul></div></details>
+</section>
+<section class="section" id="r-tier2">
+<div class="section-num">02</div>
+<h2 class="section-title">Process and Registration Questions</h2>
+<div class="section-outcome">19 questions</div>
+<h3 class="vo-faq-group">Registration Process &amp; Timeline</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">What are the visiting hours? Can I walk in whenever I want?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>You can visit the Virtual Office location, but it is recommended to inform the space team in advance.</p><p>Standard business hours are usually 9 AM to 6 PM on weekdays.</p><p>Advance notice is recommended.</p><p>Contact the space team before visiting.</p><p>Walk-ins may not always be possible because it is a working business space.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Can I use both my physical office and a virtual office at the same time for different business requirements?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Yes.</p><p>For example:</p><p>Physical office in City A for daily business operations.</p><p>Virtual Office in City B for GST registration.</p><p>Virtual Office in City C for GST registration in another state.</p><p>This is a common requirement for businesses expanding into multiple states.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">If my business structure changes from a proprietorship to a Private Limited company, can I continue using the same address?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Generally, yes, but it depends on the type of change and the compliance requirements.</p><p>The address itself may remain valid.</p><p>A new company registration may require fresh documentation.</p><p>If the same address is being used for the new entity, it needs to be checked for compliance.</p><p>It is recommended to confirm the requirement with your CA before changing the business structure.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Do I need to inform someone before visiting the office?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Yes, it is recommended.</p><p>Call or WhatsApp the space team before visiting.</p><p>Ideally, give 1–2 hours' notice.</p><p>Tell them the reason for your visit, such as a client meeting or document collection.</p><p>Advance notice helps ensure that the team is ready for you.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Do you provide any support if there is a legal or compliance issue during verification?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Yes. myHQ provides support during the verification process.</p><p>This includes:</p><p>Reviewing your application documents.</p><p>Preparing required compliance documents.</p><p>Helping with responses to government queries.</p><p>Supporting GST officer visits.</p><p>Providing support for up to two rejections, subject to the refund policy.</p><p>Escalating the issue if required.</p><p>For any compliance issue, contact supportvo@myhq.in.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">If the first GST verification fails, how quickly can you arrange another verification?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>If the first verification fails:</p><p>You receive the rejection letter from the GST department.</p><p>The application is corrected.</p><p>The application is submitted again.</p><p>The GST department schedules another verification.</p><p>myHQ provides any additional documents required from the space.</p><p>The second verification depends on the GST department's schedule, so the exact timeline cannot be controlled by myHQ.</p><p>One re-attempt is supported without additional cost if the issue is address-related.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">How long does the entire registration and approval process usually take?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>The typical process is:</p><p>KYC approval: 10–30 min.</p><p>Documentation: 5–7 business days for standard spaces or 15 min for WeWork.</p><p>Government filing: Your CA can file after receiving the documents.</p><p>Government approval: Usually around 7–10 working days.</p><p>The total process is typically around 2–4 weeks, assuming there are no government queries or objections.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">If I need the registration urgently, can you speed up the process?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Yes, some parts of the process can be made faster.</p><p>WeWork: Documents can be provided in 15  mins after KYC approval.</p><p>KYC: Submit your documents as soon as possible.</p><p>CA filing: Your CA should file immediately after receiving the documents.</p><p>Government approval: This timeline is controlled by the government and cannot be guaranteed.</p><p>The fastest practical timeline is around 2 weeks with a WeWork location, quick KYC, and immediate CA filing.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Will I have someone assigned to me who can keep me updated about the registration?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><ul><li>No, you have access to the dashboard for the documents provided by myHQ</li></ul></div></details>
+<h3 class="vo-faq-group">Pricing &amp; Payment - Tier 2</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">I am getting the same service from another provider for ₹10,000 to ₹12,000. Why should I pay more to myHQ?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Before comparing prices, compare what is actually included.</p><p>Check:</p><p>Is the address properly verified?</p><p>Are the documents valid and compliant?</p><p>Is the lease agreement active?</p><p>Do they provide support after payment?</p><p>What happens if GST raises an objection?</p><p>What is their actual success rate?</p><p>myHQ's pricing includes address verification, documentation, and post-sales support.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Another provider has given me a cheaper quote. Can you match their price?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Discounts may be available on the base price, but not on documentation charges or GST.</p><p>Before comparing only the price, check:</p><ul><li>GSTIN verification</li><li>Lease validity</li></ul><p>Documentation</p><ul><li>Post-sales support</li><li>Rejection support</li><li>Success rate</li></ul><p>The objective is to compare the complete service, not only the initial price.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Can you give me a proper comparison between your pricing and what other providers are charging?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>The market generally has different pricing levels:</p><ul><li>Budget providers: ₹5,000–₹8,000</li><li>Mid-range providers: ₹10,000–₹18,000</li><li>Premium providers: ₹18,000+</li></ul><p>The difference usually depends on:</p><ul><li>Location quality</li></ul><p>Documentation</p><ul><li>Compliance verification</li></ul><p>Brand</p><p>Support</p><p>Speed</p><p>myHQ positions itself in the mid-range with verified spaces and post-sales support.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Why are there separate documentation or KYC charges on top of the subscription fee?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>The base price covers the Virtual Office service.</p><p>Documentation charges cover the preparation of documents such as:</p><p>Agreement</p><p>NOC</p><ul><li>Compliance documents</li></ul></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Are there any additional charges for getting those documents?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Standard documents are covered under the documentation charges.</p><p>Additional charges may apply for:</p><p>Notarisation</p><ul><li>Additional copies in certain cases</li><li>Expedited processing</li></ul><p>Any additional charges should be communicated before payment.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">What isn't included in the basic price? For example, do I have to pay separately for GST filing or MCA filing?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>The following are not included:</p><ul><li>MCA company incorporation filing</li><li>GST registration filing</li><li>GST return filing</li><li>Meeting room bookings</li><li>Permanent signage</li></ul><p>Notarisation</p><ul><li>Certain address changes</li></ul><p>The customer or their CA/CS handles the government filings.</p><p>myHQ provides:</p><ul><li>Virtual Office address</li><li>Required documents</li><li>Support during the verification process</li></ul></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">I have heard better reviews about another provider. What makes myHQ more trustworthy?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Reviews are useful, but it is also important to compare actual service details.</p><p>You can compare:</p><p>Number of registrations handled.</p><p>Success rate.</p><p>Number of verified locations.</p><p>Post-sales support.</p><p>Pricing transparency.</p><p>Rejection support.</p><p>On-ground presence.</p><p>myHQ's guide states:</p><ul><li>10,000+ registrations</li><li>100%+ document success rate</li><li>250+ verified locations</li><li>Post-sales support</li><li>Two-rejection support</li><li>Physical presence at locations</li></ul><p>Compare facts and documents rather than reviews alone.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Why do I need to pay the full amount upfront? Is there an option to pay in instalments?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Full payment upfront is the standard process.</p><p>Currently:</p><p>EMI or instalment plans are not offered.</p><p>Multi-year plans may provide 15–20% savings.</p><p>Full payment allows documentation processing to start.</p><p>If budget is a concern, you can also consider starting with the Business Address Plan and upgrading later if required.</p></div></details>
+<h3 class="vo-faq-group">Subscription &amp; Cancellation</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">What happens if I want to cancel the service before my subscription ends?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Before the draft agreement is signed: Refund is possible, subject to a ₹2,000 operational deduction and applicable terms.</p><p>After the draft agreement is signed: Cancellation/refund is generally not available.</p><p>Government rejection cases: Special refund conditions may apply.</p><p>The important point is whether the draft agreement has already been signed by the space partner.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">What happens to my GST or company registration after your virtual office plan expires?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>The GST or company registration does not automatically expire just because the Virtual Office plan expires.</p><p>What expires is the Virtual Office service, such as:</p><ul><li>Address service</li><li>Mail handling</li></ul><p>Support</p><p>If you renew the plan, these services continue.</p><p>If you do not renew, you should make the required arrangements for your registered address and ongoing compliance.</p></div></details>
+</section>
+<section class="section" id="r-tier3">
+<div class="section-num">03</div>
+<h2 class="section-title">Sales Objections &amp; Counter Answers</h2>
+<div class="section-outcome">45 questions</div>
+<h3 class="vo-faq-group">Premium Documentation &amp; Speed</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">Why can't you provide the documentation for myHQ spaces within 1 hour?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Documentation depends on several steps:</p><ul><li>Payment processing</li><li>KYC verification</li><li>Document preparation</li><li>Space-level processing</li><li>Notarisation, if required</li></ul><p>For myHQ spaces, documentation generally takes 4-5 business days since  .</p><p>For WeWork spaces, documentation can be completed in around 15 mins after KYC approval. Since we use a std documentation process using legality as signing partner and E STAMP paper</p><p>The reason for the process is to ensure that the documents and space are properly verified.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Why do I have to complete the KYC process? Can't I share the documents on WhatsApp and have you complete it on my behalf?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>KYC is required to verify the customer's identity and documents.</p><p>The process is:</p><p>You submit your documents through the secure dashboard.</p><p>Space team verifies the documents.</p><p>The documents are checked as part of the compliance process.</p><p>KYC approval is generally completed within 15-20mins.</p><p>Sensitive documents should not be shared casually over WhatsApp.</p></div></details>
+<h3 class="vo-faq-group">Support &amp; Guarantee Claims</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">If another provider guarantees me a successful GST registration but myHQ only says that you will "support" me, what exactly am I paying the premium for?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>The final GST approval is decided by the GST department, so no provider can fully control that decision.</p><p>What myHQ provides is:</p><ul><li>Verified address</li><li>Required documents</li><li>Support during verification</li><li>Support with government queries</li><li>Additional documents when required</li><li>Support for address-related rejection cases</li><li>Status updates</li></ul><p>The difference is that myHQ focuses on providing a compliant address and supporting the customer through the process rather than promising something controlled by the government.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Suppose the GST officer asks for additional proof that wasn't part of the original documentation you promised me. Can you arrange it, or will you ask me to provide everything yourself?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>myHQ can help arrange standard additional documents when required.</p><p>These may include:</p><ul><li>Board resolution</li><li>Property tax receipt</li><li>Land lord KYC</li><li>Other standard compliance documents</li></ul><p>The myHQ team coordinates with the space and provides the required documents where applicable.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Do you provide any support if there is a legal or compliance issue during verification?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Yes. Support can include:</p><ul><li>Reviewing the documentation</li><li>Preparing required documents</li><li>Helping draft responses to GST queries</li><li>Coordinating with the space team</li><li>Supporting GST officer visits</li><li>Escalating complex issues where required</li></ul><p>For compliance issues, contact supportvo@myhq.in.</p></div></details>
+<h3 class="vo-faq-group">Government Approval &amp; Liability</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">If my GST application is rejected because the officer raises an objection about the Virtual Office address, will myHQ take complete responsibility for getting it corrected, or will you simply tell me to handle it with the GST department?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>It depends on the reason for rejection.</p><p>If the issue is related to the myHQ address or documents, myHQ supports:</p><ul><li>Preparing the response</li><li>Providing additional documents</li><li>Supporting re-application</li><li>Addressing the documentation issue</li></ul><p>If the issue is caused by incorrect information in your application, your CA/customer will need to correct it.</p><p>The basic distinction is:</p><p>myHQ is responsible for the address and documents it provides.
+The customer/CA is responsible for the accuracy of the application.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">If MCA or GST rejects my application, who will be responsible for fixing the issue?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>It depends on the reason for rejection.</p><p>Document issue: myHQ supports correction and re-preparation.</p><p>Application error: The customer/CA needs to correct and refile.</p><p>Government query: myHQ can support with documentation and response preparation.</p><p>Always check the rejection reason before deciding who needs to take action.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">I need my MCA registration urgently. If your documentation or internal process causes even a one-day delay and I lose a business opportunity because of it, who takes responsibility?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>myHQ can commit to its documentation timelines, but it cannot guarantee external business outcomes.</p><p>The standard timelines mentioned are:</p><ul><li>WeWork: 15 mins</li><li>Standard spaces: 4-5 business days</li></ul><p>To reduce delays:</p><p>Complete KYC quickly.</p><p>Select WeWork if the timeline is urgent.</p><p>Ask your CA to file immediately after receiving documents.</p><p>Government processing and business opportunities are outside myHQ's control.</p></div></details>
+<h3 class="vo-faq-group">Comparative Value Proposition</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">Another provider is offering company registration and GST registration together for ₹12,000 to ₹13,000. Why should I pay more here?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Before comparing the price, check exactly what the other provider is offering.</p><p>Ask:</p><p>Does the price include both registrations or only the address?</p><p>What documents are included?</p><p>Is the space verified?</p><p>Is the lease agreement valid?</p><p>What support is provided after payment?</p><p>What happens if the application is rejected?</p><p>The comparison should be based on the complete service and not only the quoted price.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">I am getting a Virtual Office from Innov8 or another competitor for around ₹8,000 to ₹10,000 with complimentary benefits. Why should I choose myHQ instead?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Instead of comparing only the complimentary benefits, compare the complete service.</p><p>Check:</p><ul><li>Address verification</li><li>Lease agreement</li></ul><p>Documents</p><ul><li>On-ground support</li><li>Rejection support</li><li>Post-sales service</li><li>Actual success rate</li></ul><p>These brands are listed on myHQ platform – we sell the same location at least 3 times higher than what do they do</p><p>A lower price does not necessarily mean the same documentation or support.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Your website mentions ₹700 per month, so why are you quoting me a much higher amount?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>The ₹700/month price refers to the Business Address Plan, which is mainly for correspondence and business presence.</p><p>If you need:</p><ul><li>GST registration</li><li>Company registration</li><li>Compliance documents</li><li>Registration support</li></ul><p>then you need a different plan, which has a higher price.</p><p>The correct price depends on what you actually need.</p></div></details>
+<h3 class="vo-faq-group">Business Case &amp; Financial Justification</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">I'm not the only person who needs to approve this purchase. If my finance head asks me tomorrow why we spent this amount on a Virtual Office instead of choosing a cheaper alternative, what justification can I give them?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>You can explain that the cost is not only for the address.</p><p>It also covers:</p><ul><li>Address verification</li></ul><p>Documentation</p><ul><li>Compliance support</li><li>On-ground support</li><li>Registration-related assistance</li><li>Post-sales support</li></ul><p>A cheaper option may have a lower upfront cost, but the customer should also compare the quality of documents, support, and rejection-handling process.</p><p>The finance decision should be based on the total cost and risk, not only the initial price.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">If I am making a financially sensible decision going ahead with myHQ and not just buying a Virtual Office from a different provider, what numbers, evidence or outcomes would you show me?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>The guide uses the following numbers:</p><ul><li>95%+ first-attempt success rate</li><li>10,000+ registrations</li><li>2–4 weeks typical overall timeline</li><li>250+ verified locations</li></ul><p>You can also compare:</p><ul><li>Total price</li></ul><p>Documentation</p><ul><li>Success rate</li></ul><p>Support</p><ul><li>Rejection handling</li><li>Registration timeline</li></ul><p>The objective is to understand the complete cost and service, rather than comparing only the base price.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">To be honest, I don't see much difference between you and your competitors. Why should I pay a premium?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>The main differences by myHQ are:</p><ul><li>Pre-onboarding space verification</li><li>A grade space with document  and lease verification</li><li>On-ground presence</li><li>Post-rejection support</li><li>Document quality</li><li>Published success metrics</li></ul><p>The premium is mainly for the additional verification, documentation, and support provided with the service.</p></div></details>
+<h3 class="vo-faq-group">Wework &amp; Address Considerations</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">Does having a WeWork address make any difference when it comes to MCA, GST or bank verification?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>The main benefit of WeWork is not a separate government approval process.</p><p>The key differences are:</p><ul><li>Premium brand</li><li>Faster documentation</li><li>Better workspace infrastructure</li><li>Meeting room access, where available</li><li>Higher price</li></ul><p>Both WeWork and non-WeWork locations need to meet the required compliance standards.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Why should I pay extra for a WeWork address if I don't actually need to work from the office?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>If you do not need the workspace or premium brand, you may not need to pay extra for WeWork.</p><p>Choose WeWork mainly if:</p><p>You need faster documentation.</p><p>Brand image is important.</p><p>You want access to premium workspace facilities.</p><p>If cost is the main priority and there is no urgent timeline, a non-WeWork location may be suitable.</p></div></details>
+<h3 class="vo-faq-group">Alternate Use Cases</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">Can I use the Virtual Office address to receive courier, parcels and business deliveries?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Yes.</p><p>Depending on the location and plan:</p><p>Mail and courier can be received at the space.</p><p>You can be notified through email or WhatsApp.</p><p>You can collect the items from the location.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Can I use the space for GMB (Google My Business) verification and bank account verification?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Yes, the address can be used for these purposes, subject to the requirements of the respective platform or bank.</p><p>For bank verification, documents such as:</p><ul><li>Address certificate</li><li>Utility bill</li><li>Lease copy</li></ul></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Can I use your address to change the registered office address of my existing company?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Yes.</p><p>The general process is:</p><p>Use the new myHQ address.</p><p>File the registered office change with MCA.</p><p>Use the NOC and agreement provided by myHQ.</p><p>Complete the required MCA process.</p><p>The final timeline depends on MCA processing.</p></div></details>
+<h3 class="vo-faq-group">Gst Verification &amp; Officer Visits</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">What happens if a GST officer makes a surprise visit to the location?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>myHQ's on-ground team can support the verification.</p><p>The process may include:</p><p>Receiving the GST officer.</p><p>Confirming that the address is registered.</p><p>Informing the customer about the visit.</p><p>Supporting the verification process.</p><p>The objective is to make sure the officer can verify the physical address and required information.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Do I personally need to be present during GST verification?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Usually, you do not need to be physically present.</p><p>The GST officer generally verifies the address and business-related documents.</p><p>However, if the officer specifically asks for you:</p><p>You have to be there or An authorized representative may be present.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">What happens if the GST officer asks for an authorised person and I am not available?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>You can arrange an authorised representative,The representative should have the required authorisation.</p><p>It is recommended that the representative understands the basic business details before the visit.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">What is your success rate for customers getting GST approval on the first attempt?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>The guide states a 95%+ first-attempt success rate across 10,000+ registrations.</p><p>Rejections may happen because of:</p><ul><li>Incorrect application details</li><li>Incorrect business category</li><li>Incomplete information</li><li>Document-related issues</li></ul><p>Address-related issues are supported by myHQ as per the applicable support and refund policy.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Have any of your customers faced rejection during GST verification?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Yes. The guide states that around 5% may face rejection on the first attempt.</p><p>The reasons mentioned include:</p><ul><li>Application errors</li><li>Documentation issues</li><li>Government policy changes</li></ul><p>myHQ provides support for re-application and document-related issues as per the applicable policy.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">You are saying my GST can be completed quickly, but if the application gets rejected after I have already paid you, why should I believe that myHQ's process is any better than a cheaper provider's?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>The guide highlights the following:</p><p>95%+ first-attempt success rate.</p><p>Support for rejection cases.</p><p>Refund consideration in specific documentation-related rejection cases.</p><p>Transparent pricing.</p><p>Verified spaces and documentation.</p><p>The key point is that myHQ provides support even if a problem occurs instead of ending the relationship after documents are delivered.</p></div></details>
+<h3 class="vo-faq-group">Timeline &amp; Competition</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">Another provider is promising me GST registration within 1 day. If you cannot give me the same timeline, why should I wait for myHQ when speed is critical for my business?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>There is a difference between documentation speed and government approval speed.</p><p>A provider may be able to provide documents quickly, but final GST approval depends on the government.</p><p>The process mentioned is:</p><p>KYC</p><p>Documentation</p><ul><li>CA filing</li><li>Government processing</li></ul><p>For urgent requirements, WeWork can provide faster documentation. And we can aim for 1 day GST through the section 14A.</p><p>Government approval timelines are outside myHQ's control.</p></div></details>
+<h3 class="vo-faq-group">Hidden Costs &amp; Transparency</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">Are there any charges, conditions, renewals, government fees or operational costs that I should know about now but that haven't been included in the price you've shown me?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Main charges:</p><ul><li>Base plan price</li><li>Documentation charges</li><li>18% GST</li><li>Payment gateway charges for online payments</li></ul><p>Additional charges, if required:</p><p>Notarisation</p><ul><li>Permanent signage</li><li>Meeting rooms</li><li>Day passes</li><li>Government filing fees handled by the CA/customer</li></ul><p>Multi-year plans may offer 15–20% savings.</p><p>All applicable charges should be communicated before payment.</p></div></details>
+<h3 class="vo-faq-group">Trust &amp; Worst Case Scenarios</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">You're showing me the best-case experience, but tell me about the worst-case situation a customer can realistically face after purchasing this service—and how myHQ handles it.</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><ul><li>1. GST rejection</li></ul><p>myHQ supports the customer with:</p><ul><li>Additional documents</li><li>Response preparation</li><li>2. Location changes</li></ul><p>If a location becomes unavailable, myHQ can arrange an alternative location and support the address transition.</p><ul><li>3. Physical GST inspection</li></ul><p>The on-ground team can coordinate with the GST officer and the customer.</p><ul><li>4. Documentation delay</li></ul><p>The issue can be escalated to the space partner for faster processing.</p><ul><li>5. Cancellation</li></ul><p>If cancellation happens before the applicable agreement stage, refund may be possible subject to the refund policy.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">Have any of your customers faced rejection during GST verification?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Yes.</p><p>around 1-2% may face first-attempt rejection.</p><p>myHQ supports:</p><ul><li>Additional documentation</li><li>Issue resolution</li><li>Second-attempt support</li></ul><p>Refund consideration may apply in specific cases involving more than 2 rejections.</p></div></details>
+<h3 class="vo-faq-group">Location Stability &amp; Exit Strategy</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">What happens to my subscription if the address becomes unavailable? Will I get a refund or compensation?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>If a location becomes unavailable, myHQ can arrange an alternative address.</p><p>The process may include:</p><ul><li>New address</li><li>New documentation</li><li>Required MCA/GST updates</li><li>Migration support</li></ul><p>If the replacement is in the same tier, the guide states that there is no additional charge.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">What happens to the Virtual Office location I have chosen shuts down or closes in the future?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>If the location closes:</p><p>myHQ arranges an alternative address.</p><p>The new documents are prepared.</p><p>The address change process is supported.</p><p>The transition is handled with the aim of maintaining continuity.</p><p>The replacement is preferably provided in the same city.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">How quickly can you arrange an alternative address if my current location stops operating?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>You will be informed when a risk is identified.</p><p>Alternative locations will be identified.</p><p>Full migration can take around 2–3 weeks.</p><p>The target is to arrange the alternative address within 30 days.</p><p>The exact timeline depends on the situation and available locations.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">What guarantee do I have that my registration and business address will remain supported if the location changes in the future?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Support for the registered address.</p><p>Alternative location if the current location becomes unavailable.</p><p>Support during the transition.</p><p>Continued support through email and other channels.</p><p>Multi-year pricing options where applicable.</p><p>The government registration itself remains subject to the applicable government rules.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">If I take this today and six months later I realize the service isn't adding enough value to my business, what exactly makes it easy for me to exit?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Before the applicable agreement is signed, cancellation/refund may be possible subject to the refund policy.</p><p>After the agreement is signed, cancellation is generally not available.</p><p>If you want to move to another provider, you may need to follow the required address-release and change process.</p><p>The best approach is to clearly understand your requirements before purchasing.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">What if my GST gets approved today but six months later there is a compliance issue related to the registered address? Will myHQ still support me, or does your responsibility end once the registration is approved?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>If the plan is still active and the issue is related to the address, myHQ can provide support.</p><p>However:</p><p>Ongoing GST compliance is handled by your CA/accountant.</p><p>Government filings are handled by the customer/CA.</p><p>Mail handling and operational support depend on an active plan.</p><p>Keeping the plan active helps maintain access to the support and address services.</p></div></details>
+<h3 class="vo-faq-group">Scalability &amp; Growth</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">My business may expand into multiple states next year. If I start with one Virtual Office today, how easily can I scale the same setup to multiple locations without having to start the entire process from scratch?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>You can add Virtual Office locations as your business expands.</p><p>For example:</p><p>Year 1:</p><p>Company registered in Delhi.</p><p>GST registered in Delhi.</p><p>Year 2:</p><p>Business expands to Mumbai.</p><p>Purchase a GST Registration Plan in Mumbai.</p><p>Year 3:</p><p>Business expands to Bengaluru or Chennai.</p><p>Purchase GST Registration Plans in those states as required.</p><p>Each state will have its own GST registration and GSTIN.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">If my business becomes significantly more successful after I register using this address, does anything about my subscription, documentation or usage change? Are there any thresholds or situations where this plan stops being sufficient?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Business growth does not automatically make the Virtual Office address invalid.</p><p>However, your requirements may change as the business grows.</p><p>For example:</p><p>You may need a physical office.</p><p>You may want additional locations.</p><p>You may need GST registrations in other states.</p><p>You may prefer a premium location.</p><p>The appropriate plan can be added or upgraded based on your business requirements.</p></div></details>
+<h3 class="vo-faq-group">Commitment &amp; Flexibility</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">Why is the minimum commitment 11 months? Can I take the service for just three or six months?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>The reasons mentioned are:</p><ul><li>Address stability</li><li>Registration requirements</li><li>Administrative requirements</li><li>Verification and onboarding costs</li></ul><p>Other options may include:</p><ul><li>Multi-year plans</li><li>Upgrading the plan later</li></ul><p>Cancellation before the applicable agreement stage, subject to the refund policy</p></div></details>
+<h3 class="vo-faq-group">Brand &amp; Competitive Comparison</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">The competitor I spoke to seems more responsive and offers better customer support. Why should I still choose myHQ?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Responsiveness is important, but you should compare the complete support system.</p><p>Check:</p><ul><li>Documentation quality</li><li>Success rate</li><li>Rejection support</li><li>Address stability</li><li>Compliance verification</li><li>Response time</li><li>Support channels</li></ul><p>The guide recommends comparing actual service metrics rather than only the customer's first impression.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">I have purchased a Virtual Office from a different brand earlier. I hardly care about the brand, so why should I pay more?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>If your existing provider is working well and meeting your requirements, there may not be a need to switch only because of the brand.</p><p>Consider switching if you are facing issues such as:</p><ul><li>Poor documentation</li><li>Lack of support</li><li>Address problems</li><li>GST rejection</li><li>Poor post-sales service</li></ul><p>myHQ's key differentiators are the verification process, documentation, on-ground presence, and post-sales support.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">How do you justify the price compared with local providers and other bigger competitors?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>Pricing varies based on:</p><p>Location</p><p>Documentation</p><p>Verification</p><p>Brand</p><p>Support</p><p>Facilities</p><p>The guide positions myHQ as a mid-range provider with verified spaces and support.</p><p>When comparing prices, compare the complete service rather than only the base price.</p></div></details>
+<details class="vo-faq"><summary><span class="vo-faq-q">If another provider is offering a cheaper solution, why should I choose myHQ when the final government registration is still subject to approval by the authorities?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>The final government decision is outside the control of any provider.</p><p>What the provider can control is:</p><p>Quality of the address.</p><p>Quality of the documents.</p><p>Verification of the space.</p><p>Speed of documentation.</p><p>Support if the government raises a query.</p><p>myHQ's value is in providing the required foundation and support for the registration process.</p></div></details>
+<h3 class="vo-faq-group">Authority Acceptance &amp; Guarantees</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">You are telling me that your locations are suitable for GST and MCA purposes. Can you actually guarantee that the specific location I am buying today will be accepted by the respective authority, or is the final decision completely out of your hands?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>There is an important difference between what myHQ can control and what the government controls.</p><p>myHQ can provide:</p><ul><li>GSTIN-verified location</li><li>Valid lease documentation where applicable</li><li>Ownership documents</li><li>Physical operational location</li><li>Required supporting documents</li></ul><p>myHQ cannot control:</p><ul><li>Final government approval</li><li>Government policy changes</li><li>Customer-side application errors</li><li>Specific government queries</li></ul><p>The final approval decision belongs to the relevant authority.</p></div></details>
+<h3 class="vo-faq-group">Third Party Advice &amp; Credibility</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">If my business partner, director, friend or CA tells me that they would advise differently about going ahead with myHQ, whose advice should I trust—and how can you prove that your recommendation is actually the right one for my business?</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>It is useful to take advice from multiple sources, especially your CA.</p><p>Ask your CA to verify:</p><p>Whether a Virtual Office is suitable for your business.</p><p>Whether the documents meet the required standards.</p><p>Whether you need company registration or only GST.</p><p>What filing process should be followed.</p><p>myHQ can provide:</p><ul><li>Sample documents</li><li>Address information</li><li>Compliance documentation</li><li>Process support</li></ul><p>The final decision should be based on your business requirement and professional advice.</p></div></details>
+<h3 class="vo-faq-group">Competitor Consideration &amp; Decision Timeline</h3>
+<details class="vo-faq"><summary><span class="vo-faq-q">Sounds great. Let me go through a few competitors. Anyway, I need to buy a Virtual Office within the next month.</span><i class="fa-solid fa-chevron-down"></i></summary><div class="vo-faq-a"><p>That is reasonable. Before making the decision, compare:</p><p>Price</p><p>Documents</p><ul><li>Location verification</li></ul><p>Timeline</p><p>Support</p><ul><li>Rejection policy</li><li>Refund policy</li></ul><p>You can also share the sample documents with your CA for review.</p><p>The objective is to compare the complete offering and then choose the option that meets your requirement.</p><ul><li>MASTER REFERENCE FAQs</li></ul><p>FAQ SET 1: What is a Virtual Office?</p><p>What is a Virtual Office?</p><p>A Virtual Office provides a professional commercial address and related services without requiring you to rent a full-time physical office.</p><p>It can be used for business correspondence, registration requirements, and other business needs depending on the plan.</p><ul><li>Three Plans myHQ Offers</li></ul><p>Company Registration Plan: Company registration + GST registration + mailing</p><ul><li>GST Registration Plan: GST registration + mailing</li><li>Business Address Plan: Official correspondence only</li><li>Plan Eligibility Quick Reference</li></ul><p>GST Plan for company registration? No.</p><p>Business Address Plan for GST? No.</p><p>Company Registration Plan for GST? Yes.</p><p>Is Virtual Office Legal in India?</p><p>Yes. The guide states that Virtual Offices are legally recognised in India and can be used for GST and company registration when the required compliance conditions are met.</p><ul><li>Cities Covered</li></ul><p>Delhi NCR, Mumbai, Bengaluru, Hyderabad, Chennai, Pune, Kolkata, Ahmedabad, Jaipur, and other locations, with 250+ partner workspace locations across India.</p><ul><li>FAQ SET 2: Documents &amp; KYC</li><li>Documents Provided by myHQ</li><li>Space-Client Agreement</li></ul><p>NOC</p><ul><li>Utility Bill</li><li>Master Agreement for leased spaces</li><li>Master NOC for leased spaces</li><li>Property Tax Receipt and Board Resolution, where applicable</li><li>Space-Client Agreement</li></ul><p>This is the agreement between the provider and the customer.</p><p>It explains:</p><p>Services</p><ul><li>Payment terms</li></ul><p>Duration</p><ul><li>Address usage</li><li>Other applicable conditions</li><li>NOC vs. Master NOC</li></ul><p>NOC:
+Issued by the space operator to the customer. It allows the customer to use the address for business or registration purposes.</p><p>Master NOC:
+Issued by the property owner to the space operator. It allows the operator to use/sublease the property for Virtual Office purposes.</p><ul><li>Owned vs. Leased Space</li></ul><p>Owned spaces generally provide greater stability because there is no lease expiry risk.</p><p>Leased spaces require:</p><ul><li>Master Agreement</li><li>Master NOC</li><li>Temporary vs. Permanent Signage</li></ul><p>Temporary signage:</p><ul><li>A4-size board</li><li>Company name</li><li>GST number</li><li>Used during GST verification</li><li>Included in the plans as mentioned in the guide</li></ul><p>Permanent signage:</p><ul><li>Dedicated signboard</li><li>Additional cost</li><li>Remains at the location as long as the applicable service continues</li><li>Notarised Documents</li></ul><p>Notarised documents can be provided when required.</p><p>They involve:</p><ul><li>Additional charges</li><li>Additional processing time of around 4–5 business days</li><li>FAQ SET 3: Pricing, Payments &amp; Documentation</li><li>Pricing Structure</li></ul><p>The price generally includes:</p><ul><li>Base plan price</li><li>Documentation charges</li><li>18% GST</li><li>Payment gateway charges for online payments</li></ul><p>Discounts apply only to the base price.</p><ul><li>Why Online Payment is Preferred</li></ul><p>Online payment is processed faster.</p><p>Once payment is confirmed:</p><p>The invoice is marked as paid.</p><p>KYC can begin.</p><p>Documentation can start after KYC approval.</p><p>NEFT/RTGS payments may take 24–48 hours to reflect.</p><ul><li>Minimum Ticket Size</li></ul><p>₹8,500</p><p>No transaction should be closed below this amount.</p><ul><li>Documentation Timeline</li><li>Non-WeWork: 5–7 business days after KYC approval</li><li>WeWork: 1 business day after KYC approval</li><li>Notarisation: Additional 4–5 business days</li><li>Payment Methods</li></ul><p>Online:</p><ul><li>Credit card</li><li>Debit card</li></ul><p>UPI</p><p>Offline:</p><p>NEFT</p><p>RTGS</p><p>IMPS</p><ul><li>FAQ SET 4: GST &amp; Company Registration Specifics</li></ul><p>Who Needs GST Registration?</p><p>GST registration may be required for:</p><ul><li>Businesses crossing the applicable turnover threshold</li><li>Interstate suppliers</li><li>E-commerce operators</li><li>Businesses operating in multiple states</li><li>Businesses that require a GSTIN for compliance</li></ul><p>The exact requirement depends on the business and applicable GST rules.</p><p>myHQ does NOT handle company incorporation.</p><p>myHQ provides the Virtual Office address and required supporting documents.</p><p>The actual MCA filing process is completed by the customer or their CA/CS.</p><ul><li>E-Commerce Business Support</li></ul><p>Yes. E-commerce businesses can use a Virtual Office address for GST registration, subject to their specific GST requirements and the seller verification requirements of the relevant platform.</p><ul><li>FAQ SET 5: Plan-Specific FAQs</li><li>Company Registration Plan</li></ul><p>This is the most comprehensive plan.</p><p>It supports:</p><ul><li>Company registration</li><li>GST registration</li><li>Official correspondence</li><li>Mail handling</li><li>Temporary signage</li></ul><p>It is suitable for new businesses that need company registration and GST support.</p><ul><li>GST Registration Plan</li></ul><p>This plan supports:</p><ul><li>GST registration</li><li>Official correspondence</li><li>Mail handling</li><li>Temporary signage</li></ul><p>It does not support company registration.</p><p>It is suitable for existing companies that need GST registration.</p><ul><li>Business Address Plan</li></ul><p>This plan provides a professional commercial address for:</p><ul><li>Business cards</li></ul><p>Letterheads</p><p>Website</p><ul><li>Google Business Profile</li><li>Official communication</li></ul><p>It does not support company or GST registration.</p><ul><li>FAQ SET 6: Refund &amp; Cancellation</li><li>Standard Refund Rule</li></ul><p>Refunds may be available until the draft agreement is signed and approved by the space partner.</p><p>After the agreement is signed, refunds are generally not available except for specific eligible government rejection cases.</p><ul><li>Refund After Government Rejection</li></ul><p>Refund may be considered if the government rejects the application twice, subject to the applicable conditions.</p><p>The guide mentions:</p><ul><li>Rejection letters submitted within 60 days of payment</li><li>Rejection not caused by customer-side errors</li><li>Internal verification by myHQ</li><li>Refund Deductions</li><li>₹2,000 operational charge</li><li>Payment gateway charges are non-refundable</li><li>Documentation charges are non-refundable</li><li>Refund Process</li></ul><p>Raise a support ticket at:</p><p>supportvo@myhq.in</p><p>Include:</p><ul><li>Reason for refund</li><li>Cancelled cheque</li><li>Supporting documents</li></ul><p>The team verifies the request within 48–72 hours.</p><p>Approved refunds are processed within 21 working days.</p><ul><li>KYC Not Completed Within 30 Days</li></ul><p>If KYC is not completed within 30 days and the customer does not inform myHQ about cancellation, the guide states that no refund is applicable.</p><ul><li>FAQ SET 7: Post-Sales Support &amp; Special Cases</li><li>NRI Purchase</li></ul><p>Yes. NRIs can purchase a Virtual Office for Indian business registration purposes.</p><p>Standard KYC documents are required.</p><p>A passport can be used as identity proof for NRI customers.</p><ul><li>Mail Handling for Out-of-City Clients</li></ul><p>The space receives and stores the mail.</p><p>The customer is informed through:</p><p>Email</p><p>WhatsApp</p><p>The customer can collect the mail personally or arrange a third-party courier at their own cost.</p><ul><li>Sample Documents Before Purchase</li></ul><p>Yes.</p><p>Sample documents can be reviewed before purchase.</p><p>Customers are encouraged to share the samples with their CA for verification before making payment.</p><ul><li>Multiple Cities</li></ul><p>Yes.</p><p>A customer can purchase Virtual Office plans in multiple cities.</p><p>Typically, each city and registration requirement may require a separate plan.</p><p>This is commonly used by businesses expanding into multiple states.</p><ul><li>Plan Transferability</li></ul><p>No.</p><p>The Virtual Office plan is issued to the specific company and authorised signatory mentioned in the agreement.</p><p>It cannot be transferred to another entity.</p><ul><li>Post-Sales Support Contact</li></ul><p>supportvo@myhq.in</p></div></details>
+</section>
+    </div>
+  </div>
+</div>
+
+<style>
+/* ── Chapter 8 objection accordion ── tokens only, no new values ── */
+.vo-faq-group { font-size: 12px; font-weight: 800; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--muted); margin: 28px 0 10px; }
+.vo-faq { border: 1px solid var(--hairline); border-radius: var(--radius);
+  margin-bottom: 8px; background: var(--white); }
+.vo-faq summary { cursor: pointer; padding: 13px 16px; display: flex;
+  align-items: flex-start; justify-content: space-between; gap: 14px;
+  font-size: 14.5px; font-weight: 600; color: var(--ink); line-height: 1.45;
+  list-style: none; transition: color var(--transition); }
+.vo-faq summary::-webkit-details-marker { display: none; }
+.vo-faq summary:hover { color: var(--blue); }
+.vo-faq summary i { font-size: 11px; color: var(--muted); margin-top: 5px;
+  flex-shrink: 0; transition: transform var(--transition); }
+.vo-faq[open] summary { color: var(--blue); }
+.vo-faq[open] summary i { transform: rotate(180deg); }
+.vo-faq-a { padding: 0 16px 15px; border-top: 1px solid var(--hairline);
+  padding-top: 13px; }
+.vo-faq-a p { font-size: 14px; line-height: 1.65; color: var(--body);
+  margin: 0 0 9px; }
+.vo-faq-a p:last-child { margin-bottom: 0; }
+.vo-faq-a ul { margin: 0 0 9px; padding-left: 18px; }
+.vo-faq-a li { font-size: 14px; line-height: 1.6; color: var(--body);
+  margin-bottom: 3px; }
+.vo-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 26px; }
+.vo-chip { border: 1px solid var(--hairline); border-radius: 20px;
+  padding: 7px 14px; font-size: 12.5px; font-weight: 600; color: var(--body); }
+.vo-chip-n { color: var(--blue); font-weight: 800; margin-left: 5px; }
+.vo-lead { font-size: 16px; line-height: 1.6; color: var(--body); max-width: 60ch; }
+.vo-note { border-left: 2px solid var(--blue); padding: 11px 0 11px 15px;
+  font-size: 14px; line-height: 1.6; color: var(--body); max-width: 64ch; }
+.vo-note strong { color: var(--ink); }
+</style>
+
+<script>
+/* ── FIREBASE AUTH GATE ── */
+(function() {
+  var CHAPTER_ID = 'vch8';
+  window.firebaseAuth.onAuthStateChanged(function(user) {
+    if (!user) { window.location.href = 'landing.html'; return; }
+    var db = window.firebaseDB;
+    db.collection('users').doc(user.uid).get().then(function(snap) {
+      var data = snap.exists ? snap.data() : {};
+      var unlocked = (data.unlockedChapters && data.unlockedChapters.beginner) || [];
+      // VO track is in preview - master admin only. Keep this in
+      // step with VO_PREVIEW_ONLY in hub.html.
+      var VO_PREVIEW_ONLY = true;
+      if (VO_PREVIEW_ONLY && !(data.masterAdmin || data.voPreview)) {
+        unlocked = [];
+      }
+      if (unlocked.indexOf(CHAPTER_ID) === -1) {
+        document.getElementById('slide-mode').style.display = 'none';
+        var rm = document.getElementById('read-mode');
+        if (rm) rm.style.display = 'none';
+        var lock = document.createElement('div');
+        lock.style.cssText = 'position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;font-family:Manrope,sans-serif;z-index:9999;';
+        lock.innerHTML = '<div style="font-size:2.5rem;">🔒</div><div style="font-size:1.2rem;font-weight:800;color:#1E22AA;">This chapter is locked.</div><div style="font-size:14px;color:#7B7FE8;max-width:340px;text-align:center;">Ask your admin to unlock it.</div><a href="hub.html" style="margin-top:8px;font-size:13px;font-weight:700;color:#1E22AA;text-decoration:underline;">← Back to Hub</a>';
+        document.body.appendChild(lock);
+        return;
+      }
+      db.collection('content').doc(CHAPTER_ID).get().then(function(cSnap) {
+        if (!cSnap.exists) return;
+        var cData = cSnap.data();
+        document.querySelectorAll('[data-editable]').forEach(function(el) {
+          var key = el.getAttribute('data-editable');
+          var val = cData[key];
+          if (val === undefined) return;
+          el.innerHTML = val;
+        });
+      });
+
+    });
+  });
+})();
+
+/* ── MODE TOGGLE ── */
+let currentMode = 'slide';
+
+function setMode(mode) {
+  currentMode = mode;
+  const isSlide = mode === 'slide';
+  document.getElementById('slide-mode').style.display = isSlide ? '' : 'none';
+  const readEl = document.getElementById('read-mode');
+  readEl.classList.toggle('hidden', isSlide);
+  document.body.style.overflow = isSlide ? 'hidden' : 'auto';
+  document.getElementById('screenCounter').style.display = isSlide ? '' : 'none';
+  document.getElementById('dotNav').style.display = isSlide ? '' : 'none';
+  const keyHintEl = document.getElementById('keyHint'); if (keyHintEl) keyHintEl.style.display = isSlide ? '' : 'none';
+  const chapterLabelEl = document.getElementById('chapterLabel');
+  if (chapterLabelEl) chapterLabelEl.style.display = isSlide ? '' : 'none';
+  const btn = document.getElementById('btnRead');
+  if (isSlide) {
+    btn.innerHTML = '<i class="fa-solid fa-book-open"></i>&nbsp;Read Full Chapter';
+    btn.onclick = function() { setMode('read'); };
+  } else {
+    btn.innerHTML = '<i class="fa-solid fa-display"></i>&nbsp;Back to Slides';
+    btn.onclick = function() { setMode('slide'); };
+    window.scrollTo(0, 0);
+  }
+}
+
+/* ── SLIDE ENGINE ── */
+const TOTAL = 5;
+let current = 0;
+let animating = false;
+
+function buildDots() {
+  const nav = document.getElementById('dotNav');
+  nav.innerHTML = '';
+  for (let i = 0; i < TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    nav.appendChild(d);
+  }
+}
+
+function updateCounter() {
+  document.getElementById('screenCounter').textContent = `${current + 1} / ${TOTAL}`;
+  const chap = document.getElementById('chapterLabel');
+  if (chap) chap.style.display = current === 0 ? '' : 'none';
+}
+
+// Baseline device-pixel-ratio captured at first paint (100% zoom reference).
+const BASE_DPR = window.devicePixelRatio || 1;
+
+function scaleSlides() {
+  const REF_W = 1440;
+  const REF_H = 900;
+  const wrap = document.getElementById('slides');
+  if (!wrap) return;
+  const topbar = document.querySelector('.topbar');
+  const topbarH = topbar ? topbar.offsetHeight : 52;
+  const vw = document.documentElement.clientWidth;
+  const vh = document.documentElement.clientHeight - topbarH;
+
+  // Browser zoom factor: when the user zooms in (Cmd +), devicePixelRatio
+  // rises above the baseline. clientWidth shrinks at the same time, so the
+  // raw fit-scale would shrink the slide (content "zooms out"). Multiplying
+  // the fit-scale by the zoom factor makes the slide grow with the browser
+  // zoom — exactly like the natively-zoomed topbar.
+  const zoom = (window.devicePixelRatio || 1) / BASE_DPR;
+  const fit = Math.min(vw / REF_W, vh / REF_H);
+  const scale = fit * zoom;
+
+  const scaledW = REF_W * scale;
+  const scaledH = REF_H * scale;
+  // Center while the scaled slide still fits; once it grows past the viewport
+  // (zoomed in), clamp to 0 so the top-left stays anchored and the overflow
+  // extends down/right where the body can scroll to it.
+  const offsetX = Math.max(0, Math.round((vw - scaledW) / 2));
+  const offsetY = Math.max(0, Math.round((vh - scaledH) / 2));
+  wrap.style.width = REF_W + 'px';
+  wrap.style.height = REF_H + 'px';
+  wrap.style.left = offsetX + 'px';
+  wrap.style.top = (topbarH + offsetY) + 'px';
+  wrap.style.right = 'auto';
+  wrap.style.bottom = 'auto';
+  wrap.style.transform = `scale(${scale})`;
+  wrap.style.transformOrigin = 'top left';
+  // Grow the document so the body can scroll to overflowing (zoomed-in) slide.
+  document.body.style.minHeight = (topbarH + offsetY + scaledH) + 'px';
+  document.body.style.minWidth = (offsetX + scaledW) + 'px';
+}
+window.addEventListener('resize', scaleSlides);
+
+// Re-scale when browser zoom changes (devicePixelRatio changes on zoom).
+(function watchZoom() {
+  const mq = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+  mq.addEventListener('change', function() { scaleSlides(); watchZoom(); });
+})();
+
+function goTo(index) {
+  if (animating || index === current || index < 0 || index >= TOTAL) return;
+  animating = true;
+  const screens = document.querySelectorAll('.screen');
+  const dots = document.querySelectorAll('.dot');
+  const prev = current;
+  current = index;
+  screens[prev].classList.add('exit-up');
+  screens[prev].classList.remove('active');
+  setTimeout(() => screens[prev].classList.remove('exit-up'), 500);
+  screens[current].classList.add('active');
+  dots[prev].classList.remove('active');
+  dots[current].classList.add('active');
+  updateCounter();
+  const keyHint = document.getElementById('keyHint'); if (keyHint) keyHint.classList.add('hidden');
+  setTimeout(() => {
+    animating = false;
+    if (typeof redrawAmbitionChart === 'function') redrawAmbitionChart();
+  }, 520);
+}
+
+function next() { goTo(current + 1); }
+function prev() { goTo(current - 1); }
+
+
+document.addEventListener('keydown', e => {
+  if (currentMode !== 'slide') return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   prev();
+});
+
+/* ── TIMELINE ACCORDION ── */
+
+/* ── DYK ACCORDION ── */
+
+/* ── TOC SCROLL SPY ── */
+const tocLinks = document.querySelectorAll('.toc-link');
+const readSections = document.querySelectorAll('.section[id], .r-section[id]');
+const tocObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      tocLinks.forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`.toc-link[data-s="${entry.target.id}"]`);
+      if (a) a.classList.add('active');
+    }
+  });
+}, { rootMargin: '-15% 0px -75% 0px', threshold: 0 });
+readSections.forEach(s => tocObserver.observe(s));
+
+/* ── INIT ── */
+window.addEventListener('DOMContentLoaded', () => {
+  scaleSlides();
+  buildDots();
+  document.querySelectorAll('.screen')[0].classList.add('active');
+  updateCounter();
+});
+
+
+/* ── ASSESSMENT ── */
+const SHEET_URL_CH2 = 'https://script.google.com/macros/s/AKfycbwX0Z5vx6DSwdwZwK26pKZL3V3U9XwEyWgPa9Ek_cFEH1_tpULnWNcn7RlgE-wT8M9M/exec';
+
+const MIN_WORDS = 50;
+
+
+
+
+
+
+
+// ── Ambition 2030 Chart ──────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+  buildDots();
+  updateCounter();
+  scaleSlides();
+});
+
+</script>
+</body>
+</html>
+

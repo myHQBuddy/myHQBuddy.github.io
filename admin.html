@@ -1459,10 +1459,15 @@ const COURSES = {
     {
       section: 'VO Chapters',
       chapters: [
-        { id: 'vch0', name: 'VO Chapter 1 · Virtual Office Foundations', desc: 'Culture, product, market, sales standards and the fulfilment flow', available: true },
-        { id: 'vch1', name: 'VO Chapter 2 · VO Sales Pitch', desc: 'The eleven-stage call framework, plan paths and objection handling', available: true },
-        { id: 'vch2', name: 'VO Chapter 3 · Sample Recordings', desc: 'Real calls from the floor, mapped back onto the framework', available: true },
-        { id: 'vo4', name: 'VO Chapter 4', desc: '', available: false }
+        { id: 'vch1', name: 'VO Chapter 1 · Virtual Office DNA', desc: 'Culture, conduct and the six pillars', available: true },
+        { id: 'vch2', name: 'VO Chapter 2 · Virtual Office Basics', desc: 'What a Virtual Office is, who buys it, market position', available: true },
+        { id: 'vch3', name: 'VO Chapter 3 · Sales Conduct & Standards', desc: 'Six standards, zero tolerance, urgency vs pressure', available: true },
+        { id: 'vch4', name: 'VO Chapter 4 · The Product', desc: 'Registration concepts and the document chain', available: true },
+        { id: 'vch5', name: 'VO Chapter 5 · The Process', desc: 'Lead to payment, fulfilment, KYC, verification, support', available: true },
+        { id: 'vch6', name: 'VO Chapter 6 · VO Sales Pitch', desc: 'The eleven-stage call framework and plan paths', available: true },
+        { id: 'vch7', name: 'VO Chapter 7 · Admin, CRM & Tools', desc: 'Zoho, proposals, payment links and payout mandate (content in preparation)', available: true },
+        { id: 'vch8', name: 'VO Chapter 8 · FAQs & Objection Handling', desc: '91 objections in three tiers, with answers', available: true },
+        { id: 'vch9', name: 'VO Chapter 9 · Mock Calls', desc: 'Real calls from the floor, mapped onto the framework', available: true }
       ]
     },
     {
@@ -1727,7 +1732,7 @@ function renderChapterList() {
   // Without this the portal reports a VO chapter as Unlocked from a stale
   // unlockedChapters entry while the live page refuses entry.
   const VO_PREVIEW_ONLY = true;
-  const voIds = ['vch0', 'vch1', 'vch2'];
+  const voIds = ['vch1', 'vch2', 'vch3', 'vch4', 'vch5', 'vch6', 'vch7', 'vch8', 'vch9'];
   const voBlocked = VO_PREVIEW_ONLY
     && !(currentUserDoc?.masterAdmin || currentUserDoc?.voPreview);
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VO Chapter 3: Sample Recordings | myHQ</title>
+<title>VO Chapter 9: Mock Calls | myHQ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com">
@@ -173,7 +173,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
     <span class="topbar-logo">myHQ</span>
     <span class="topbar-chapter" id="chapterLabel">VO &middot; Chapter 3</span>
   </div>
-  <div class="topbar-center">Sample Recordings</div>
+  <div class="topbar-center">Mock Calls</div>
   <div class="topbar-right">
     <a class="hub-btn" href="hub.html" title="Back to Hub"><i class="fa-solid fa-house"></i></a>
     <span class="screen-counter" id="screenCounter">1 / 3</span>
@@ -233,7 +233,7 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 <script>
 /* FIREBASE AUTH GATE - matches VO Chapter 1 and 2. */
 (function() {
-  var CHAPTER_ID = 'vch2';
+  var CHAPTER_ID = 'vch9';
   window.firebaseAuth.onAuthStateChanged(function(user) {
     if (!user) { window.location.href = 'landing.html'; return; }
     window.firebaseDB.collection('users').doc(user.uid).get().then(function(snap) {
