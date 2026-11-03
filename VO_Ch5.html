@@ -866,7 +866,11 @@ body { font-family: var(--sans); background: var(--white); color: var(--ink); ov
 <a href="#r-fulfilment" class="toc-link" data-s="r-fulfilment">02 &middot; Fulfilment and KYC</a>
 <a href="#r-verification" class="toc-link" data-s="r-verification">03 &middot; Government verification</a>
 <a href="#r-support" class="toc-link" data-s="r-support">04 &middot; Support and escalation</a>
-<a href="#r-assess" class="toc-link" data-s="r-assess">Assessment</a>
+<div class="toc-assess-head">Assessment</div>
+<a href="#r-assess" class="toc-link toc-sub on" data-q="cr" data-s="r-assess" onclick="return gotoAssess('cr');">Company Registration<span class="toc-n">50</span></a>
+<a href="#r-assess" class="toc-link toc-sub" data-q="gst" data-s="r-assess" onclick="return gotoAssess('gst');">GST Registration<span class="toc-n">50</span></a>
+<a href="#r-assess" class="toc-link toc-sub" data-q="ba" data-s="r-assess" onclick="return gotoAssess('ba');">Business Address<span class="toc-n">50</span></a>
+<a href="#r-assess" class="toc-link toc-sub" data-q="scenarios" data-s="r-assess" onclick="return gotoAssess('scenarios');">Scenarios<span class="toc-n">30</span></a>
     </aside>
     <div class="r-content">
 <section class="section" id="r-intro">
@@ -1526,6 +1530,32 @@ function showTab(scope, key) {
   root.querySelectorAll('.vo-tab').forEach(function(t) {
     t.classList.toggle('on', t.getAttribute('data-k') === key);
   });
+}
+</script>
+
+
+<style>
+/* -- assessment entries in the chapter sidebar -- */
+.toc-assess-head { font-size: 10px; font-weight: 800; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--muted); margin: 18px 0 6px;
+  padding-left: 14px; }
+.toc-link.toc-sub { padding-left: 26px; font-size: 13px; position: relative; }
+.toc-link.toc-sub::before { content: ""; position: absolute; left: 14px;
+  top: 50%; width: 5px; height: 1px; background: var(--hairline); }
+.toc-link.toc-sub .toc-n { font-size: 10.5px; color: var(--muted);
+  margin-left: 6px; }
+.toc-link.toc-sub.on { color: var(--blue); font-weight: 700; }
+</style>
+<script>
+/* Sidebar and tab bar are two views of the same choice; keep them in step. */
+function gotoAssess(key) {
+  showTab('r-assess', key);
+  document.querySelectorAll('.toc-link.toc-sub').forEach(function(a) {
+    a.classList.toggle('on', a.getAttribute('data-q') === key);
+  });
+  var sec = document.getElementById('r-assess');
+  if (sec) sec.scrollIntoView({behavior: 'smooth', block: 'start'});
+  return false;
 }
 </script>
 
