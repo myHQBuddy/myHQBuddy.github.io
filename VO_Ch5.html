@@ -1338,7 +1338,12 @@ const tocObserver = new IntersectionObserver(entries => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       tocLinks.forEach(l => l.classList.remove('active'));
-      const a = document.querySelector(`.toc-link[data-s="${entry.target.id}"]`);
+      // Assessment sub-links all share data-s="r-assess", so a plain
+      // querySelector would always return the first one and fight the
+      // click handler. Skip them; which quiz is current is a click, not
+      // a scroll position.
+      const a = document.querySelector(
+        `.toc-link[data-s="${entry.target.id}"]:not(.toc-sub)`);
       if (a) a.classList.add('active');
     }
   });
